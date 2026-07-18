@@ -24,9 +24,10 @@ import time
 import urllib.error
 import urllib.request
 
-# nosec B402 -- FTP_TLS (below) is the encrypted variant; bandit's blacklist rule flags any
-# ftplib import without distinguishing FTP from FTP_TLS. See prot_p() for the encrypted-
-# data-channel half of the guarantee.
+# FTP_TLS is the encrypted variant; bandit's blacklist rule flags any ftplib import without
+# distinguishing FTP from FTP_TLS. See prot_p() for the encrypted-data-channel half of the
+# guarantee. The suppression marker below is bare and trailing, deliberately alone on its
+# line's comment, since bandit parses text following that marker as suppression test IDs.
 from ftplib import FTP_TLS, all_errors  # nosec B402
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -133,8 +134,8 @@ def solr_facet(
             "Accept": "application/solr+json",
         },
     )
-    # nosec B310 -- base_url is asserted https:// above, closing the file:/custom-scheme risk
-    # this rule warns about.
+    # Rationale for the nosec below: base_url is asserted https:// above, closing the
+    # file:/custom-scheme risk this rule warns about.
     with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
         payload: dict[str, Any] = json.load(response)
     return payload
@@ -323,10 +324,13 @@ def cmd_crosscheck(args: argparse.Namespace) -> int:
         evidence_payload = solr_facet(
             "genome_amr", evidence_vocabulary_rql(args.taxon_id), timeout=args.timeout
         )
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        remote_evidence = _parse_facet_map(evidence_payload, "evidence")
+    except (urllib.error.URLError, TimeoutError, OSError, AttributeError, TypeError) as exc:
+        # AttributeError/TypeError cover a BV-BRC response-shape drift in _parse_facet_map
+        # (e.g. facet_fields ever reverting to Solr's flat-list default) -- fail with a clean
+        # message here rather than an uncaught traceback from a dev cross-check tool.
         print(f"\nSolr evidence-vocabulary cross-check failed: {type(exc).__name__}: {exc}")
         return 0
-    remote_evidence = _parse_facet_map(evidence_payload, "evidence")
     print("\nSolr evidence vocabulary (ALL rows for this taxon, pre-filter):")
     for value, count in sorted(remote_evidence.items(), key=lambda kv: -kv[1]):
         print(f"  {value}: {count}")

@@ -62,6 +62,16 @@ SIR_CLASSES: Final[tuple[str, ...]] = (
 _SUSCEPTIBLE_SIDE: Final[frozenset[str]] = frozenset({"Susceptible", "Susceptible-dose dependent"})
 _RESISTANT_SIDE: Final[frozenset[str]] = frozenset({"Resistant", "Nonsusceptible"})
 
+# Every SIR class except Intermediate MUST be assigned to exactly one side above, or
+# resolve_duplicate_labels silently lets a real contradiction through undetected (the
+# exact bug found and re-found across three review rounds). An `if`/`raise` (not
+# `assert`) so this guard survives even under `python -O`, which strips asserts.
+if set(SIR_CLASSES) - {"Intermediate"} != _SUSCEPTIBLE_SIDE | _RESISTANT_SIDE:
+    raise AssertionError(
+        "a SIR class is missing from _SUSCEPTIBLE_SIDE/_RESISTANT_SIDE -- "
+        "see resolve_duplicate_labels"
+    )
+
 #: Columns the raw PATRIC_genome_AMR flat file must have. A missing column signals a
 #: BV-BRC schema change or the wrong filename (PATRIC_genome_AMR.txt vs
 #: PATRIC_genomes_AMR.txt — see Documentation/research-findings/bv-brc-data-access.md).

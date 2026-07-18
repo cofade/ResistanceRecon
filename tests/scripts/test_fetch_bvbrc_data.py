@@ -84,6 +84,62 @@ def test_parse_facet_map_missing_field_returns_empty() -> None:
     assert fetch_bvbrc_data._parse_facet_map(payload, "evidence") == {}
 
 
+def test_cmd_crosscheck_end_to_end_offline(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Drives the real solr_facet -> _parse_facet_map -> print wiring in
+    cmd_crosscheck, with solr_facet patched so no network call happens -- the gap
+    round 2's fix left uncovered (only _parse_facet_map was tested in isolation)."""
+
+    def fake_solr_facet(
+        collection: str,
+        rql: str,
+        *,
+        base_url: str = fetch_bvbrc_data.SOLR_BASE,
+        timeout: float = 60.0,
+    ) -> dict[str, object]:
+        if "resistant_phenotype" in rql:
+            return {"response": {"numFound": 19}}
+        return {
+            "facet_counts": {
+                "facet_fields": {"evidence": {"Laboratory Method": 19, "Computational Method": 5}}
+            }
+        }
+
+    monkeypatch.setattr(fetch_bvbrc_data, "solr_facet", fake_solr_facet)
+    args = fetch_bvbrc_data.build_parser().parse_args(["crosscheck", "--flatfile", str(FLATFILE)])
+    assert args.func(args) == 0
+
+    printed = capsys.readouterr().out
+    assert "numFound (same filter):" in printed
+    assert "Laboratory Method: 19" in printed
+
+
+def test_cmd_crosscheck_handles_facet_shape_drift_cleanly(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """If BV-BRC ever reverts facet_fields to Solr's default flat-list shape,
+    cmd_crosscheck must fail with a clean message, not an uncaught traceback."""
+
+    def fake_solr_facet(
+        collection: str,
+        rql: str,
+        *,
+        base_url: str = fetch_bvbrc_data.SOLR_BASE,
+        timeout: float = 60.0,
+    ) -> dict[str, object]:
+        if "resistant_phenotype" in rql:
+            return {"response": {"numFound": 19}}
+        return {"facet_counts": {"facet_fields": {"evidence": ["Laboratory Method", 19]}}}
+
+    monkeypatch.setattr(fetch_bvbrc_data, "solr_facet", fake_solr_facet)
+    args = fetch_bvbrc_data.build_parser().parse_args(["crosscheck", "--flatfile", str(FLATFILE)])
+    assert args.func(args) == 0  # degrades gracefully, does not crash
+
+    printed = capsys.readouterr().out
+    assert "cross-check failed" in printed
+
+
 def test_cmd_report_end_to_end_offline(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """The full `report` subcommand (issue #12's human-checkpoint) against the
     committed fixtures -- no network, exercises real argparse wiring."""
