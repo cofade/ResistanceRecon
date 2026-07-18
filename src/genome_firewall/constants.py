@@ -21,3 +21,6 @@ SUPPORTED_ANTIBIOTICS: Final[tuple[str, ...]] = (
     "gentamicin",
     "trimethoprim-sulfamethoxazole",
 )
+
+#: NCBI taxon_id for the MVP species (see Documentation/research-findings/bv-brc-data-access.md).
+KLEBSIELLA_PNEUMONIAE_TAXON_ID: Final[int] = 573

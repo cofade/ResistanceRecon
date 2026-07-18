@@ -11,7 +11,7 @@ uv sync --all-extras                              # install (dev + optional grou
 uv run pytest                                     # tests (cov >= 80)
 uv run ruff check src/ tests/ && uv run ruff format src/ tests/   # lint + format
 uv run mypy src/                                  # type check (strict)
-uv run bandit -r src/ --severity-level high       # security scan
+uv run bandit -r src/ scripts/ --severity-level high   # security scan
 uv run uvicorn genome_firewall.api.main:app --reload   # API
 uv run streamlit run src/genome_firewall/ui/app.py     # demo UI
 ```
@@ -73,6 +73,8 @@ Every code, documentation, CI, or refactor change follows this. A feature branch
 
 Automated tests and senior review are necessary but **never sufficient** — manual testing is the final, user-owned gate. Use `/finalize-epic` for the mechanical steps 6–10.
 
+**Deferral safety.** When a plan defers scope out of the issue being worked (e.g. "build X" narrows to "build the input Y that X needs"), post a carry-forward comment on both the source issue and the issue that inherits the deferred work *before* starting implementation — so nothing is silently dropped. State what was deferred, why, and which issue now owns it.
+
 ## Evidence hierarchy (weakest → sovereign)
 
 Never overclaim a lower tier as proof. Green CI does not mean "correct"; it means "the assertions someone thought to write passed."
@@ -84,7 +86,7 @@ Never overclaim a lower tier as proof. Green CI does not mean "correct"; it mean
 
 ## Quality gates (mandatory before every PR)
 
-1. Local gates green: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ --severity-level high`, and `python scripts/check_import_boundary.py`.
+1. Local gates green: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ scripts/ --severity-level high`, and `python scripts/check_import_boundary.py`.
 2. The **senior-reviewer** agent (`.claude/agents/senior-reviewer.md`) runs against a fresh worktree/diff vs `main` and returns "mergeable as-is" or "mergeable with [minor changes]".
 3. If it raises P0/P1s: fix, **re-run the agent, loop until no P0/P1 remain** (a review of the original is not a review of the fix).
 4. Open the DRAFT PR only after 1 and 2 pass. Use `/finalize-epic` for the wrap-up. Coverage drops in `predictor/` or `reader/` (the trust-critical path) require an ADR.
@@ -135,7 +137,7 @@ Release automation is **deferred** (there is no `release.yml` yet). Interim rule
 ## Progress tracking
 
 **Current phase:** EPIC 0 — scaffolding & six-layer harness; process-hardening from issue #35 (change-control, evidence, and skill-routing rules transferred from the reference harness).
-**Completed:** research documentation (7 findings docs), reuse inventory, arc42 (12 chapters + 10 ADRs), repo skeleton, quality gates, CI + import-boundary gate, `.claude/` harness (senior-reviewer + skills), ground-truth log seeded.
+**Completed:** research documentation (7 findings docs), reuse inventory, arc42 (12 chapters + 12 ADRs), repo skeleton, quality gates, CI + import-boundary gate, `.claude/` harness (senior-reviewer + skills), ground-truth log seeded.
 **Next up:** GitHub epics/issues + Project board, then EPIC 1 (BV-BRC data pipeline).
 
 Update this section at the start of each work session; do not reconstruct it from git history.
@@ -151,6 +153,8 @@ Instrument with `print()` prefixed `[DEBUG]`; remove ALL before committing. Perm
 Format: symptom → root cause → prevention.
 - **Symptom:** an LLM narrative states a verdict the model didn't produce. **Root cause:** LLM given write access to a verdict field. **Prevention:** LLM output schemas contain no verdict/confidence field; reviewer + schema tests enforce it.
 - **Symptom:** inflated held-out accuracy. **Root cause:** near-identical genomes split across train/test. **Prevention:** homology-aware grouped split (MLST + Mash fallback); explicit no-leakage test.
+- **Symptom:** FTPS control-channel handshake (connect/login/PROT P/PASV) succeeds but every data transfer (`LIST`/`RETR`) fails with `425 Unable to build data connection`. **Root cause:** a consumer-grade router's FTP ALG can't track FTPS's TLS-encrypted control channel and mishandles the passive-mode data connection — a network constraint, not a code defect. **Prevention:** a dedicated error hint (VPN / disable router FTP-ALG / different network) instead of a generic message; `@pytest.mark.live` tests catch this class of failure that fixture-only tests never can. See Documentation/11-risks-and-technical-debt/README.md §11.4.
+- **Symptom:** BV-BRC Solr query returns `HTTP 400` for `eq(evidence,Laboratory Method)`; a `json(nl,map)` facet request returns a dict and breaks code written for Solr's default flat list. **Root cause:** un-encoded space in an RQL literal; a wrongly-assumed facet response shape. **Prevention:** encode RQL literals (`_rql_value`); a live test against the real API (`numFound=85291`, matching the research doc exactly). See Documentation/11-risks-and-technical-debt/README.md §11.4.
 
 ## ADR triggers
 

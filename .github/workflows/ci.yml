@@ -60,4 +60,4 @@ jobs:
           python-version: "3.11"
       - run: uv sync --all-extras
       - name: Bandit (high severity)
-        run: uv run bandit -r src/ --severity-level high
+        run: uv run bandit -r src/ scripts/ --severity-level high

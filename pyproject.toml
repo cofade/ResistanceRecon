@@ -27,6 +27,7 @@ dependencies = [
   "pydantic-settings>=2.2",
   "biopython>=1.83",
   "pandas>=2.2",
+  "pyarrow>=16",
   "numpy>=1.26",
   "scikit-learn>=1.5",
   "joblib>=1.4",
@@ -84,7 +85,9 @@ ignore = []
 "tests/**" = ["ARG", "S101"]
 
 [tool.mypy]
-python_version = "3.11"
+# Matches the resolved dev toolchain (numpy's bundled stubs use 3.12-only syntax);
+# requires-python stays ">=3.11" above, this only controls mypy's own stub parsing.
+python_version = "3.12"
 strict = true
 files = ["src"]
 warn_unused_configs = true
@@ -105,6 +108,9 @@ exclude_dirs = ["tests"]
 minversion = "8.0"
 addopts = "-ra --cov=genome_firewall --cov-branch --cov-report=term-missing --cov-fail-under=80"
 testpaths = ["tests"]
+# lets tests/scripts/test_fetch_bvbrc_live.py `import fetch_bvbrc_data` directly --
+# scripts/ is deliberately outside the src/ package (see EPIC 1 plan's boundary map).
+pythonpath = ["scripts"]
 markers = [
   "integration: end-to-end pipeline tests (mocked annotator, no Docker)",
   "live: tests requiring a live external tool/API (skipped in CI)",

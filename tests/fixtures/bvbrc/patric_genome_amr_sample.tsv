@@ -1,0 +1,23 @@
+id	owner	genome_id	genome_name	taxon_id	antibiotic	resistant_phenotype	evidence	laboratory_typing_method	laboratory_typing_platform	vendor	testing_standard	testing_standard_year	measurement	measurement_value	measurement_unit	pmid	source	computational_method	computational_method_performance	public	date_inserted	date_modified
+amr.1	PATRIC@patricbrc.org	573.10001	Klebsiella pneumoniae	573	Meropenem	Resistant	Laboratory Method	Broth dilution			CLSI	2019	>=32	32	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.2	PATRIC@patricbrc.org	573.10001	Klebsiella pneumoniae	573	Meropenem	Resistant	Laboratory Method	VITEK 2			EUCAST	2020	>=16	16	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.3	PATRIC@patricbrc.org	573.10001	Klebsiella pneumoniae	573	Meropenem	Intermediate	Laboratory Method	Disk diffusion			CLSI	2018	8	8	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.4	PATRIC@patricbrc.org	573.10002	Klebsiella pneumoniae	573	Ciprofloxacin	Resistant	Laboratory Method	Broth dilution			CLSI	2019	>=4	4	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.5	PATRIC@patricbrc.org	573.10002	Klebsiella pneumoniae	573	Ciprofloxacin	Susceptible	Laboratory Method	VITEK 2			EUCAST	2020	<=0.25	0.25	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.6	PATRIC@patricbrc.org	573.10003	Klebsiella pneumoniae	573	Ceftriaxone	Resistant	Laboratory Method	Broth dilution			CLSI	2019	>=64	64	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.7	PATRIC@patricbrc.org	573.10004	Klebsiella pneumoniae	573	Gentamicin	Susceptible	Laboratory Method	Disk diffusion			EUCAST	2021	<=2	2	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.8	PATRIC@patricbrc.org	573.10005	Klebsiella pneumoniae	573	Trimethoprim/Sulfamethoxazole	Resistant	Laboratory Method	Broth dilution			CLSI	2020	>=4	4	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.9	PATRIC@patricbrc.org	573.10006	Klebsiella pneumoniae	573	SXT	Intermediate	Laboratory Method	VITEK 2			EUCAST	2019	2	2	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.10	PATRIC@patricbrc.org	573.10007	Klebsiella pneumoniae	573	Ampicillin	Resistant	Laboratory Method	Disk diffusion			CLSI	2019	>=32	32	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.11	PATRIC@patricbrc.org	573.10008	Klebsiella pneumoniae	573	Amikacin	Susceptible	Laboratory Method	Broth dilution			CLSI	2020	<=8	8	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.12	PATRIC@patricbrc.org	573.10009	Klebsiella pneumoniae	573	Cefoxitin	Resistant	Laboratory Method	VITEK 2			EUCAST	2021	>=32	32	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.13	PATRIC@patricbrc.org	573.10010	Klebsiella pneumoniae	573	Meropenem	Resistant	Computational Method										PATRIC	AdaBoost Classifier	Accuracy:0.931, F1:0.935, AUC:0.950	true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.14	PATRIC@patricbrc.org	573.10011	Klebsiella pneumoniae	573	Ciprofloxacin	Resistant	AMR Panel	Broth dilution			CLSI	2019	>=4	4	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.15	PATRIC@patricbrc.org	573.10012	Klebsiella pneumoniae	573	Gentamicin		Laboratory Method	Broth dilution			CLSI	2019					PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.16	PATRIC@patricbrc.org	573.10013	Klebsiella pneumoniae	573	Ceftriaxone	Sensitive	Laboratory Method	Disk diffusion			CLSI	2019	<=1	1	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.17	PATRIC@patricbrc.org	573.10014	Klebsiella pneumoniae	573	Ciprofloxacin	S	Laboratory Method	VITEK 2			EUCAST	2020	<=0.25	0.25	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.18	PATRIC@patricbrc.org	573.10015	Klebsiella pneumoniae	573	Gentamicin	I	Laboratory Method	Broth dilution			CLSI	2019	8	8	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.19	PATRIC@patricbrc.org	573.10016	Klebsiella pneumoniae	573	Meropenem	Non-susceptible	Laboratory Method	Disk diffusion			CLSI	2019	>=16	16	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.20	PATRIC@patricbrc.org	573.10017	Klebsiella pneumoniae	573	Ceftriaxone	Susceptible-dose dependent	Laboratory Method	VITEK 2			EUCAST	2021	4	4	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.21	PATRIC@patricbrc.org	573.10018	Klebsiella pneumoniae	573	Ciprofloxacin	Resistant	Laboratory Method				CLSI	2019	>=4	4	mg/L		PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
+amr.22	PATRIC@patricbrc.org	573.10019	Klebsiella pneumoniae	573	Meropenem	Resistant	Laboratory Method	Broth dilution									PATRIC			true	2024-01-05T00:00:00Z	2024-01-05T00:00:00Z
