@@ -33,7 +33,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ml = ["crepes>=0.7", "mapie>=0.9", "shap>=0.45"]
+# numba floor forces modern numba/llvmlite (with cp311/cp312 wheels); without it
+# the resolver backtracks to numba 0.53.1 / llvmlite 0.36.0, which only support
+# Python <3.10 and fail to build in CI. shap pulls numba transitively. See ADR-0009.
+ml = ["crepes>=0.7", "mapie>=0.9", "shap>=0.45", "numba>=0.60"]
 api = ["fastapi>=0.111", "uvicorn[standard]>=0.30", "jinja2>=3.1"]
 ui = ["streamlit>=1.36", "plotly>=5.22"]
 llm = ["openai>=1.35"]

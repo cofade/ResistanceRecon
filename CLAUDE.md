@@ -121,7 +121,7 @@ Canonical version and house style live in `gf-docs-and-writing`; this compact co
 | New API/UI capability | runtime/deployment docs + acceptance criteria + manual test plan |
 | New domain term | `Documentation/12-glossary/` |
 | New security or safety issue | risks/technical debt + a test + ADR if architectural |
-| Non-obvious bug | Known AI Pitfalls (below) + risks + `debug-verbose` case study + regression test |
+| Non-obvious bug / hard-won lesson | §11.4 log (canonical) + Known AI Pitfalls (below) + `debug-verbose` case study + regression test — same session, no exceptions |
 | Research/design finding | `Documentation/research-findings/` in the same session |
 
 ## Versioning & release
@@ -145,6 +145,8 @@ Update this section at the start of each work session; do not reconstruct it fro
 Instrument with `print()` prefixed `[DEBUG]`; remove ALL before committing. Permanent logging uses `import logging`, never `print`.
 
 ## Known AI pitfalls (append as discovered)
+
+**Capturing a lesson is mandatory — no exceptions.** Every non-obvious bug and every hard-won lesson is recorded **in the same session it is learned**: here (quick-list), in the canonical detailed log `Documentation/11-risks-and-technical-debt/README.md` §11.4, as a `debug-verbose` case study if instrumented, and pinned by a regression test. The senior-reviewer treats a missing capture as a P1. A lesson that lives only in chat is a lesson lost.
 
 Format: symptom → root cause → prevention.
 - **Symptom:** an LLM narrative states a verdict the model didn't produce. **Root cause:** LLM given write access to a verdict field. **Prevention:** LLM output schemas contain no verdict/confidence field; reviewer + schema tests enforce it.

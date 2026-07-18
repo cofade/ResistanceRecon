@@ -31,12 +31,14 @@ Before you change something that looks odd, find out whether it's odd on purpose
 - **LLM writing a verdict.** An LLM narrative once could state a verdict the model didn't produce (root cause: a verdict field on an LLM schema). Prevention: LLM schemas carry no verdict/confidence field; import-boundary + schema tests enforce it. Do not "simplify" by letting the narrator compute a verdict.
 - **Inflated held-out accuracy.** Near-identical clonal genomes split across train/test. Prevention: homology-aware grouped split + an explicit no-leakage test. Do not switch to a plain random split for convenience.
 
-## Recording a new failure (same session)
+## Recording a new failure (same session — mandatory, no exceptions)
 
-- Add a **Known AI Pitfall** to `CLAUDE.md` (bold rule → symptom → root cause → prevention).
+Every non-obvious bug and hard-won lesson is captured in the session it is learned. A missing capture is a P1 at review. Do all four:
+
+- Add a **§11.4 entry** to `Documentation/11-risks-and-technical-debt/README.md` — the **canonical** detailed log (house style: bold rule → issue/PR → symptom → root cause `file:function` → fix → `Pinned by tests/...` → generalized lesson).
+- Add a **Known AI Pitfall** quick-line to `CLAUDE.md` (symptom → root cause → prevention).
 - Add a **debug-verbose case study** if you instrumented to find it.
-- Add a risk/technical-debt row in `Documentation/11-*` if it leaves standing debt.
-- Append a `ground-truth/decisions.jsonl` line, and pin the fix with a regression test.
+- **Pin the fix with a regression test**, and append a `ground-truth/decisions.jsonl` line if it changed a decision.
 
 ## When NOT to use this skill
 

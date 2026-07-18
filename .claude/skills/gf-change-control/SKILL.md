@@ -32,6 +32,7 @@ Everything a change adds must eventually be reflected in the arc42 docs and poss
 8. **Manual testing is sovereign.** Automated green + a clean review are necessary, never sufficient. The PR carries a falsifiable manual-testing checklist; it stays draft until the user *explicitly* confirms manual testing passed. Only then: mark ready and merge. If the *design* fails manual testing, dropping the feature is a legitimate outcome.
 9. **Ask before irreversible remote actions** (mark-ready, merge, delete-branch, force-push) that are not already approved.
 10. **Never create git tags manually.** Release automation is deferred; when it lands, CI owns tags/versions (§4). Observe CI/release state by **transition**, never by grepping dates.
+11. **Capture every lesson — no exceptions.** Every non-obvious bug and hard-won lesson is recorded in the **same session** it is learned: a `Documentation/11-risks-and-technical-debt/README.md` §11.4 entry (canonical), a `debug-verbose` case study if instrumented, a `CLAUDE.md` Known-AI-pitfall line, and a pinning regression test. A missing capture is a P1 at review. See `gf-failure-archaeology`.
 
 ## 3. Evidence hierarchy (weakest → sovereign)
 

@@ -34,7 +34,7 @@ Every change must leave the docs better than it found them. Documentation is the
 | New API / UI capability | runtime + deployment docs + acceptance criteria + manual test plan |
 | New domain term | `Documentation/12-glossary/` |
 | New security or safety issue | risks/technical debt + a test + ADR if architectural |
-| Non-obvious bug | Known AI Pitfalls (`CLAUDE.md`) + risks + `debug-verbose` case study + regression test |
+| Non-obvious bug / hard-won lesson | §11.4 log (`11-risks-and-technical-debt/`, canonical) + Known AI Pitfalls (`CLAUDE.md`) + `debug-verbose` case study + regression test — same session, no exceptions |
 | Research / design finding | `Documentation/research-findings/` in the same session |
 
 Before merge: verify the required docs are updated and cross-references (paths, ADR numbers, EPIC labels) are not stale.
@@ -55,7 +55,7 @@ Every ADR trigger and every notable agent/human decision appends one line to `gr
 - [ ] `ground-truth/decisions.jsonl` appended this session.
 - [ ] Roadmap epic ticked / status noted.
 - [ ] `CLAUDE.md` progress table current.
-- [ ] Non-obvious bug → `debug-verbose` case study + Known AI Pitfall entry.
+- [ ] Non-obvious bug / lesson → §11.4 entry (canonical) + `debug-verbose` case study + Known AI Pitfall line + pinning test (same session, no exceptions).
 - [ ] Cross-references and paths verified (no dangling links).
 
 ## House style
