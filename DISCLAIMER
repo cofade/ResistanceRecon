@@ -1,0 +1,24 @@
+GENOME FIREWALL — RESEARCH PROTOTYPE DISCLAIMER
+================================================
+
+Genome Firewall is a RESEARCH PROTOTYPE built for the Hack-Nation 6th Global AI
+Hackathon (Challenge 06). It is NOT a medical device, NOT clinically validated,
+and NOT approved for any diagnostic or treatment purpose.
+
+- Predictions are based on historical, openly available bacterial genome data and
+  do not prove the system is safe, accurate, or suitable for real healthcare
+  decisions.
+- EVERY antibiotic-response result MUST be confirmed by standard laboratory
+  antimicrobial susceptibility testing before any clinical action.
+- The tool provides decision SUPPORT only. It must never make, or be used to make,
+  a treatment decision on its own. A trained healthcare or laboratory professional
+  retains full responsibility.
+- The system is strictly DEFENSIVE. It predicts and explains antibiotic resistance
+  that already exists. It does not, and must never be extended to, design, modify,
+  synthesize, strengthen, or optimize any organism.
+- Coverage is limited to the specific bacterial species and antibiotics stated in
+  the model card. Results outside that scope are not supported and are reported as
+  "no-call" or "not covered".
+
+Use of this software is at your own risk. See LICENSE (Apache-2.0) for warranty and
+liability terms.

@@ -1,0 +1,13 @@
+Genome Firewall
+Copyright 2026 Sebastian Wienhold and Genome Firewall contributors
+
+This product includes software developed as a research prototype for the
+Hack-Nation 6th Global AI Hackathon (Challenge 06 — Genome Firewall).
+
+This software is a research prototype and is NOT a medical device. It must not be
+used for clinical decision-making. Every antibiotic-response prediction must be
+confirmed by standard laboratory antimicrobial susceptibility testing. See the
+DISCLAIMER file.
+
+The system is strictly defensive: it predicts and explains antibiotic resistance
+that already exists. It does not design, modify, synthesize, or optimize organisms.

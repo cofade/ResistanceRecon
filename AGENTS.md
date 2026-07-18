@@ -1,0 +1,18 @@
+# AGENTS.md — Genome Firewall
+
+Agent-tool-agnostic instructions. The full, authoritative guidance lives in [`CLAUDE.md`](CLAUDE.md) — read it. This mirror exists for assistants that follow the `AGENTS.md` convention.
+
+**One-line:** Genome Firewall predicts per-antibiotic response (work / fail / no-call) from a *K. pneumoniae* genome, with calibrated confidence and evidence. Strictly defensive decision support; confirm every result with standard lab testing.
+
+## The rules that matter most
+
+1. The LLM **never** predicts. Verdicts/confidence come only from the deterministic `predictor/` pipeline (LR + calibration + conformal). `predictor/`, `features/`, `reader/` never import `llm/`.
+2. Defensive by construction: analyze genomes only; never design/modify/synthesize an organism.
+3. Ground Truth First: separate KNOWN mechanism from STATISTICAL association; every claim traceable.
+4. Every report shows the lab-confirmation disclaimer (three enforcement points).
+5. No raw dicts across boundaries — use the `schemas.py` Pydantic models.
+6. AMRFinderPlus runs only via Docker/WSL2 behind `annotation/`; never imported; never in CI (use `MockAnnotator` + fixtures).
+
+## Commands & workflow
+
+See [`CLAUDE.md`](CLAUDE.md) “Quick reference” and “Workflow”. Quality gates (pytest cov≥80, ruff, mypy strict, bandit high) must pass before every commit. Plan → branch → implement → gate → human approval → conventional commit → log decision.

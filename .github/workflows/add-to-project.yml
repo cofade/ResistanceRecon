@@ -1,0 +1,20 @@
+name: Auto-add issues to project
+
+# Adds every newly opened issue to the Genome Firewall Project board.
+# Requires: a repo secret ADD_TO_PROJECT_PAT (a PAT with project scope) and the
+# correct project number below (set once the board is created:
+#   gh project list --owner cofade    # find the number
+# ). Until both are set this workflow is a no-op-on-failure and can be ignored.
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue to project
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: gh project item-add ${{ vars.GF_PROJECT_NUMBER }} --owner cofade --url "${{ github.event.issue.html_url }}"
