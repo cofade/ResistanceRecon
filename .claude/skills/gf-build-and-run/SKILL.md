@@ -19,7 +19,7 @@ uv run pre-commit install
 uv run pytest                                                   # tests, coverage >= 80
 uv run ruff check src/ tests/ && uv run ruff format --check src/ tests/
 uv run mypy src/                                                # strict
-uv run bandit -r src/ --severity-level high
+uv run bandit -r src/ scripts/ --severity-level high
 uv run python scripts/check_import_boundary.py                  # LLM boundary gate
 ```
 

@@ -84,7 +84,8 @@ def test_enumerate_evidence_lists_all(raw_df: pd.DataFrame) -> None:
 def test_enumerate_sir_values_incl_legacy(raw_df: pd.DataFrame) -> None:
     counts = dataset.enumerate_sir_values(raw_df)
     assert counts["Resistant"] == 11
-    assert counts["Susceptible"] == 4
+    assert counts["Susceptible"] == 3
+    assert counts["Intermediate"] == 2
     assert counts["Sensitive"] == 1
     assert counts["S"] == 1
     assert counts["I"] == 1
@@ -158,10 +159,26 @@ def test_resolve_duplicate_majority(working_df: pd.DataFrame) -> None:
     resolved, _dropped = dataset.resolve_duplicate_labels(working_df)
     row = resolved[(resolved["genome_id"] == "573.10001") & (resolved["antibiotic"] == "meropenem")]
     assert len(row) == 1
-    assert row["sir"].iat[0] == "Resistant"  # R, R, S -> R
+    assert row["sir"].iat[0] == "Resistant"  # R, R, I -> R (no S present, so it's a clean majority)
     assert row["sir_source_rows"].iat[0] == 3
     assert row["sir_n_agree"].iat[0] == 2
     assert math.isclose(row["sir_majority_fraction"].iat[0], 2 / 3)
+
+
+def test_resolve_duplicate_r_and_s_coexist_dropped_even_without_a_tie() -> None:
+    """R,R,S,I is NOT a clean 2-vote majority for R -- Resistant and Susceptible are
+    clinical opposites, so their co-occurrence anywhere in the group is a genuine
+    contradiction and the whole group is dropped, regardless of vote counts."""
+    df = pd.DataFrame(
+        {
+            "genome_id": ["573.99001"] * 4,
+            "antibiotic": ["meropenem"] * 4,
+            "sir": ["Resistant", "Resistant", "Susceptible", "Intermediate"],
+        }
+    )
+    resolved, dropped = dataset.resolve_duplicate_labels(df)
+    assert resolved.empty
+    assert len(dropped) == 4
 
 
 def test_resolve_duplicate_tie_dropped(working_df: pd.DataFrame) -> None:
@@ -177,7 +194,7 @@ def test_per_drug_counts_rows_and_unique_genomes(working_df: pd.DataFrame) -> No
     counts = dataset.per_drug_label_counts(working_df).set_index("antibiotic")
     row = counts.loc["meropenem"]
     assert row["Resistant"] == 3
-    assert row["Susceptible"] == 1
+    assert row["Intermediate"] == 1
     assert row["Nonsusceptible"] == 1
     assert row["total"] == 5
     assert row["n_unique_genomes"] == 3
@@ -219,6 +236,30 @@ def test_build_labels_schema(filtered_df: pd.DataFrame) -> None:
     # Intermediate must survive -- 3-class kept; binary collapse is EPIC 3's job.
     intermediate_rows = labels[labels["sir"] == "Intermediate"]
     assert len(intermediate_rows) == 2  # 573.10006 (SXT) and 573.10015 (gentamicin)
+
+
+def test_aggregate_mic_does_not_mix_measurement_units() -> None:
+    """A genome tested by both broth dilution (MIC, mg/L) and disk diffusion (zone
+    diameter, mm) must not have those incompatible numbers blended into one median --
+    mic_value/mic_sign/mic_unit must all come from the same (dominant) unit."""
+    lab_rows = pd.DataFrame(
+        {
+            "genome_id": ["573.99002"] * 3,
+            "antibiotic": ["Meropenem"] * 3,
+            "resistant_phenotype": ["Resistant"] * 3,
+            "laboratory_typing_method": ["Broth dilution"] * 3,
+            "testing_standard": ["CLSI"] * 3,
+            "testing_standard_year": ["2019"] * 3,
+            "measurement": ["<=0.5", ">=1", "20"],
+            "measurement_value": ["0.5", "1.0", "20"],
+            "measurement_unit": ["mg/L", "mg/L", "mm"],
+        }
+    )
+    labels = dataset.build_labels_table(lab_rows)
+    assert len(labels) == 1
+    row = labels.iloc[0]
+    assert row["mic_unit"] == "mg/L"  # dominant unit (2 of 3 rows)
+    assert math.isclose(row["mic_value"], 0.75)  # median of ONLY the mg/L rows, not all 3
 
 
 def test_intrinsic_ampicillin_retained(filtered_df: pd.DataFrame) -> None:

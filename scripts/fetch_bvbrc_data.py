@@ -23,7 +23,10 @@ import json
 import time
 import urllib.error
 import urllib.request
-from ftplib import FTP_TLS, all_errors
+from ftplib import FTP_TLS, all_errors  # nosec B402 -- FTP_TLS is the encrypted variant; bandit's
+
+# blacklist rule flags any ftplib import without distinguishing FTP from FTP_TLS. See prot_p()
+# below for the encrypted-data-channel half of the guarantee.
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -78,20 +81,34 @@ def ftps_download(
         return FetchResult(ok=True, source=source, path=dest)
     except all_errors as exc:
         tmp.unlink(missing_ok=True)
-        if isinstance(exc, TimeoutError):
-            hint = "FTPS control channel may be blocked on this network -- try a VPN or the Data API fallback"
-        elif "550" in str(exc):
-            hint = "file not found -- retry with --filename PATRIC_genomes_AMR.txt (BV-BRC's flat-file name has varied across releases)"
-        elif "425" in str(exc) or "data connection" in str(exc).lower():
-            hint = (
-                "passive-mode DATA channel blocked even though the control channel connected -- "
-                "common behind routers with an FTP ALG that mishandles FTPS's encrypted control "
-                "channel (e.g. many consumer routers); try a different network, disable the "
-                "router's FTP helper/ALG, or use a VPN"
-            )
-        else:
-            hint = "verify host/credentials against Documentation/research-findings/bv-brc-data-access.md"
-        return FetchResult(ok=False, source=source, error=f"{type(exc).__name__}: {exc} ({hint})")
+        return FetchResult(ok=False, source=source, error=_describe_ftps_error(exc))
+
+
+def _describe_ftps_error(exc: BaseException) -> str:
+    """Turn a raw ftplib exception into an actionable message. Pure -- pinned by
+    offline unit tests (tests/scripts/test_fetch_bvbrc_data.py), not only by the
+    @pytest.mark.live tests that exercise the real failure (see Documentation/11-
+    risks-and-technical-debt/README.md §11.4: 'FTPS behind a router FTP ALG').
+    """
+    if isinstance(exc, TimeoutError):
+        hint = "FTPS control channel may be blocked -- try a VPN or the Data API fallback"
+    elif "550" in str(exc):
+        hint = (
+            "file not found -- retry with --filename PATRIC_genomes_AMR.txt "
+            "(BV-BRC's flat-file name has varied across releases)"
+        )
+    elif "425" in str(exc) or "data connection" in str(exc).lower():
+        hint = (
+            "passive-mode DATA channel blocked even though the control channel connected -- "
+            "common behind routers with an FTP ALG that mishandles FTPS's encrypted control "
+            "channel (e.g. many consumer routers); try a different network, disable the "
+            "router's FTP helper/ALG, or use a VPN"
+        )
+    else:
+        hint = (
+            "verify host/credentials against Documentation/research-findings/bv-brc-data-access.md"
+        )
+    return f"{type(exc).__name__}: {exc} ({hint})"
 
 
 def solr_facet(
@@ -115,7 +132,8 @@ def solr_facet(
             "Accept": "application/solr+json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310 -- base_url is
+        # asserted https:// above, so the file:/custom-scheme risk this rule warns about is closed.
         payload: dict[str, Any] = json.load(response)
     return payload
 
@@ -161,7 +179,9 @@ def cmd_fetch_labels(args: argparse.Namespace) -> int:
     if dest.exists() and not args.overwrite:
         print(f"{dest} already exists; skipping (use --overwrite to re-download).")
     else:
-        result = ftps_download(args.host, f"{RELEASE_NOTES_DIR}/{args.filename}", dest, timeout=args.timeout)
+        result = ftps_download(
+            args.host, f"{RELEASE_NOTES_DIR}/{args.filename}", dest, timeout=args.timeout
+        )
         _print_result("AMR flat file", result)
         if not result.ok:
             return 1
@@ -171,7 +191,10 @@ def cmd_fetch_labels(args: argparse.Namespace) -> int:
             print(f"{meta_dest} already exists; skipping (use --overwrite to re-download).")
         else:
             result = ftps_download(
-                args.host, f"{RELEASE_NOTES_DIR}/{DEFAULT_METADATA_FILE}", meta_dest, timeout=args.timeout
+                args.host,
+                f"{RELEASE_NOTES_DIR}/{DEFAULT_METADATA_FILE}",
+                meta_dest,
+                timeout=args.timeout,
             )
             _print_result("genome_metadata", result)
             if not result.ok:
@@ -188,7 +211,9 @@ def cmd_report(args: argparse.Namespace) -> int:
     sir_counts_raw = dataset.enumerate_sir_values(raw_df)
 
     evidence_values = (
-        tuple(v.strip() for v in args.evidence.split(",")) if args.evidence else (dataset.LAB_EVIDENCE,)
+        tuple(v.strip() for v in args.evidence.split(","))
+        if args.evidence
+        else (dataset.LAB_EVIDENCE,)
     )
     require_typing_method = not args.no_require_typing_method
     lab_rows = dataset.filter_lab_ast(
@@ -202,7 +227,8 @@ def cmd_report(args: argparse.Namespace) -> int:
     print("\nEvidence vocabulary (ALL rows, pre-filter):")
     for value, count in evidence_counts.items():
         print(f"  {value}: {count}")
-    print(f"\nFilter applied: evidence in {evidence_values}, require_typing_method={require_typing_method}")
+    print(f"\nFilter applied: evidence in {evidence_values}")
+    print(f"require_typing_method={require_typing_method}")
     print(f"Lab-AST rows after filter: {len(lab_rows)}")
 
     print("\nPer-drug label counts (rows; SIR classes; unique genomes):")
@@ -215,9 +241,17 @@ def cmd_report(args: argparse.Namespace) -> int:
     if args.metadata:
         genome_metadata = dataset.parse_genome_metadata(Path(args.metadata), taxon_id=args.taxon_id)
         total = len(genome_metadata)
-        with_st = int(genome_metadata["mlst_st"].notna().sum()) if "mlst_st" in genome_metadata.columns else 0
+        with_st = (
+            int(genome_metadata["mlst_st"].notna().sum())
+            if "mlst_st" in genome_metadata.columns
+            else 0
+        )
         missing_fraction = (total - with_st) / total if total else 0.0
-        mlst_summary = {"genomes_total": total, "with_st": with_st, "missing_fraction": missing_fraction}
+        mlst_summary = {
+            "genomes_total": total,
+            "with_st": with_st,
+            "missing_fraction": missing_fraction,
+        }
         print(
             f"\nMLST coverage: {with_st}/{total} genomes have a sequence type "
             f"(missing_fraction={missing_fraction:.2%})"
@@ -296,8 +330,12 @@ def cmd_fetch_fasta(args: argparse.Namespace) -> int:
     plan's Deferral safety section and the carry-forward comment on issue #11).
     """
     labels = pd.read_parquet(args.from_labels)
-    antibiotics = tuple(a.strip() for a in args.antibiotics.split(",")) if args.antibiotics else None
-    genome_ids = dataset.select_genome_ids(labels, antibiotics=antibiotics, min_n_per_drug=args.min_n)
+    antibiotics = (
+        tuple(a.strip() for a in args.antibiotics.split(",")) if args.antibiotics else None
+    )
+    genome_ids = dataset.select_genome_ids(
+        labels, antibiotics=antibiotics, min_n_per_drug=args.min_n
+    )
     if args.genome_ids_file:
         extra_ids = [
             line.strip()
@@ -307,6 +345,11 @@ def cmd_fetch_fasta(args: argparse.Namespace) -> int:
         genome_ids = sorted(set(genome_ids) | set(extra_ids))
     if args.cap is not None:
         genome_ids = genome_ids[: args.cap]
+        print(
+            "NOTE: --cap truncates the globally sorted genome_id list, not stratified per "
+            "antibiotic -- a low cap can zero out a rarer panel drug's genomes. Use --antibiotics "
+            "to scope the cap to one drug at a time if that matters for this run."
+        )
 
     print(f"Selected {len(genome_ids)} genome_id(s) for FASTA download (cap={args.cap}).")
     out_dir = Path(args.out_dir)
@@ -320,14 +363,21 @@ def cmd_fetch_fasta(args: argparse.Namespace) -> int:
             continue
         remote_path = f"genomes/{genome_id}/{genome_id}.fna"
         result = _download_with_retries(
-            args.host, remote_path, dest, retries=args.retries, backoff=args.backoff, timeout=args.timeout
+            args.host,
+            remote_path,
+            dest,
+            retries=args.retries,
+            backoff=args.backoff,
+            timeout=args.timeout,
         )
         if result.ok:
             downloaded += 1
         else:
             failures.append(f"{genome_id}: {result.error}")
 
-    print(f"Downloaded: {downloaded}, skipped (already present): {skipped}, failed: {len(failures)}")
+    print(
+        f"Downloaded: {downloaded}, skipped (already present): {skipped}, failed: {len(failures)}"
+    )
     for failure in failures:
         print(f"  FAILED {failure}")
     return 1 if failures else 0
@@ -344,7 +394,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     fetch_labels = sub.add_parser(
-        "fetch-labels", help="Phase A: FTPS-download the AMR flat file (+ optional genome_metadata)."
+        "fetch-labels",
+        help="Phase A: FTPS-download the AMR flat file (+ optional genome_metadata).",
     )
     fetch_labels.add_argument("--host", default=DEFAULT_HOST)
     fetch_labels.add_argument("--filename", default=DEFAULT_FLATFILE)
@@ -356,18 +407,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     report = sub.add_parser(
         "report",
-        help="Phase A: pure evidence enumeration + per-drug count report (issue #12 checkpoint). No network.",
+        help="Phase A: evidence enumeration + per-drug counts (issue #12 checkpoint). No network.",
     )
     report.add_argument("--flatfile", required=True)
     report.add_argument("--metadata")
     report.add_argument("--taxon-id", type=int, default=KLEBSIELLA_PNEUMONIAE_TAXON_ID)
-    report.add_argument("--evidence", help="Comma-separated evidence values to keep (default: 'Laboratory Method').")
+    report.add_argument(
+        "--evidence", help="Comma-separated evidence values to keep (default: 'Laboratory Method')."
+    )
     report.add_argument("--no-require-typing-method", action="store_true")
-    report.add_argument("--out", help="Write the report as JSON (e.g. data/processed/label_report.json).")
+    report.add_argument(
+        "--out", help="Write the report as JSON (e.g. data/processed/label_report.json)."
+    )
     report.set_defaults(func=cmd_report)
 
     crosscheck = sub.add_parser(
-        "crosscheck", help="Phase A: compare local flat-file counts against the BV-BRC Solr Data API."
+        "crosscheck",
+        help="Phase A: compare local flat-file counts against the BV-BRC Solr Data API.",
     )
     crosscheck.add_argument("--flatfile", required=True)
     crosscheck.add_argument("--taxon-id", type=int, default=KLEBSIELLA_PNEUMONIAE_TAXON_ID)
@@ -375,12 +431,15 @@ def build_parser() -> argparse.ArgumentParser:
     crosscheck.set_defaults(func=cmd_crosscheck)
 
     fetch_fasta = sub.add_parser(
-        "fetch-fasta", help="Phase B: FTPS-download .fna for selected genome_ids. Run only after `report` review."
+        "fetch-fasta",
+        help="Phase B: FTPS-download .fna for selected genome_ids. Run only after `report` review.",
     )
     fetch_fasta.add_argument("--from-labels", required=True, help="Path to labels.parquet")
     fetch_fasta.add_argument("--antibiotics", help="Comma-separated finalized panel; default: all")
     fetch_fasta.add_argument("--min-n", type=int)
-    fetch_fasta.add_argument("--cap", type=int, help="Human-chosen download cap (see report's checkpoint).")
+    fetch_fasta.add_argument(
+        "--cap", type=int, help="Human-chosen download cap (see report's checkpoint)."
+    )
     fetch_fasta.add_argument("--genome-ids-file")
     fetch_fasta.add_argument("--host", default=DEFAULT_HOST)
     fetch_fasta.add_argument("--out-dir", default="data/raw/bvbrc/genomes")

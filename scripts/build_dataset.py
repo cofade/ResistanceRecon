@@ -25,8 +25,6 @@ import argparse
 import json
 from pathlib import Path
 
-import pandas as pd
-
 from genome_firewall.constants import KLEBSIELLA_PNEUMONIAE_TAXON_ID
 from genome_firewall.predictor import dataset
 
@@ -72,7 +70,9 @@ def build(
     )
     bundle = dataset.build_labels_bundle(lab_rows)
 
-    genome_metadata = dataset.parse_genome_metadata(metadata, taxon_id=taxon_id) if metadata else None
+    genome_metadata = (
+        dataset.parse_genome_metadata(metadata, taxon_id=taxon_id) if metadata else None
+    )
 
     fasta_ids = _discover_fasta_genome_ids(fasta_dir) if fasta_dir else set()
     labels = dataset.mark_fasta_availability(bundle.labels, fasta_ids)
@@ -121,25 +121,42 @@ def main(argv: list[str] | None = None) -> int:
         "Local file I/O only -- no network."
     )
     parser.add_argument(
-        "--flatfile", required=True, help="Raw PATRIC_genome_AMR flat file (or the committed fixture for a dry run)."
+        "--flatfile",
+        required=True,
+        help="Raw PATRIC_genome_AMR flat file (or the committed fixture for a dry run).",
     )
-    parser.add_argument("--metadata", help="Raw genome_metadata flat file (optional -- enables MLST coverage).")
-    parser.add_argument("--fasta-dir", help="Directory of downloaded genomes/<id>/<id>.fna (sets has_fasta).")
+    parser.add_argument(
+        "--metadata", help="Raw genome_metadata flat file (optional -- enables MLST coverage)."
+    )
+    parser.add_argument(
+        "--fasta-dir", help="Directory of downloaded genomes/<id>/<id>.fna (sets has_fasta)."
+    )
     parser.add_argument("--out-dir", default="data/processed")
     parser.add_argument("--taxon-id", type=int, default=KLEBSIELLA_PNEUMONIAE_TAXON_ID)
-    parser.add_argument("--evidence", help="Comma-separated evidence values to keep (default: 'Laboratory Method').")
+    parser.add_argument(
+        "--evidence", help="Comma-separated evidence values to keep (default: 'Laboratory Method')."
+    )
     parser.add_argument("--no-require-typing-method", action="store_true")
     parser.add_argument(
         "--antibiotics",
-        help="Comma-separated finalized panel to record in the manifest (informational -- all drugs are still ingested).",
+        help=(
+            "Comma-separated finalized panel to record in the manifest "
+            "(informational; all drugs are still ingested)."
+        ),
     )
-    parser.add_argument("--cap", type=int, help="Download cap to record in the manifest (informational).")
+    parser.add_argument(
+        "--cap", type=int, help="Download cap to record in the manifest (informational)."
+    )
     args = parser.parse_args(argv)
 
     evidence_values = (
-        tuple(v.strip() for v in args.evidence.split(",")) if args.evidence else (dataset.LAB_EVIDENCE,)
+        tuple(v.strip() for v in args.evidence.split(","))
+        if args.evidence
+        else (dataset.LAB_EVIDENCE,)
     )
-    panel_selected = tuple(a.strip() for a in args.antibiotics.split(",")) if args.antibiotics else ()
+    panel_selected = (
+        tuple(a.strip() for a in args.antibiotics.split(",")) if args.antibiotics else ()
+    )
 
     manifest = build(
         flatfile=Path(args.flatfile),

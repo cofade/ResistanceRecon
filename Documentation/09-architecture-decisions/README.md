@@ -15,3 +15,4 @@ One record per non-trivial, hard-to-reverse decision. Format: Title, Date, Statu
 | [0009](ADR-0009-versioning-and-release-control.md) | Single-source version; release automation deferred | Accepted |
 | [0010](ADR-0010-draft-pr-change-control-lifecycle.md) | Draft-PR lifecycle & manual-test sovereignty | Accepted |
 | [0011](ADR-0011-pyarrow-parquet-engine.md) | Add pyarrow as the Parquet engine | Accepted |
+| [0012](ADR-0012-pure-python-bvbrc-fetch.md) | Pure Python for the BV-BRC fetch, not WSL2/p3-CLI | Accepted |

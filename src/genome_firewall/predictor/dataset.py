@@ -335,14 +335,22 @@ def resolve_duplicate_labels(
     """Collapse multiple lab-AST rows per (genome_id, antibiotic) to one SIR call by
     majority vote over the canonical SIR class.
 
-    Ties/conflicts (more than one class sharing the top vote count — e.g. one
-    Resistant row and one Susceptible row for the same genome+drug) are DROPPED
-    rather than guessed at: never train on contradictory ground truth. Rows with no
-    canonical ``sir`` (already None) are excluded before voting.
+    Two situations are treated as genuine, unresolvable contradictions and DROPPED
+    rather than guessed at -- never train on contradictory ground truth:
+
+    1. Both ``Resistant`` and ``Susceptible`` appear anywhere in the group. This is
+       checked regardless of vote counts -- a 3-Resistant/1-Susceptible group is
+       still a real disagreement, not a clean majority, because the two classes are
+       clinical opposites (unlike e.g. Resistant+Intermediate, which do not
+       contradict as sharply and are allowed to resolve normally).
+    2. More than one class ties for the top vote count (e.g. one Intermediate row
+       and one Susceptible-dose-dependent row, no clear plurality).
+
+    Rows with no canonical ``sir`` (already None) are excluded before voting.
 
     Returns ``(resolved, dropped)``: ``resolved`` has one row per group with
     ``sir_source_rows``/``sir_n_agree``/``sir_majority_fraction`` attached;
-    ``dropped`` holds every row from a dropped (tied/conflicting) group, for the
+    ``dropped`` holds every row from a dropped (contradictory/tied) group, for the
     manifest's dropped-conflict count.
     """
     votable = df.dropna(subset=[sir_column]).copy()
@@ -351,6 +359,10 @@ def resolve_duplicate_labels(
     dropped_frames: list[pd.DataFrame] = []
     for key_values, group in votable.groupby(group_key_list, sort=False):
         keys = key_values if isinstance(key_values, tuple) else (key_values,)
+        classes_present = set(group[sir_column])
+        if {"Resistant", "Susceptible"} <= classes_present:
+            dropped_frames.append(group)
+            continue
         counts = group[sir_column].value_counts()
         top_count = int(counts.iloc[0])
         winners = counts.index[counts == top_count]
@@ -421,10 +433,14 @@ def per_drug_standard_breakdown(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _most_common(series: pd.Series) -> str | None:
-    """Most frequent non-null value in ``series``, or None if it's empty."""
+    """Most frequent non-null value in ``series``, or None if it's empty. Ties break
+    on the value itself (ascending) for determinism -- ``value_counts()`` alone does
+    not guarantee a stable order across equal counts."""
     if series.empty:
         return None
-    return str(series.value_counts().index[0])
+    counts = series.value_counts()
+    top = counts[counts == counts.iloc[0]]
+    return str(sorted(top.index)[0])
 
 
 def _parse_mic_sign(measurement: object) -> str | None:
@@ -437,22 +453,41 @@ def _parse_mic_sign(measurement: object) -> str | None:
 
 
 def _aggregate_mic(df: pd.DataFrame) -> pd.DataFrame:
-    """One row per (genome_id, antibiotic): median MIC value and the most-common
-    sign/unit across every lab row for that pair. Rows lacking a numeric measurement
-    contribute nothing to the median."""
+    """One row per (genome_id, antibiotic): median MIC value and its sign, restricted
+    to the single most common ``measurement_unit`` in the group.
+
+    Different lab methods report incompatible measurement types under the same
+    ``measurement_value`` column -- e.g. broth-dilution MIC in mg/L vs disk-diffusion
+    zone diameter in mm. Blending them into one median would fabricate a number that
+    describes neither. Restricting to the dominant unit keeps ``mic_value``,
+    ``mic_sign``, and ``mic_unit`` mutually consistent, drawn from the same rows.
+    """
     rows: list[dict[str, object]] = []
     for (genome_id, antibiotic), group in df.groupby(["genome_id", "antibiotic"], sort=False):
-        values = pd.to_numeric(group["measurement_value"], errors="coerce").dropna()
-        signs = group["measurement"].map(_parse_mic_sign).dropna()
-        units = group["measurement_unit"].dropna()
-        units = units[units.str.strip() != ""]
+        units = group["measurement_unit"].fillna("").str.strip()
+        units = units[units != ""]
+        dominant_unit = _most_common(units)
+        if dominant_unit is None:
+            rows.append(
+                {
+                    "genome_id": genome_id,
+                    "antibiotic": antibiotic,
+                    "mic_value": None,
+                    "mic_sign": None,
+                    "mic_unit": None,
+                }
+            )
+            continue
+        same_unit = group[group["measurement_unit"].fillna("").str.strip() == dominant_unit]
+        values = pd.to_numeric(same_unit["measurement_value"], errors="coerce").dropna()
+        signs = same_unit["measurement"].map(_parse_mic_sign).dropna()
         rows.append(
             {
                 "genome_id": genome_id,
                 "antibiotic": antibiotic,
                 "mic_value": float(values.median()) if not values.empty else None,
                 "mic_sign": _most_common(signs),
-                "mic_unit": _most_common(units),
+                "mic_unit": dominant_unit,
             }
         )
     return pd.DataFrame(rows)

@@ -11,7 +11,7 @@ uv sync --all-extras                              # install (dev + optional grou
 uv run pytest                                     # tests (cov >= 80)
 uv run ruff check src/ tests/ && uv run ruff format src/ tests/   # lint + format
 uv run mypy src/                                  # type check (strict)
-uv run bandit -r src/ --severity-level high       # security scan
+uv run bandit -r src/ scripts/ --severity-level high   # security scan
 uv run uvicorn genome_firewall.api.main:app --reload   # API
 uv run streamlit run src/genome_firewall/ui/app.py     # demo UI
 ```
@@ -86,7 +86,7 @@ Never overclaim a lower tier as proof. Green CI does not mean "correct"; it mean
 
 ## Quality gates (mandatory before every PR)
 
-1. Local gates green: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ --severity-level high`, and `python scripts/check_import_boundary.py`.
+1. Local gates green: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ scripts/ --severity-level high`, and `python scripts/check_import_boundary.py`.
 2. The **senior-reviewer** agent (`.claude/agents/senior-reviewer.md`) runs against a fresh worktree/diff vs `main` and returns "mergeable as-is" or "mergeable with [minor changes]".
 3. If it raises P0/P1s: fix, **re-run the agent, loop until no P0/P1 remain** (a review of the original is not a review of the fix).
 4. Open the DRAFT PR only after 1 and 2 pass. Use `/finalize-epic` for the wrap-up. Coverage drops in `predictor/` or `reader/` (the trust-critical path) require an ADR.
@@ -137,7 +137,7 @@ Release automation is **deferred** (there is no `release.yml` yet). Interim rule
 ## Progress tracking
 
 **Current phase:** EPIC 0 — scaffolding & six-layer harness; process-hardening from issue #35 (change-control, evidence, and skill-routing rules transferred from the reference harness).
-**Completed:** research documentation (7 findings docs), reuse inventory, arc42 (12 chapters + 11 ADRs), repo skeleton, quality gates, CI + import-boundary gate, `.claude/` harness (senior-reviewer + skills), ground-truth log seeded.
+**Completed:** research documentation (7 findings docs), reuse inventory, arc42 (12 chapters + 12 ADRs), repo skeleton, quality gates, CI + import-boundary gate, `.claude/` harness (senior-reviewer + skills), ground-truth log seeded.
 **Next up:** GitHub epics/issues + Project board, then EPIC 1 (BV-BRC data pipeline).
 
 Update this section at the start of each work session; do not reconstruct it from git history.
