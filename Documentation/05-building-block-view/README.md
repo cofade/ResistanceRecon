@@ -5,7 +5,7 @@
 ```mermaid
 flowchart LR
     subgraph M1["Module 01 — Genome Reader"]
-        RD["reader"] --> AN["annotation\n(AMRFinderPlus / Mock)"] --> FE["features"]
+        RD["reader.fasta_parser"] --> AN["annotation\n(AMRFinderPlus / Mock)"] --> FB["reader.feature_builder"]
     end
     subgraph M2["Module 02 — Predictor (LLM-free)"]
         GATE["target_gate"] --> TR["train / calibration"] --> CO["conformal"] --> PR["predict"]
@@ -14,16 +14,20 @@ flowchart LR
         RB["report_builder\n(deterministic)"] --> API2["api (FastAPI)"] --> UI2["ui (Streamlit)"]
         RB -.->|optional| NAR["kb (RAG) + llm (narrate/review)"]
     end
-    FE --> GATE
+    FB --> GATE
     PR --> RB
 ```
 
 ## Level 1 — the package `genome_firewall`
 
 ```
-reader/      Module 01 — FASTA parse + AMRFinderPlus runner + feature builder (+ feature_schema.json)
-annotation/  AMRFinderPlus Docker/WSL2 wrapper (envelope) + MockAnnotator (fixtures, CI)
-features/    feature engineering from AMR gene/mutation calls
+reader/      Module 01 — FASTA parse (fasta_parser.py) + feature builder (feature_builder.py,
+             ReferenceGeneCatalog lookup, feature_schema.json) -- the raw-annotation-to-vector step
+annotation/  AMRFinderPlus Docker/WSL2 wrapper (envelope, amrfinder.py) + MockAnnotator (mock.py,
+             fixtures, CI) -- the only place a subprocess/Docker call happens (golden rule #6)
+features/    RESERVED for EPIC 3's per-drug ML feature engineering (QRDR mutation counts, AME maps)
+             built on top of reader/'s GenomeFeatureVector -- a different concern from the raw-
+             annotation-to-vector step above, which lives in reader/ per EPIC 2 (issue #17)
 predictor/   Module 02 (the star) — dataset, split, target_gate, train, calibration, conformal, predict, model_registry
 report/      Module 03a — deterministic report builder (+ jinja template) + additive LLM narrative sub-pipeline
 kb/          AMR-mechanism KB: hybrid BM25 + embedding + RRF retrieval (evidence RAG)
@@ -36,7 +40,7 @@ schemas.py   Pydantic contracts crossing every boundary
 constants.py canonical disclaimer, supported species/antibiotics
 ```
 
-Supporting: `scripts/` (BV-BRC fetch, AMRFinderPlus batch, dataset build, env validate, import-boundary check), `data/` and `models/` (git-ignored, published as release assets).
+Supporting: `scripts/` (BV-BRC fetch, AMRFinderPlus batch, dataset build, env validate, import-boundary check); `data/raw/`, `data/interim/`, `data/processed/`, and `models/` (git-ignored, published as release assets) -- but `data/reference/` (pinned lookup tables like `ReferenceGeneCatalog.txt`, ADR-0013) is committed, matching the fixture-data convention rather than the bulk-data one.
 
 ## Key responsibilities & boundaries
 
