@@ -23,3 +23,19 @@ Every external tool/network call returns an `{ok, source, error}` envelope; the 
 ## Reproducibility
 
 Pinned AMRFinderPlus Docker tag + DB version recorded per run; versioned `feature_schema.json`; MLflow tracking; `ground-truth/decisions.jsonl` decision trail.
+
+## Integration-test mandate
+
+Every user story ships at least one end-to-end integration test through a realistic boundary (`@pytest.mark.integration`, driven by `MockAnnotator` — never Docker/AMRFinderPlus in CI). **No merge without it. No exceptions.** A feature is not mergeable with only happy-path unit tests when a boundary workflow is available. Bug fixes pin their regression at the appropriate layer. The seven shapes (detail + what counts as evidence in `.claude/skills/gf-validation-and-qa/`):
+
+1. **Data pipeline** — fixture data → normalized labels → persisted dataset contract.
+2. **Reader** — FASTA fixture → MockAnnotator → feature vector (matches `feature_schema.json`).
+3. **Predictor** — feature vector → target gate / model / calibration / conformal → verdict.
+4. **Report** — prediction → complete report with `evidence_category` + disclaimer.
+5. **LLM** — frozen report → narrative/reviewer → accepted, or fail-closed deterministic template.
+6. **API** — request → structured response / `{ok:false}` → 503 error envelope.
+7. **UI** — upload/demo flow → rendered verdict / evidence / non-dismissible disclaimer.
+
+## Evidence hierarchy
+
+Weakest → sovereign: **green CI < full local quality gates < independent senior review < manual testing by the user**. Green CI means "the assertions someone wrote passed", not "correct"; never overclaim a lower tier as proof. Manual testing is the final, user-owned gate — a change stays in a draft PR until the user explicitly confirms it passed (ADR-0010). Each gate's specific limitations are documented in `gf-validation-and-qa`.

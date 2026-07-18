@@ -15,4 +15,12 @@ Agent-tool-agnostic instructions. The full, authoritative guidance lives in [`CL
 
 ## Commands & workflow
 
-See [`CLAUDE.md`](CLAUDE.md) “Quick reference” and “Workflow”. Quality gates (pytest cov≥80, ruff, mypy strict, bandit high) must pass before every commit. Plan → branch → implement → gate → human approval → conventional commit → log decision.
+See [`CLAUDE.md`](CLAUDE.md) “Quick reference”, “Plan Mode”, and “Workflow (change lifecycle)” for the authoritative detail. In short:
+
+- **Plan Mode first** for any non-trivial change: read the issue/acceptance criteria + roadmap + ADRs + arc42 docs, analyze existing code, propose the smallest viable design, surface at least one alternative and its failure modes, agree with the user, then implement.
+- **Feature branch for every change** (code, docs, CI, refactor) — never commit directly to `main`.
+- **Quality gates** (pytest cov ≥ 80, ruff, mypy strict, bandit high, import-boundary) must pass, then a **fresh-worktree senior-reviewer pass** with re-review until no P0/P1 remain.
+- **Every user story ships an end-to-end integration test** — no merge without it.
+- **A draft PR is the normal end state.** It stays draft, carrying a manual-testing checklist, until the user explicitly confirms manual testing passed; only then mark ready and merge. Automated green is necessary but never sufficient — **manual testing is sovereign.**
+- Evidence hierarchy (weakest → sovereign): green CI < full local gates < independent senior review < manual testing.
+- Log every notable decision in `ground-truth/decisions.jsonl` in the same session; update docs per the change-type matrix. Never create git tags manually (release automation is deferred; see `gf-change-control`).

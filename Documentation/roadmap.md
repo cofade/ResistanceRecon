@@ -1,5 +1,9 @@
 # Roadmap
 
+## Process (EPIC 0)
+
+- [x] Change-control & evidence rules transferred from the reference harness (issue #35): draft-PR lifecycle + manual-test sovereignty (ADR-0010), single-source versioning (ADR-0009), skill-routing table, documentation-update matrix, branch-push CI. Every EPIC below ships its end-to-end integration test (the seven shapes in `08-crosscutting-concepts/`) — no merge without it.
+
 ## MVP (24h sprint) — K. pneumoniae, 5 antibiotics
 
 - [ ] EPIC 1 — BV-BRC data pipeline (lab-AST labels + FASTAs)
