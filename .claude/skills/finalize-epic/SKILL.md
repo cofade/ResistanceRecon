@@ -33,6 +33,6 @@ Run the full post-approval wrap-up for a completed unit of work. All issues foun
 5. **Update `Documentation/roadmap.md`** (tick the epic; note what shipped).
 6. **Commit** on the feature branch with a conventional message: `feat(<scope>): <description>`.
 7. **Push:** `git push -u origin feat/<epic>-<slug>`.
-8. **Open the PR** (`gh pr create`): body has `## Summary`, `## Test plan` (checklist), a note that senior-reviewer ran, and the WOZCODE footer. The `add-to-project.yml` workflow auto-adds it to the Project board.
+8. **Open the PR** (`gh pr create`): body has `## Summary`, `## Test plan` (checklist), a note that senior-reviewer ran, and the WOZCODE footer. Add it to the Project board manually if needed: `gh project item-add 3 --owner cofade --url <pr-url>`.
 9. **Gate on CI, then merge:** `gh pr checks <PR#> --watch --fail-fast`; merge only when green.
 10. **Clean up & clear context:** delete the merged branch; start the next epic clean (`/clear`).
