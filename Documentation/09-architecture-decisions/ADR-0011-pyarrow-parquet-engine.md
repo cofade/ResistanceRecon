@@ -1,4 +1,4 @@
-# ADR-0009 — Add pyarrow as the Parquet engine
+# ADR-0011 — Add pyarrow as the Parquet engine
 
 - **Date:** 2026-07-18
 - **Status:** Accepted

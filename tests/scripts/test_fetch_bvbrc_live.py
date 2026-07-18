@@ -34,9 +34,10 @@ def test_solr_evidence_facet_has_lab_method() -> None:
     payload = fetch_bvbrc_data.solr_facet(
         "genome_amr", fetch_bvbrc_data.evidence_vocabulary_rql(573), timeout=30.0
     )
-    facets = payload.get("facet_counts", {}).get("facet_fields", {}).get("evidence", [])
-    values = facets[::2]  # Solr facet_fields is a flat [value, count, value, count, ...] list
-    assert "Laboratory Method" in values
+    # json(nl,map) makes Solr return the facet as {value: count, ...}, not a flat list.
+    facet = payload.get("facet_counts", {}).get("facet_fields", {}).get("evidence", {})
+    assert "Laboratory Method" in facet
+    assert facet["Laboratory Method"] > 0
 
 
 @pytest.mark.live

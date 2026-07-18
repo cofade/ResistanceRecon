@@ -31,6 +31,7 @@ import pandas as pd
 
 from genome_firewall.constants import KLEBSIELLA_PNEUMONIAE_TAXON_ID
 from genome_firewall.predictor import dataset
+from genome_firewall.predictor.dataset import LAB_EVIDENCE
 
 DEFAULT_HOST = "ftp.bv-brc.org"
 DEFAULT_FLATFILE = "PATRIC_genome_AMR.txt"
@@ -78,9 +79,16 @@ def ftps_download(
     except all_errors as exc:
         tmp.unlink(missing_ok=True)
         if isinstance(exc, TimeoutError):
-            hint = "FTPS may be blocked on this network -- try a VPN or the Data API fallback"
+            hint = "FTPS control channel may be blocked on this network -- try a VPN or the Data API fallback"
         elif "550" in str(exc):
             hint = "file not found -- retry with --filename PATRIC_genomes_AMR.txt (BV-BRC's flat-file name has varied across releases)"
+        elif "425" in str(exc) or "data connection" in str(exc).lower():
+            hint = (
+                "passive-mode DATA channel blocked even though the control channel connected -- "
+                "common behind routers with an FTP ALG that mishandles FTPS's encrypted control "
+                "channel (e.g. many consumer routers); try a different network, disable the "
+                "router's FTP helper/ALG, or use a VPN"
+            )
         else:
             hint = "verify host/credentials against Documentation/research-findings/bv-brc-data-access.md"
         return FetchResult(ok=False, source=source, error=f"{type(exc).__name__}: {exc} ({hint})")
@@ -112,9 +120,19 @@ def solr_facet(
     return payload
 
 
+def _rql_value(value: str) -> str:
+    """Percent/plus-encode an RQL literal value. A raw space (e.g. in ``"Laboratory
+    Method"``) is invalid RQL syntax and returns HTTP 400 -- BV-BRC's own curl
+    example encodes it as ``Laboratory+Method`` (confirmed empirically against the
+    live API; see Documentation/research-findings/bv-brc-data-access.md)."""
+    return value.replace(" ", "+")
+
+
 def evidence_vocabulary_rql(taxon_id: int) -> str:
     """RQL: every distinct `evidence` value present for `taxon_id`, pre-filter --
-    mirrors dataset.enumerate_evidence_values but against the live API."""
+    mirrors dataset.enumerate_evidence_values but against the live API. Requests
+    ``json(nl,map)`` so the facet comes back as ``{value: count, ...}`` rather than
+    Solr's default flat ``[value, count, value, count, ...]`` list."""
     return f"eq(taxon_id,{taxon_id})&facet((field,evidence,limit,50))&limit(1)&json(nl,map)"
 
 
@@ -122,7 +140,7 @@ def lab_ast_facet_rql(taxon_id: int) -> str:
     """RQL: numFound + per-antibiotic/per-phenotype facets for lab-only AST rows --
     the live-side cross-check for dataset.per_drug_label_counts."""
     return (
-        f"and(eq(taxon_id,{taxon_id}),eq(evidence,Laboratory Method))"
+        f"and(eq(taxon_id,{taxon_id}),eq(evidence,{_rql_value(LAB_EVIDENCE)}))"
         "&facet((field,antibiotic,limit,200),(field,resistant_phenotype,limit,20))"
         "&limit(1)&json(nl,map)"
     )
