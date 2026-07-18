@@ -48,19 +48,21 @@ uv run streamlit run src/genome_firewall/ui/app.py     # demo UI
 | 2 | Read the GitHub issue / acceptance criteria |
 | 3 | Feature branch: `git checkout -b feat/<epic>-<slug>` |
 | 4 | Implement; run quality checks incrementally |
-| 5 | Pre-commit gates (pytest, ruff, mypy, bandit) all pass |
+| 5 | Local gates green (pytest, ruff, mypy, bandit, import-boundary) |
 | 6 | Present a testing checklist for human approval |
-| 7 | Conventional commit `feat(<scope>): ...`; PR |
-| 8 | Log the decision in `ground-truth/decisions.jsonl`; `/clear` |
+| 7 | Conventional commit `feat(<scope>): ...`; push; open a **draft PR** |
+| 8 | Iterate with **senior-reviewer** against the branch/PR until clean (see Quality gates) |
+| 9 | Re-confirm local gates green; commit + push again if the loop changed anything |
+| 10 | Hand the human any remaining verification you can't do yourself (manual/UI, live external services, deployment) before marking the PR ready for review |
+| 11 | `/finalize-epic`: roadmap update, `ground-truth/decisions.jsonl`, `/clear` |
 
-**Never commit before human approval. Never skip the pre-commit gates.** Coverage drops in `predictor/` or `reader/` (the trust-critical path) require an ADR.
+**Never commit before human approval (step 6). Never skip the local gates.** Once approved, the fix-gate-push loop in steps 8-9 doesn't need re-approval per iteration — it's converging on the already-approved scope, not changing it. Coverage drops in `predictor/` or `reader/` (the trust-critical path) require an ADR.
+
+**Deferral safety.** When a plan defers scope out of the issue being worked (e.g. "build X" narrows to "build the input Y that X needs"), post a carry-forward comment on both the source issue and the issue that inherits the deferred work *before* starting implementation — so nothing is silently dropped. State what was deferred, why, and which issue now owns it.
 
 ## Quality gates (mandatory before every PR)
 
-1. Local gates green: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ --severity-level high`, and `python scripts/check_import_boundary.py`.
-2. The **senior-reviewer** agent (`.claude/agents/senior-reviewer.md`) runs against the current branch and returns "mergeable as-is" or "mergeable with [minor changes]".
-3. If it raises P0s: fix, re-run the agent, loop until clean.
-4. Open the PR only after 1 and 2 pass. Use `/finalize-epic` for the wrap-up (commit → push → PR → roadmap update → ground-truth log).
+The gate commands: `pytest` (cov ≥ 80), `ruff check`, `ruff format --check`, `mypy --strict`, `bandit -r src/ --severity-level high`, and `python scripts/check_import_boundary.py`. The **senior-reviewer** agent (`.claude/agents/senior-reviewer.md`) reviews the branch/PR diff and returns "mergeable as-is" or "mergeable with [minor changes]"; if it raises P0s, fix them, re-run the local gates, push, and re-run the agent — loop until clean. A draft PR exists for the whole loop (Workflow step 7) so CI and reviewers see live progress instead of a single finished diff. Use `/finalize-epic` for the wrap-up once the human has signed off on any manual verification (roadmap update → ground-truth log).
 
 ## Progress tracking
 

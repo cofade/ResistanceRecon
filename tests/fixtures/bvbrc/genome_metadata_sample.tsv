@@ -1,0 +1,6 @@
+genome_id	genome_name	taxon_id	mlst	genome_length	contigs	genome_status
+573.10001	Klebsiella pneumoniae	573	kpneumoniae.258	5333942	1	Complete
+573.10002	Klebsiella pneumoniae	573		5290000	45	WGS
+573.10003	Klebsiella pneumoniae	573	kpneumoniae.15	5310000	3	Complete
+573.10004	Klebsiella pneumoniae	573	kpneumoniae.11	5298000	12	WGS
+573.10005	Klebsiella pneumoniae	573	malformed-value	5300000	8	WGS
