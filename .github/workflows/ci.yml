@@ -1,8 +1,16 @@
 name: CI
 
+# Intentional: CI runs on pushes to ALL branches and on pull requests, so a
+# feature branch gets green/red feedback before its draft PR is opened. Once a
+# PR exists, a push runs twice (a `push` run on refs/heads/<branch> and a
+# `pull_request` run on refs/pull/N/merge) — different `github.ref`, so the
+# concurrency group does NOT dedupe the pair; it only cancels superseded runs
+# on the same ref (rapid successive pushes). The doubled run on PR branches is
+# accepted in exchange for pre-PR feedback. `tags-ignore` keeps future release
+# tags (deferred; ADR-0009) from firing a redundant push run.
 on:
   push:
-    branches: [main]
+    tags-ignore: ["**"]
   pull_request:
 
 concurrency:

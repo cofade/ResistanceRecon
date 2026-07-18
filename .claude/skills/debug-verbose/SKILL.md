@@ -30,6 +30,9 @@ argument: "Optional: short description of the bug or area to instrument"
 
 ## Case studies (append one per non-obvious bug fixed)
 
-<!-- Format: Symptom -> Instrumentation -> Root cause -> Fix -> Prevention. This log is institutional memory; also mirror the lesson into CLAUDE.md "Known AI pitfalls" and Documentation/11-risks-and-technical-debt/. -->
+<!-- Format: Symptom -> Instrumentation -> Root cause -> Fix -> Prevention. Mandatory,
+same session, no exceptions. The CANONICAL detailed log is Documentation/11-risks-and-technical-debt/
+README.md §11.4; also mirror a quick line into CLAUDE.md "Known AI pitfalls" and pin a regression
+test. See gf-failure-archaeology. -->
 
 _(none yet — add the first real case study here when it happens.)_

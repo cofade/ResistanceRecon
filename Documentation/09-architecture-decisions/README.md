@@ -12,3 +12,6 @@ One record per non-trivial, hard-to-reverse decision. Format: Title, Date, Statu
 | [0006](ADR-0006-llm-boundary-rag-reviewer-report-only.md) | LLM boundary: RAG/reviewer/report only | Accepted |
 | [0007](ADR-0007-streamlit-fastapi-demo-stack.md) | Streamlit + FastAPI demo stack | Accepted |
 | [0008](ADR-0008-species-scope-kpneumoniae-first.md) | K. pneumoniae first, MRSA follow-up | Accepted |
+| [0009](ADR-0009-versioning-and-release-control.md) | Single-source version; release automation deferred | Accepted |
+| [0010](ADR-0010-draft-pr-change-control-lifecycle.md) | Draft-PR lifecycle & manual-test sovereignty | Accepted |
+| [0011](ADR-0011-pyarrow-parquet-engine.md) | Add pyarrow as the Parquet engine | Accepted |

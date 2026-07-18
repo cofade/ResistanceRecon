@@ -4,7 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "genome-firewall"
-version = "0.1.0"
+# Single source of truth: src/genome_firewall/__init__.py:__version__ (read dynamically
+# by hatch, configured below). Never add a second static version here. See ADR-0009.
+dynamic = ["version"]
 description = "Defensive AI decision-support: predict antibiotic response from a reconstructed bacterial genome (Klebsiella pneumoniae)."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -32,7 +34,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ml = ["crepes>=0.7", "mapie>=0.9", "shap>=0.45"]
+# numba floor forces modern numba/llvmlite (with cp311/cp312 wheels); without it
+# the resolver backtracks to numba 0.53.1 / llvmlite 0.36.0, which only support
+# Python <3.10 and fail to build in CI. shap pulls numba transitively. See ADR-0009.
+ml = ["crepes>=0.7", "mapie>=0.9", "shap>=0.45", "numba>=0.60"]
 api = ["fastapi>=0.111", "uvicorn[standard]>=0.30", "jinja2>=3.1"]
 ui = ["streamlit>=1.36", "plotly>=5.22"]
 llm = ["openai>=1.35"]
@@ -55,6 +60,10 @@ genome-firewall = "genome_firewall.cli:main"
 [project.urls]
 Repository = "https://github.com/cofade/ResistanceRecon"
 Documentation = "https://github.com/cofade/ResistanceRecon/tree/main/Documentation"
+
+[tool.hatch.version]
+# Version source of truth (ADR-0009): __version__ in the package __init__.
+path = "src/genome_firewall/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/genome_firewall"]
