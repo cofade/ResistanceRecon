@@ -54,6 +54,14 @@ SIR_CLASSES: Final[tuple[str, ...]] = (
     "Susceptible-dose dependent",
 )
 
+#: The two clinically opposed sides of the SIR spectrum, used by resolve_duplicate_labels
+#: to detect a genuine contradiction. Nonsusceptible is defined as "not susceptible" (as
+#: sharp an opposite of Susceptible as Resistant is) and Susceptible-dose-dependent is a
+#: susceptibility category (as sharp an opposite of Resistant as plain Susceptible is).
+#: Intermediate sits in neither side deliberately -- it does not contradict either sharply.
+_SUSCEPTIBLE_SIDE: Final[frozenset[str]] = frozenset({"Susceptible", "Susceptible-dose dependent"})
+_RESISTANT_SIDE: Final[frozenset[str]] = frozenset({"Resistant", "Nonsusceptible"})
+
 #: Columns the raw PATRIC_genome_AMR flat file must have. A missing column signals a
 #: BV-BRC schema change or the wrong filename (PATRIC_genome_AMR.txt vs
 #: PATRIC_genomes_AMR.txt — see Documentation/research-findings/bv-brc-data-access.md).
@@ -338,11 +346,12 @@ def resolve_duplicate_labels(
     Two situations are treated as genuine, unresolvable contradictions and DROPPED
     rather than guessed at -- never train on contradictory ground truth:
 
-    1. Both ``Resistant`` and ``Susceptible`` appear anywhere in the group. This is
-       checked regardless of vote counts -- a 3-Resistant/1-Susceptible group is
-       still a real disagreement, not a clean majority, because the two classes are
-       clinical opposites (unlike e.g. Resistant+Intermediate, which do not
-       contradict as sharply and are allowed to resolve normally).
+    1. A class from ``_SUSCEPTIBLE_SIDE`` (Susceptible, Susceptible-dose dependent)
+       and a class from ``_RESISTANT_SIDE`` (Resistant, Nonsusceptible) both appear
+       anywhere in the group. Checked regardless of vote counts -- a 3-Resistant/
+       1-Susceptible group is still a real disagreement, not a clean majority,
+       because the two sides are clinical opposites (unlike e.g. Resistant+
+       Intermediate, which does not contradict as sharply and resolves normally).
     2. More than one class ties for the top vote count (e.g. one Intermediate row
        and one Susceptible-dose-dependent row, no clear plurality).
 
@@ -360,7 +369,7 @@ def resolve_duplicate_labels(
     for key_values, group in votable.groupby(group_key_list, sort=False):
         keys = key_values if isinstance(key_values, tuple) else (key_values,)
         classes_present = set(group[sir_column])
-        if {"Resistant", "Susceptible"} <= classes_present:
+        if classes_present & _SUSCEPTIBLE_SIDE and classes_present & _RESISTANT_SIDE:
             dropped_frames.append(group)
             continue
         counts = group[sir_column].value_counts()
@@ -466,6 +475,9 @@ def _aggregate_mic(df: pd.DataFrame) -> pd.DataFrame:
     for (genome_id, antibiotic), group in df.groupby(["genome_id", "antibiotic"], sort=False):
         units = group["measurement_unit"].fillna("").str.strip()
         units = units[units != ""]
+        # On a genuine tie (e.g. one "mm" row and one "mg/L" row), _most_common's
+        # alphabetical tie-break picks a unit arbitrarily -- acceptable because
+        # mic_unit always names whichever unit won, so mic_value is never mislabeled.
         dominant_unit = _most_common(units)
         if dominant_unit is None:
             rows.append(

@@ -56,6 +56,34 @@ def test_describe_ftps_error_hints(exc: BaseException, expected_hint_substring: 
     assert expected_hint_substring in message
 
 
+def test_parse_facet_map_matches_real_solr_shape() -> None:
+    """Synthetic payload matching the exact shape confirmed against the live BV-BRC
+    API (Documentation/11-risks-and-technical-debt/README.md §11.4): json(nl,map)
+    returns facets as {value: count, ...}, not Solr's default flat list."""
+    payload = {
+        "facet_counts": {
+            "facet_fields": {
+                "evidence": {
+                    "Computational Method": 1728894,
+                    "Laboratory Method": 85291,
+                    "Computational Prediction": 0,
+                }
+            }
+        }
+    }
+    parsed = fetch_bvbrc_data._parse_facet_map(payload, "evidence")
+    assert parsed == {
+        "Computational Method": 1728894,
+        "Laboratory Method": 85291,
+        "Computational Prediction": 0,
+    }
+
+
+def test_parse_facet_map_missing_field_returns_empty() -> None:
+    payload = {"facet_counts": {"facet_fields": {}}}
+    assert fetch_bvbrc_data._parse_facet_map(payload, "evidence") == {}
+
+
 def test_cmd_report_end_to_end_offline(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """The full `report` subcommand (issue #12's human-checkpoint) against the
     committed fixtures -- no network, exercises real argparse wiring."""

@@ -181,13 +181,59 @@ def test_resolve_duplicate_r_and_s_coexist_dropped_even_without_a_tie() -> None:
     assert len(dropped) == 4
 
 
-def test_resolve_duplicate_tie_dropped(working_df: pd.DataFrame) -> None:
+def test_resolve_duplicate_resistant_susceptible_coexist_dropped(working_df: pd.DataFrame) -> None:
+    """573.10002/ciprofloxacin is R,S (a 1-1 tie AND a susceptible/resistant-side
+    contradiction) -- this exercises the contradiction branch, not the tie branch;
+    see test_resolve_duplicate_genuine_tie_without_contradiction for the tie branch.
+    """
     resolved, dropped = dataset.resolve_duplicate_labels(working_df)
     tied = resolved[
         (resolved["genome_id"] == "573.10002") & (resolved["antibiotic"] == "ciprofloxacin")
     ]
-    assert tied.empty  # R vs S tie -> dropped, not guessed
+    assert tied.empty  # R vs S -> dropped, not guessed
     assert len(dropped[dropped["genome_id"] == "573.10002"]) == 2
+
+
+def test_resolve_duplicate_genuine_tie_without_contradiction() -> None:
+    """Intermediate vs Susceptible-dose-dependent is a 1-1 tie with NEITHER class on
+    the opposite side (both are on/near the susceptible side) -- this must hit the
+    tie-drop branch, not the contradiction branch."""
+    df = pd.DataFrame(
+        {
+            "genome_id": ["573.99003", "573.99003"],
+            "antibiotic": ["meropenem", "meropenem"],
+            "sir": ["Intermediate", "Susceptible-dose dependent"],
+        }
+    )
+    resolved, dropped = dataset.resolve_duplicate_labels(df)
+    assert resolved.empty
+    assert len(dropped) == 2
+
+
+@pytest.mark.parametrize(
+    "sir_values",
+    [
+        pytest.param(["Susceptible", "Susceptible", "Nonsusceptible"], id="S+NS"),
+        pytest.param(["Resistant", "Susceptible-dose dependent"], id="R+SDD"),
+    ],
+)
+def test_resolve_duplicate_drops_susceptible_side_vs_resistant_side_contradictions(
+    sir_values: list[str],
+) -> None:
+    """Nonsusceptible ('not susceptible') contradicts Susceptible as sharply as
+    Resistant does; Susceptible-dose-dependent contradicts Resistant as sharply as
+    plain Susceptible does. Both must drop even though neither pair is the literal
+    {Resistant, Susceptible} the original fix only checked for."""
+    df = pd.DataFrame(
+        {
+            "genome_id": ["573.99004"] * len(sir_values),
+            "antibiotic": ["meropenem"] * len(sir_values),
+            "sir": sir_values,
+        }
+    )
+    resolved, dropped = dataset.resolve_duplicate_labels(df)
+    assert resolved.empty
+    assert len(dropped) == len(sir_values)
 
 
 def test_per_drug_counts_rows_and_unique_genomes(working_df: pd.DataFrame) -> None:

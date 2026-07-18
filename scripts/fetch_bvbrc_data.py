@@ -23,10 +23,11 @@ import json
 import time
 import urllib.error
 import urllib.request
-from ftplib import FTP_TLS, all_errors  # nosec B402 -- FTP_TLS is the encrypted variant; bandit's
 
-# blacklist rule flags any ftplib import without distinguishing FTP from FTP_TLS. See prot_p()
-# below for the encrypted-data-channel half of the guarantee.
+# nosec B402 -- FTP_TLS (below) is the encrypted variant; bandit's blacklist rule flags any
+# ftplib import without distinguishing FTP from FTP_TLS. See prot_p() for the encrypted-
+# data-channel half of the guarantee.
+from ftplib import FTP_TLS, all_errors  # nosec B402
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -132,8 +133,9 @@ def solr_facet(
             "Accept": "application/solr+json",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310 -- base_url is
-        # asserted https:// above, so the file:/custom-scheme risk this rule warns about is closed.
+    # nosec B310 -- base_url is asserted https:// above, closing the file:/custom-scheme risk
+    # this rule warns about.
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
         payload: dict[str, Any] = json.load(response)
     return payload
 
@@ -283,6 +285,17 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _parse_facet_map(payload: dict[str, Any], field: str) -> dict[str, int]:
+    """Extract a ``json(nl,map)``-shaped Solr facet as ``{value: count, ...}``.
+
+    Pure -- pinned by an offline test against a synthetic payload matching the real
+    shape (Documentation/11-risks-and-technical-debt/README.md §11.4: 'RQL values
+    need form-encoding; json(nl,map) changes the facet response shape').
+    """
+    facet = payload.get("facet_counts", {}).get("facet_fields", {}).get(field, {})
+    return {str(k): int(v) for k, v in facet.items()}
+
+
 def cmd_crosscheck(args: argparse.Namespace) -> int:
     """Phase A: compare local flat-file counts against the BV-BRC Solr Data API. The
     local flat file remains source of truth; this only flags drift to investigate."""
@@ -305,6 +318,18 @@ def cmd_crosscheck(args: argparse.Namespace) -> int:
         delta = abs(local_lab_rows - int(remote_num_found))
         verdict = "matches" if delta == 0 else "investigate before trusting counts"
         print(f"Delta: {delta}  ({verdict})")
+
+    try:
+        evidence_payload = solr_facet(
+            "genome_amr", evidence_vocabulary_rql(args.taxon_id), timeout=args.timeout
+        )
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        print(f"\nSolr evidence-vocabulary cross-check failed: {type(exc).__name__}: {exc}")
+        return 0
+    remote_evidence = _parse_facet_map(evidence_payload, "evidence")
+    print("\nSolr evidence vocabulary (ALL rows for this taxon, pre-filter):")
+    for value, count in sorted(remote_evidence.items(), key=lambda kv: -kv[1]):
+        print(f"  {value}: {count}")
     return 0
 
 
