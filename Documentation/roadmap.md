@@ -6,7 +6,10 @@
 
 ## MVP (24h sprint) — K. pneumoniae, 5 antibiotics
 
-- [ ] EPIC 1 — BV-BRC data pipeline (lab-AST labels + FASTAs)
+- [x] EPIC 1 — BV-BRC data pipeline (lab-AST labels + FASTAs). Labels/metadata ingestion +
+  provenance manifest shipped; feature_matrix (EPIC 2) and train/test splits (EPIC 3) are
+  explicitly out of scope — see carry-forward comments on #11/#13/#17/#18. The actual live
+  BV-BRC bulk pull (multi-GB FASTA download) is a separate operational step, not yet run.
 - [ ] EPIC 2 — Genome Reader (schemas + AMRFinderPlus runner + feature builder + MockAnnotator)
 - [ ] EPIC 3 — Predictor: split + target gate + LR + calibration + conformal + registry
 - [ ] EPIC 4 — Deterministic Decision Report (LLM-free MVP)
