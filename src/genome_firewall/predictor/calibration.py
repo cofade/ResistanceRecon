@@ -8,8 +8,11 @@ isotonic, because per-drug BV-BRC calibration folds rarely clear isotonic's ~100
 floor and sigmoid is the recommended choice for imbalanced, under-confident classifiers.
 
 The calibration fold is homology-grouped upstream (predictor/split.three_way_grouped_split)
-precisely because CalibratedClassifierCV's own internal splitter knows nothing about genome
-homology and would leak clones. Pure sklearn; LLM-free.
+so the calibrated probabilities are estimated on genomes group-disjoint from the training
+set -- the outer boundary that matters. (Under FrozenEstimator the base model is not refit,
+so the calibrator's own internal CV cannot leak clones; the internal CV's only job here is a
+nominal split of the calibration fold, and its fold count is bounded to the minority-class
+size below so it never emits sklearn's small-fold UserWarning.) Pure sklearn; LLM-free.
 """
 
 from __future__ import annotations
@@ -21,6 +24,7 @@ import numpy.typing as npt
 from pydantic import BaseModel, ConfigDict
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 from sklearn.metrics import brier_score_loss
+from sklearn.model_selection import StratifiedKFold
 
 try:  # sklearn >= 1.6
     from sklearn.frozen import FrozenEstimator
@@ -49,7 +53,15 @@ def calibrate(
     frozen (the ADR-0004 cv='prefit' semantics). Returns the fitted CalibratedClassifierCV.
     """
     if _HAS_FROZEN:
-        calibrated = CalibratedClassifierCV(FrozenEstimator(prefit_model), method=method)
+        # Bound the internal CV to the minority-class size so an imbalanced per-drug
+        # calibration fold (e.g. a carbapenemase-heavy meropenem set) never triggers
+        # sklearn's "least populated class has only N members < n_splits" UserWarning. Under
+        # FrozenEstimator the base is not refit, so predictions are fold-independent and the
+        # cv choice does not change the fitted calibrator -- only silences the warning.
+        minority = min(y_cal.count(0), y_cal.count(1)) if y_cal else 0
+        n_splits = max(2, min(5, minority))
+        cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=0)
+        calibrated = CalibratedClassifierCV(FrozenEstimator(prefit_model), method=method, cv=cv)
     else:  # pragma: no cover - older sklearn fallback
         calibrated = CalibratedClassifierCV(prefit_model, method=method, cv="prefit")
     calibrated.fit(x_cal, y_cal)

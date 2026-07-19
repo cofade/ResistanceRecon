@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
@@ -27,3 +29,19 @@ def test_calibrate_yields_valid_probabilities_and_a_report() -> None:
     assert 0.0 <= report.brier <= 1.0
     assert report.n == 80
     assert len(report.mean_predicted) == len(report.fraction_positive)
+
+
+def test_calibrate_is_warning_free_on_an_imbalanced_fold() -> None:
+    # An imbalanced per-drug calibration fold (minority 4 < sklearn's default 5-fold) must not
+    # emit the "least populated class ... less than n_splits" UserWarning -- the cv is bounded
+    # to the minority size, and predictions are fold-independent under FrozenEstimator.
+    rng = np.random.RandomState(1)
+    x = rng.rand(60, 3)
+    y = [1] * 4 + [0] * 56
+    model = LogisticRegression().fit(x, y)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        calibrated = calibrate(model, x, y)
+    messages = [str(item.message) for item in caught]
+    assert not any("n_splits" in m or "populated" in m for m in messages), messages
+    assert 0.0 <= predict_resistant_proba(calibrated, x).max() <= 1.0

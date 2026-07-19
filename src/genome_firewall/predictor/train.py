@@ -41,6 +41,7 @@ from genome_firewall.predictor.calibration import (
     predict_resistant_proba,
 )
 from genome_firewall.predictor.split import (
+    ClusterBackend,
     MinNGateResult,
     MlstStBackend,
     SplitResult,
@@ -190,17 +191,32 @@ def train_one_antibiotic(
     feature_schema: ModelFeatureSchema,
     config: TrainingConfig = DEFAULT_TRAINING_CONFIG,
     gate_positive: Mapping[str, bool] | None = None,
+    backend: ClusterBackend | None = None,
 ) -> DrugTrainingResult:
     """Train + calibrate one drug's model. ``labels`` maps genome_id -> "R"/"S" (already
     binary-collapsed). ``gate_positive`` (genome_id -> fired) enables the gate-negative
-    headline metrics; omit it to report marginal metrics only.
+    headline metrics; omit it to report marginal metrics only. ``backend`` selects the
+    homology grouping (defaults to MlstStBackend, shared with the split).
     """
+    if list(feature_matrix.columns) != list(feature_schema.feature_names):
+        raise ValueError(
+            "feature_matrix columns must equal feature_schema.feature_names in the same order "
+            "(build both via features.build_vocabulary + assemble_feature_matrix); a reordered "
+            "matrix would mislabel the coefficient/SHAP evidence attached to each feature"
+        )
+    resolved_backend: ClusterBackend = backend if backend is not None else MlstStBackend()
     genome_ids = sorted(set(feature_matrix.index) & set(labels))
     y = [labels[gid] for gid in genome_ids]
     y_int = [1 if label == "R" else 0 for label in y]
 
     split = make_split(
-        genome_ids, y, metadata, antibiotic=antibiotic, n_splits=config.n_splits, seed=config.seed
+        genome_ids,
+        y,
+        metadata,
+        antibiotic=antibiotic,
+        backend=resolved_backend,
+        n_splits=config.n_splits,
+        seed=config.seed,
     )
     if not split.min_n.ok or split.split is None or split.holdout is None:
         return DrugTrainingResult(
@@ -208,7 +224,7 @@ def train_one_antibiotic(
         )
 
     x = feature_matrix.loc[genome_ids].to_numpy(dtype=np.float64)
-    group_map = MlstStBackend().assign_groups(genome_ids, metadata)
+    group_map = resolved_backend.assign_groups(genome_ids, metadata)
     groups = [group_map[gid] for gid in genome_ids]
 
     train_idx = list(split.split.train_index)

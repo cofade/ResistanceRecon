@@ -29,6 +29,13 @@ from sklearn.model_selection import StratifiedGroupKFold
 from genome_firewall.constants import MIN_RESISTANT_PER_DRUG, MIN_SUSCEPTIBLE_PER_DRUG
 from genome_firewall.predictor.dataset import mlst_group_id
 
+#: A drug needs at least this many DISTINCT homology groups to form a leakage-safe grouped
+#: holdout + train/calibration/test split. Fewer means the labels are too clonal to split
+#: without a group straddling a boundary -- reported as insufficient data, never crashed on
+#: (StratifiedGroupKFold raises when n_splits exceeds the group count). The real-data failure
+#: mode: a thin drug whose labels concentrate in one or two dominant STs (ST258/ST512/ST11).
+MIN_DISTINCT_GROUPS = 4
+
 
 class LeakageError(RuntimeError):
     """Raised when a homology group would appear on both sides of a split boundary."""
@@ -110,6 +117,8 @@ class SplitResult(_Frozen):
 
 class ClusterBackend(Protocol):
     """Assigns each genome_id a homology-group id used for the grouped split."""
+
+    name: str
 
     def assign_groups(
         self, genome_ids: Sequence[str], metadata: pd.DataFrame
@@ -329,16 +338,50 @@ def make_split(
             antibiotic=antibiotic, backend=backend_name, seed=seed, n_groups=n_groups, min_n=min_n
         )
 
-    holdout = leave_one_group_out_holdout(y, groups)
-    remaining = list(holdout.remaining_index)
-    y_rem = [y[i] for i in remaining]
-    groups_rem = [groups[i] for i in remaining]
-    local = three_way_grouped_split(y_rem, groups_rem, n_splits=n_splits, seed=seed)
-    split = ThreeWaySplit(
-        train_index=tuple(remaining[i] for i in local.train_index),
-        calibration_index=tuple(remaining[i] for i in local.calibration_index),
-        test_index=tuple(remaining[i] for i in local.test_index),
-    )
+    def _insufficient(reason: str) -> SplitResult:
+        # min-n (R/S counts) passed, but the drug can't be split -- report it as insufficient
+        # data (never crash on a too-clonal drug). n_resistant/n_susceptible carry the real
+        # counts; the reason names the group-diversity cause.
+        return SplitResult(
+            antibiotic=antibiotic,
+            backend=backend_name,
+            seed=seed,
+            n_groups=n_groups,
+            min_n=MinNGateResult(
+                ok=False,
+                n_resistant=min_n.n_resistant,
+                n_susceptible=min_n.n_susceptible,
+                reason=reason,
+            ),
+        )
+
+    if n_groups < MIN_DISTINCT_GROUPS:
+        return _insufficient(
+            f"insufficient homology-group diversity: {n_groups} distinct group(s) < "
+            f"{MIN_DISTINCT_GROUPS} needed for a leakage-safe grouped holdout + "
+            "train/calibration/test split (labels too clonal to split without leakage)"
+        )
+
+    try:
+        holdout = leave_one_group_out_holdout(y, groups)
+        remaining = list(holdout.remaining_index)
+        y_rem = [y[i] for i in remaining]
+        groups_rem = [groups[i] for i in remaining]
+        local = three_way_grouped_split(y_rem, groups_rem, n_splits=n_splits, seed=seed)
+        split = ThreeWaySplit(
+            train_index=tuple(remaining[i] for i in local.train_index),
+            calibration_index=tuple(remaining[i] for i in local.calibration_index),
+            test_index=tuple(remaining[i] for i in local.test_index),
+        )
+        train_y = [y[i] for i in split.train_index]
+        train_groups = [groups[i] for i in split.train_index]
+        inner_folds = make_grouped_folds(train_y, train_groups, n_splits=n_splits, seed=seed)
+    except ValueError as exc:
+        # StratifiedGroupKFold raises when a dominant clone leaves a fold with too few groups
+        # of a class -- degrade to insufficient data rather than aborting the whole run.
+        # (A genuine leak raises LeakageError, a RuntimeError, and is NOT swallowed here.)
+        return _insufficient(f"grouped split could not be formed (too clonal/imbalanced): {exc}")
+
     no_leakage_check(
         groups,
         split.train_index,
@@ -346,10 +389,6 @@ def make_split(
         split.test_index,
         holdout.holdout_index,
     )
-
-    train_y = [y[i] for i in split.train_index]
-    train_groups = [groups[i] for i in split.train_index]
-    inner_folds = make_grouped_folds(train_y, train_groups, n_splits=n_splits, seed=seed)
     balances = per_fold_class_balance(inner_folds, train_y)
 
     return SplitResult(

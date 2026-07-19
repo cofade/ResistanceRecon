@@ -93,6 +93,20 @@ def test_evaluate_min_n_flags_insufficient_susceptible() -> None:
     assert result.reason is not None
 
 
+def test_make_split_reports_insufficient_data_on_a_too_clonal_drug() -> None:
+    # 20 R / 20 S clears the min-n COUNT gate, but the labels sit in only 2 MLST STs -- too
+    # clonal to split without a group straddling a boundary. Must degrade to insufficient_data,
+    # never crash (StratifiedGroupKFold would otherwise raise n_splits > n_groups).
+    genome_ids = [f"g{i}" for i in range(40)]
+    y = ["R"] * 20 + ["S"] * 20
+    sts = ["258" if i % 2 == 0 else "512" for i in range(40)]
+    metadata = pd.DataFrame({"genome_id": genome_ids, "mlst_scheme": ["kp"] * 40, "mlst_st": sts})
+    result = make_split(genome_ids, y, metadata, antibiotic="meropenem")
+    assert result.min_n.ok is False
+    assert result.split is None and result.holdout is None
+    assert result.min_n.reason is not None and "group" in result.min_n.reason.lower()
+
+
 def test_make_split_short_circuits_on_min_n_failure() -> None:
     genome_ids = [f"g{i}" for i in range(30)]
     y = ["R"] * 25 + ["S"] * 5  # only 5 S -> below the gate

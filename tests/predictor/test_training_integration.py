@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import warnings
+
 import pytest
 
 from genome_firewall.features.feature_matrix import assemble_feature_matrix
@@ -49,3 +51,19 @@ def test_pra_pipeline_trains_a_model_drug_and_flags_the_thin_drug(
     )
     assert thin.status == "insufficient_data"
     assert thin.calibrated_model is None
+
+    # meropenem is imbalanced (carbapenemase-driven, 24 R / 96 S, gate fires) -- training it
+    # must not crash or emit sklearn's small-fold warning on the minority calibration fold.
+    mero_gate = {v.genome_id: evaluate_gate("meropenem", v).result.fired for v in vectors}
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        mero = train_one_antibiotic(
+            matrix,
+            labels["meropenem"],
+            metadata,
+            antibiotic="meropenem",
+            feature_schema=schema,
+            gate_positive=mero_gate,
+        )
+    assert mero.status == "trained"
+    assert not any("n_splits" in str(c.message) or "populated" in str(c.message) for c in caught)
