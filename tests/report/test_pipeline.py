@@ -37,6 +37,23 @@ def test_accepted_path_serves_the_llm_narrative() -> None:
     assert LAB_CONFIRMATION_DISCLAIMER in (env.report.narrative_summary or "")
 
 
+def test_llm_disclaimer_caveat_is_not_duplicated() -> None:
+    """An LLM that helpfully restates the disclaimer as a caveat must not yield two disclaimers:
+    the canonical one is appended once and the near-duplicate caveat is dropped (golden rule #4)."""
+    narrative = NLReportSection(
+        summary="Decision support summary.",
+        per_antibiotic=(
+            NLDrugNarrative(antibiotic="meropenem", narrative="Meropenem is LIKELY TO FAIL."),
+        ),
+        caveats=("Confirm all results with standard laboratory susceptibility testing.",),
+    )
+    env = narrate_report(_REPORT, client=_client(narrative, judge_pass=True))
+    assert env.source == "llm"
+    summary = env.report.narrative_summary or ""
+    assert summary.count(LAB_CONFIRMATION_DISCLAIMER) == 1
+    assert summary.count("susceptibility testing") == 1
+
+
 def test_judge_rejection_fails_closed_to_template() -> None:
     env = narrate_report(_REPORT, client=_client(_GROUNDED, judge_pass=False))
     assert env.review_status == "llm_output_rejected"

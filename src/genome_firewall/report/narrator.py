@@ -26,7 +26,10 @@ _SYSTEM = (
     "association say the model weighted it, not that it causes resistance. (4) State each drug's "
     "verdict (LIKELY TO WORK / LIKELY TO FAIL / NO CALL) and any mechanism/causal claim ONLY "
     "inside that drug's per_antibiotic narrative; keep the `summary` and `caveats` as a high-level "
-    "overview free of any per-drug verdict phrase or causal claim. (5) Keep it concise."
+    "overview free of any per-drug verdict phrase or causal claim. (5) Keep it concise. "
+    "(6) Do NOT restate the lab-confirmation disclaimer (the 'confirm with laboratory "
+    "testing' sentence); the system appends the official disclaimer, so restating it "
+    "duplicates it."
 )
 
 
