@@ -5,13 +5,28 @@ from __future__ import annotations
 
 import warnings
 
+import numpy as np
 import pytest
 
 from genome_firewall.features.feature_matrix import assemble_feature_matrix
 from genome_firewall.features.vocabulary import build_vocabulary
 from genome_firewall.predictor.target_gate import evaluate_gate
-from genome_firewall.predictor.train import train_one_antibiotic
+from genome_firewall.predictor.train import _signed_coefficients, train_one_antibiotic
 from tests.predictor.conftest import SyntheticCohort
+
+
+def test_signed_coefficients_retains_the_full_vector_not_a_top_k_slice() -> None:
+    # Direct producer pin for the coefficient-truncation P1: train._signed_coefficients (the
+    # root-cause function) must return EVERY feature's weight. A >20-feature model is required to
+    # catch a revert to `pairs[:20]`; the shared synthetic cohort has only 14 features, so the
+    # e2e / registry len==len assertions alone cannot bite at the truncation boundary.
+    class _FakeLR:
+        coef_ = np.arange(30, dtype=float).reshape(1, 30)
+
+    names = tuple(f"f{i:02d}" for i in range(30))
+    coefficients = _signed_coefficients(_FakeLR(), names)
+    assert len(coefficients) == 30
+    assert {coefficient.feature for coefficient in coefficients} == set(names)
 
 
 @pytest.mark.integration
