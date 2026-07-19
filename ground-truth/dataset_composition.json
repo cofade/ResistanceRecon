@@ -1,0 +1,47 @@
+{
+  "note": "Aggregate composition of the BV-BRC K. pneumoniae lab-AST source pull and the modelled subset. Committed as ground-truth so every figure in Documentation/DATASHEET.md traces to a committed artifact. Distilled from data/processed/dataset_manifest.json (created 2026-07-19T02:52:07Z) + the training feature matrix -- both gitignored, reproducible via scripts/build_dataset.py -> scripts/build_feature_matrix.py.",
+  "source": {
+    "ftps_host": "ftp.bv-brc.org",
+    "amr_flatfile": "PATRIC_genome_AMR.txt",
+    "genome_metadata_file": "genome_metadata",
+    "taxon_id": 573,
+    "evidence_values_kept": ["Laboratory Method"]
+  },
+  "funnel": {
+    "raw_rows": 85291,
+    "lab_rows": 80645,
+    "labels_after_collapse": 64237,
+    "dropped_conflict": 116,
+    "dropped_uncanonical_sir": 15650,
+    "unique_genomes_with_label": 5227
+  },
+  "sir_raw_distribution": {
+    "Resistant": 42084,
+    "Susceptible": 24056,
+    "Intermediate": 3370,
+    "Nonsusceptible": 128,
+    "blank": 15653
+  },
+  "mlst_coverage": {
+    "genomes_total": 39628,
+    "with_st": 36885,
+    "missing_st": 2743,
+    "missing_fraction": 0.0692187342283234
+  },
+  "per_drug_panel": {
+    "ciprofloxacin": {"R": 2406, "S": 688, "I": 82, "genomes": 4157, "clsi": 2488, "eucast": 914, "other_or_blank": 781},
+    "trimethoprim-sulfamethoxazole": {"R": 2104, "S": 720, "I": 15, "genomes": 3097, "clsi": 2487, "eucast": 458, "other_or_blank": 178},
+    "ceftriaxone": {"R": 2145, "S": 417, "I": 62, "genomes": 2902, "clsi": 2468, "eucast": 194, "other_or_blank": 251},
+    "gentamicin": {"R": 1516, "S": 2049, "I": 111, "genomes": 4239, "clsi": 2523, "eucast": 1056, "other_or_blank": 687},
+    "meropenem": {"R": 1463, "S": 1904, "I": 157, "genomes": 5433, "clsi": 4060, "eucast": 853, "other_or_blank": 624}
+  },
+  "modelled_subset": {
+    "n_genomes": 130,
+    "n_homology_groups": 67,
+    "n_st_groups": 64,
+    "n_singletons": 3,
+    "n_features": 186,
+    "amrfinder_db_version": "2026-05-15.1"
+  },
+  "tool_versions": {"python": "3.12.9", "pandas": "2.3.3"}
+}
