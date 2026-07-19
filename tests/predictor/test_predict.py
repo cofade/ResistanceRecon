@@ -294,6 +294,51 @@ def test_predict_antibiotic_also_fails_loud_on_compat() -> None:
         predict_antibiotic(_carbapenemase_vector(db="2099-01-01.9"), "meropenem", registry)
 
 
+def test_full_vector_present_determinant_beyond_top20_is_not_zeroed() -> None:
+    # Regression pin for the coefficient-truncation P1: a PRESENT resistance determinant ranked
+    # BEYOND the old top-20 display slice must still carry its real weight, so the honest
+    # "no known determinants" note is suppressed. A [:20] slice (the original bug) would zero it
+    # and falsely declare works-from-absence -- the exact overclaim ADR-0018 forbids.
+    names = (*(f"noise{i:02d}" for i in range(25)), "rareDeterminant")
+    coefficients = (
+        *(SignedCoefficient(feature=f"noise{i:02d}", coefficient=5.0 - i * 0.1) for i in range(25)),
+        SignedCoefficient(feature="rareDeterminant", coefficient=0.4),  # positive, ranked last
+    )
+    schema = ModelFeatureSchema(
+        schema_version=_SCHEMA_V,
+        amrfinder_db_version=_DB,
+        engineered_feature_spec_version="1",
+        feature_names=names,
+        vocabulary_sha256="cafe",
+    )
+    conformal = ConformalArtifact(
+        alpha=0.1,
+        tau_s=0.5,
+        tau_r=0.5,
+        n_cal_susceptible=50,
+        n_cal_resistant=50,
+        guarantee_available=True,
+    )
+    model = DrugModel(
+        antibiotic="gentamicin",
+        version="v1",
+        calibrated_model=_FixedModel(0.05),  # low p -> {S} -> likely_to_work
+        feature_schema=schema,
+        conformal=conformal,
+        coefficients=coefficients,
+    )
+    vector = GenomeFeatureVector(
+        genome_id="t",
+        schema_version=_SCHEMA_V,
+        amrfinder_db_version=_DB,
+        gene_presence={"rareDeterminant": True},  # the one present feature, ranked #26 by |weight|
+    )
+    prediction = predict_antibiotic(vector, "gentamicin", _registry_for(model))
+    assert prediction.verdict == "likely_to_work"
+    # The present positive determinant is seen -> the false "no known determinants" note is absent.
+    assert not any("no known" in feature for feature in prediction.supporting_features)
+
+
 def test_engineered_spec_version_mismatch_raises() -> None:
     # Running-code engineered-feature spec differs from the trained model's -> fail loud.
     registry = PredictorRegistry(

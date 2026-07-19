@@ -35,6 +35,9 @@ def test_pra_pipeline_trains_a_model_drug_and_flags_the_thin_drug(
     )
     assert result.status == "trained"
     assert result.calibrated_model is not None
+    # The full signed coefficient vector is retained (one weight per feature), not a display
+    # top-k -- so predict.py's per-genome attribution can cite every present feature.
+    assert len(result.coefficients) == len(schema.feature_names)
     assert result.metrics is not None and result.metrics.test_marginal is not None
     assert result.metrics.test_marginal.resistant_recall >= 0.8
     # the model's own top coefficients should implicate the AME signal (statistical evidence)

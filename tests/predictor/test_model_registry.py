@@ -53,6 +53,9 @@ def test_save_load_round_trip(synthetic_cohort: SyntheticCohort, tmp_path: Path)
     assert loaded.feature_schema.vocabulary_sha256 == schema.vocabulary_sha256
     assert loaded.conformal.tau_r == artifact.tau_r
     assert loaded.coefficients == result.coefficients
+    # The FULL signed coefficient vector is persisted (one per feature), not a display top-k --
+    # the pin for the truncation P1 (a [:20] slice would zero the per-genome evidence path).
+    assert len(loaded.coefficients) == len(loaded.feature_schema.feature_names)
     # The persisted calibrated model reproduces the same probabilities.
     x = matrix.to_numpy(dtype=np.float64)[:4]
     original = predict_resistant_proba(result.calibrated_model, x)
