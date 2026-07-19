@@ -83,3 +83,13 @@ def test_narrative_envelope_carries_no_verdict_field() -> None:
 
     forbidden = {"verdict", "calibrated_confidence", "probability_resistant", "sir"}
     assert forbidden.isdisjoint(NarrativeEnvelope.model_fields)
+
+
+def test_published_percents_grounded_tripwire() -> None:
+    # #45-A tripwire: every percent in the FINAL published string must be one of the report's own
+    # numbers, else narrate_report fails closed. Unit-pins the helper the pipeline gates on.
+    from genome_firewall.report.reviewer import published_percents_grounded
+
+    report = build_report(_ALL_DRUGS)
+    assert published_percents_grounded("meropenem: LIKELY TO FAIL (confidence 99%).", report)
+    assert not published_percents_grounded("resistance is estimated at 73% here.", report)

@@ -35,4 +35,10 @@ same session, no exceptions. The CANONICAL detailed log is Documentation/11-risk
 README.md §11.4; also mirror a quick line into CLAUDE.md "Known AI pitfalls" and pin a regression
 test. See gf-failure-archaeology. -->
 
-_(none yet — add the first real case study here when it happens.)_
+### Issue #45 — a percent token that exists only in the published narrative
+
+- **Symptom:** the reviewer's deterministic pre-check reported a narrative as clean (`_PERCENT_RE.findall` on the validated prose = `[]`), yet the string actually published by `report/pipeline._flatten` contained an `88%` confidence token no check had seen.
+- **Instrumentation:** printed `_PERCENT_RE.findall(...)` at two points — on `reviewer._section_prose(section)` (what the pre-check scans) and on `pipeline._flatten(section, report)` (what is published) — for a section whose per-drug narrative ended in a bare KB digit (`…identity 88`) followed by a caveat beginning `%`. Observed `[]` vs `['88']`: the differential is real and lives entirely in the newline join.
+- **Root cause:** two guards checking a proxy. The pre-check scans a *differently-ordered* serialization (`summary, caveats, narratives`) than `_flatten` publishes (`summary, narratives, caveats, disclaimer`), and `_PERCENT_RE = (\d+(?:\.\d+)?)\s*%` — the `\s*` matches a newline, so `"88\n%"` forms an `88%` token across the join in the published order only.
+- **Fix:** `_PERCENT_RE` → `(\d+(?:\.\d+)?)[^\S\r\n]*%` (intra-line); number validation moved per-component so each published unit is what is checked; `reviewer.published_percents_grounded` re-scans the FINAL flattened string with `pipeline.narrate_report` failing closed to the deterministic template on any ungrounded published percent.
+- **Prevention:** a deterministic guard must scan the exact artifact it protects; where it can't, a fail-closed tripwire on the published string catches drift. Pinned by `tests/report/test_pipeline.py::test_flattened_output_forms_no_percent_the_precheck_missed` and `::test_tripwire_fails_closed_if_flatten_emits_an_ungrounded_percent`. See §11.4 (issue #45), ADR-0023.

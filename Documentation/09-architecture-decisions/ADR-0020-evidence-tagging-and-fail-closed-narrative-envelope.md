@@ -42,7 +42,9 @@ narrative (EPIC 5) must fail closed when it cannot be trusted (ADR-0006). Two de
   verdict or causal phrase at all** — those belong in the per-antibiotic narratives — so no
   proximity heuristic is load-bearing (a proximity guess is defeated by a plural/aggregate sentence
   such as "both are likely to work"). The narrator prompt mirrors this contract. A confidence-shaped
-  number (`N%`) must match one of the report's own numbers, not merely KB text. This makes the
+  number (`N%`) must match one of the report's own numbers, not merely KB text. **(Refined by
+  ADR-0023: this binding is now per-drug — a per-antibiotic narrative's `N%` must equal that drug's
+  own rendered confidence, and a fail-closed tripwire re-checks the final published string.)** This makes the
   guard's strength independent of *which field* a claim lands in, and removes both the multi-drug
   masking hole and the contrastive false-reject that per-drug proximity attribution would have.
 - The **deterministic renderer is verdict-aware**: a present-but-non-gating known-mechanism gene on

@@ -9,6 +9,7 @@ records why. The disclaimer is present on every branch.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from typing import Literal
 
@@ -21,7 +22,7 @@ from genome_firewall.llm.errors import LLMError
 from genome_firewall.report.narrative import render_deterministic_narrative
 from genome_firewall.report.narrator import generate_narrative
 from genome_firewall.report.nl_schemas import NLReportSection, ReportVerdict
-from genome_firewall.report.reviewer import review_narrative
+from genome_firewall.report.reviewer import published_percents_grounded, review_narrative
 from genome_firewall.schemas import GenomeReport
 
 ReviewStatus = Literal["llm_output_accepted", "llm_output_rejected", "llm_disabled"]
@@ -62,11 +63,24 @@ def _template_envelope(
 
 
 def _restates_disclaimer(caveat: str) -> bool:
-    """True when an LLM caveat restates the lab-confirmation disclaimer (which the pipeline
-    appends verbatim). Dropping it avoids the double disclaimer the model produces when it adds
-    its own; the canonical disclaimer from ``report.disclaimer`` still stands (golden rule #4)."""
+    """True only when a caveat near-restates the appended lab-confirmation disclaimer, so the
+    model's helpful duplicate is dropped while a *distinct* clinical caveat is preserved.
+
+    The bug (issue #45-C) was the first conjunct: substring ``"confirm"`` also matched
+    ``"confirmed"``, so a real hedge ('the blaKPC allele could not be confirmed -- laboratory
+    re-testing advised') was wrongly dropped. Fixed with a word boundary (``\bconfirm\b`` does
+    not fire on 'confirmed') and anchored on the canonical's 'result' skeleton, so a
+    specific-finding hedge naming no 'result' is kept. The lab conjunct stays broad ('laborator'
+    OR 'susceptibility test') so a 'laboratory testing' restatement is still de-duplicated. A
+    paraphrase omitting the skeleton is not dropped -- at worst a cosmetic double disclaimer, not
+    a lost caveat; the canonical disclaimer from ``report.disclaimer`` still stands (rule #4).
+    """
     lowered = caveat.lower()
-    return "confirm" in lowered and ("laborator" in lowered or "susceptibility test" in lowered)
+    return (
+        re.search(r"\bconfirm\b", lowered) is not None
+        and "result" in lowered
+        and ("laborator" in lowered or "susceptibility test" in lowered)
+    )
 
 
 def _flatten(section: NLReportSection, report: GenomeReport) -> str:
@@ -106,7 +120,18 @@ def narrate_report(
             report, "llm_output_rejected", error=outcome.reason, grounding=outcome.verdict
         )
 
-    report_with_narrative = _with_summary(report, _flatten(section, report))
+    flattened = _flatten(section, report)
+    if not published_percents_grounded(flattened, report):
+        # Defense-in-depth tripwire (#45-A): the accepted narrative serialised to a percent absent
+        # from the report's own numbers. Fail closed to the deterministic template rather than
+        # publish it, keeping the review verdict for provenance.
+        return _template_envelope(
+            report,
+            "llm_output_rejected",
+            error="published narrative contains an ungrounded percent",
+            grounding=outcome.verdict,
+        )
+    report_with_narrative = _with_summary(report, flattened)
     return NarrativeEnvelope(
         report=report_with_narrative,
         review_status="llm_output_accepted",
