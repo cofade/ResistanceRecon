@@ -56,6 +56,210 @@ def test_describe_ftps_error_hints(exc: BaseException, expected_hint_substring: 
     assert expected_hint_substring in message
 
 
+def _fake_ftps_download(
+    responses: dict[str, fetch_bvbrc_data.FetchResult],
+    calls: list[str],
+):
+    """Build a fake `ftps_download` keyed by the requested filename (last path segment),
+    recording call order in `calls` -- for pinning ftps_download_flatfile's fallback
+    order and stop-on-non-550 behavior (issue #41) without touching the network."""
+
+    def fake(
+        host: str,
+        remote_path: str,
+        dest,
+        *,
+        user: str = "anonymous",
+        password: str = "guest",
+        timeout: float = 60.0,
+    ) -> fetch_bvbrc_data.FetchResult:
+        name = remote_path.rsplit("/", 1)[-1]
+        calls.append(name)
+        return responses[name]
+
+    return fake
+
+
+def test_ftps_download_flatfile_falls_back_to_singular_on_550(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """BV-BRC's flat-file name drifted plural->singular before and singular->plural
+    since (issue #41); a clean 550 on the current default must fall back to the next
+    known name, not fail outright."""
+    calls: list[str] = []
+    responses = {
+        "PATRIC_genomes_AMR.txt": fetch_bvbrc_data.FetchResult(
+            ok=False, source="x", error="error_perm: 550 not found"
+        ),
+        "PATRIC_genome_AMR.txt": fetch_bvbrc_data.FetchResult(
+            ok=True, source="x", path=tmp_path / "PATRIC_genome_AMR.txt"
+        ),
+    }
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", _fake_ftps_download(responses, calls))
+
+    result = fetch_bvbrc_data.ftps_download_flatfile(
+        fetch_bvbrc_data.DEFAULT_HOST, tmp_path, timeout=1.0
+    )
+
+    assert result.ok
+    assert calls == ["PATRIC_genomes_AMR.txt", "PATRIC_genome_AMR.txt"]  # plural first
+
+
+def test_ftps_download_flatfile_succeeds_on_first_try_no_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The current-production happy path: the plural name is served, succeeds on the
+    first attempt, and the singular legacy name is never even tried."""
+    calls: list[str] = []
+    responses = {
+        "PATRIC_genomes_AMR.txt": fetch_bvbrc_data.FetchResult(
+            ok=True, source="x", path=tmp_path / "PATRIC_genomes_AMR.txt"
+        ),
+    }
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", _fake_ftps_download(responses, calls))
+
+    result = fetch_bvbrc_data.ftps_download_flatfile(
+        fetch_bvbrc_data.DEFAULT_HOST, tmp_path, timeout=1.0
+    )
+
+    assert result.ok
+    assert calls == ["PATRIC_genomes_AMR.txt"]  # no fallback attempted
+
+
+def test_ftps_download_flatfile_explicit_filename_is_pinned_exclusively(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An explicit `filename` override must never silently fall back to a name the
+    caller didn't ask for, even if it 550s -- distinguishes a real pin from "unset"."""
+    calls: list[str] = []
+    responses = {
+        "some_custom_name.txt": fetch_bvbrc_data.FetchResult(
+            ok=False, source="x", error="error_perm: 550 not found"
+        ),
+    }
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", _fake_ftps_download(responses, calls))
+
+    result = fetch_bvbrc_data.ftps_download_flatfile(
+        fetch_bvbrc_data.DEFAULT_HOST, tmp_path, filename="some_custom_name.txt", timeout=1.0
+    )
+
+    assert not result.ok
+    assert calls == ["some_custom_name.txt"]  # never expanded to KNOWN_FLATFILE_NAMES
+
+
+def test_ftps_download_flatfile_stops_on_425(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A 425 (router-ALG data-channel block, §11.4) is not a naming problem -- retrying
+    a different filename over the same blocked data channel cannot help, so the helper
+    must stop after the first candidate rather than burn through the whole list."""
+    calls: list[str] = []
+    responses = {
+        "PATRIC_genomes_AMR.txt": fetch_bvbrc_data.FetchResult(
+            ok=False, source="x", error="error_perm: 425 Unable to build data connection"
+        ),
+        "PATRIC_genome_AMR.txt": fetch_bvbrc_data.FetchResult(
+            ok=True, source="x", path=tmp_path / "PATRIC_genome_AMR.txt"
+        ),
+    }
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", _fake_ftps_download(responses, calls))
+
+    result = fetch_bvbrc_data.ftps_download_flatfile(
+        fetch_bvbrc_data.DEFAULT_HOST, tmp_path, timeout=1.0
+    )
+
+    assert not result.ok
+    assert "425" in (result.error or "")
+    assert calls == ["PATRIC_genomes_AMR.txt"]  # did not try the second name
+
+
+def test_ftps_download_flatfile_returns_last_550_when_all_missing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If every known name 550s, the server has drifted to a third name -- surface the
+    actionable hint from the last attempt rather than swallowing it."""
+    calls: list[str] = []
+    responses = {
+        name: fetch_bvbrc_data.FetchResult(
+            ok=False, source="x", error=f"error_perm: 550 {name} not found"
+        )
+        for name in fetch_bvbrc_data.KNOWN_FLATFILE_NAMES
+    }
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", _fake_ftps_download(responses, calls))
+
+    result = fetch_bvbrc_data.ftps_download_flatfile(
+        fetch_bvbrc_data.DEFAULT_HOST, tmp_path, timeout=1.0
+    )
+
+    assert not result.ok
+    assert calls == list(fetch_bvbrc_data.KNOWN_FLATFILE_NAMES)
+    assert fetch_bvbrc_data.KNOWN_FLATFILE_NAMES[-1] in (result.error or "")
+    # The exhausted-fallback context must be explicit, not just the single (possibly
+    # already-tried) name the generic 550 hint names.
+    assert "already tried every known name" in (result.error or "")
+
+
+def test_cmd_fetch_labels_skips_when_fallback_name_already_exists_locally(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A file that landed under the singular fallback name on a previous run must be
+    recognized as already-present on a re-run -- the pre-check looks at every known
+    candidate (_flatfile_candidates), not just the plural default (issue #41 senior
+    review round 2)."""
+    (tmp_path / "PATRIC_genome_AMR.txt").write_text("genome_id\tantibiotic\n", encoding="utf-8")
+
+    def fake(
+        host: str,
+        remote_path: str,
+        dest: Path,
+        *,
+        user: str = "anonymous",
+        password: str = "guest",
+        timeout: float = 60.0,
+    ) -> fetch_bvbrc_data.FetchResult:
+        raise AssertionError("ftps_download must not be called when a candidate already exists")
+
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", fake)
+    args = fetch_bvbrc_data.build_parser().parse_args(["fetch-labels", "--out-dir", str(tmp_path)])
+    assert args.func(args) == 0
+
+    printed = capsys.readouterr().out
+    assert "already exists; skipping" in printed
+    assert "PATRIC_genome_AMR.txt" in printed
+
+
+def test_cmd_fetch_labels_falls_back_offline(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The real `fetch-labels` CLI, driven end-to-end offline: the plural default 550s,
+    the singular legacy name succeeds, and the file lands under the resolved name."""
+    calls: list[str] = []
+
+    def fake(
+        host: str,
+        remote_path: str,
+        dest: Path,
+        *,
+        user: str = "anonymous",
+        password: str = "guest",
+        timeout: float = 60.0,
+    ) -> fetch_bvbrc_data.FetchResult:
+        name = remote_path.rsplit("/", 1)[-1]
+        calls.append(name)
+        if name == "PATRIC_genomes_AMR.txt":
+            return fetch_bvbrc_data.FetchResult(ok=False, source="x", error="error_perm: 550 nf")
+        dest.write_text("genome_id\tantibiotic\n", encoding="utf-8")
+        return fetch_bvbrc_data.FetchResult(ok=True, source="x", path=dest)
+
+    monkeypatch.setattr(fetch_bvbrc_data, "ftps_download", fake)
+    args = fetch_bvbrc_data.build_parser().parse_args(["fetch-labels", "--out-dir", str(tmp_path)])
+    assert args.func(args) == 0
+    assert calls == ["PATRIC_genomes_AMR.txt", "PATRIC_genome_AMR.txt"]
+    assert (tmp_path / "PATRIC_genome_AMR.txt").exists()
+    printed = capsys.readouterr().out
+    assert "AMR flat file: OK" in printed
+
+
 def test_parse_facet_map_matches_real_solr_shape() -> None:
     """Synthetic payload matching the exact shape confirmed against the live BV-BRC
     API (Documentation/11-risks-and-technical-debt/README.md §11.4): json(nl,map)

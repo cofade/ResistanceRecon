@@ -39,7 +39,15 @@ from genome_firewall.predictor import dataset
 from genome_firewall.predictor.dataset import LAB_EVIDENCE
 
 DEFAULT_HOST = "ftp.bv-brc.org"
-DEFAULT_FLATFILE = "PATRIC_genome_AMR.txt"
+#: BV-BRC's AMR flat-file name has drifted server-side before and will again (issue
+#: #41: singular -> plural, 2026-07). Plural first (current), singular as legacy
+#: fallback -- ftps_download_flatfile tries each in order on a clean 550 "not found".
+KNOWN_FLATFILE_NAMES = ("PATRIC_genomes_AMR.txt", "PATRIC_genome_AMR.txt")
+#: fetch-labels-https (ADR-0016) builds this TSV locally from Data API records -- it
+#: has no server-side filename to drift, so it gets its own constant rather than
+#: sharing KNOWN_FLATFILE_NAMES (which tracks the live FTPS server's name and can
+#: drift independently of this one, issue #41 senior review).
+DEFAULT_LABELS_OUTPUT_FILENAME = "PATRIC_genome_AMR.txt"
 DEFAULT_METADATA_FILE = "genome_metadata"
 RELEASE_NOTES_DIR = "RELEASE_NOTES"
 SOLR_BASE = "https://www.bv-brc.org/api"
@@ -84,6 +92,60 @@ def ftps_download(
     except all_errors as exc:
         tmp.unlink(missing_ok=True)
         return FetchResult(ok=False, source=source, error=_describe_ftps_error(exc))
+
+
+def _flatfile_candidates(filename: str | None) -> list[str]:
+    """Try-order of AMR flat-file names: `filename` alone if given (an explicit
+    override is pinned exclusively -- no silent fallback to a name the caller didn't
+    ask for), else every `KNOWN_FLATFILE_NAMES` entry in order (issue #41)."""
+    return [filename] if filename else list(KNOWN_FLATFILE_NAMES)
+
+
+def ftps_download_flatfile(
+    host: str,
+    dest_dir: Path,
+    *,
+    filename: str | None = None,
+    user: str = "anonymous",
+    password: str = "guest",
+    timeout: float = 60.0,
+) -> FetchResult:
+    """Download the BV-BRC AMR flat file, tolerating the singular/plural filename
+    drift (issue #41) instead of pinning one name.
+
+    Tries `_flatfile_candidates(filename)` in order. A clean `550` (file not found --
+    the control channel worked, the name is just wrong) advances to the next
+    candidate. Any other failure (425 data-channel block, timeout, auth) stops
+    immediately and is returned as-is -- retrying a different *name* cannot fix a
+    blocked *data channel*, and this keeps every retry on the cheap control channel
+    only, never re-touching the router-ALG-fragile data channel (see the 425 entry in
+    Documentation/11-risks-and-technical-debt/README.md §11.4).
+    """
+    candidates = _flatfile_candidates(filename)
+    result: FetchResult | None = None
+    for name in candidates:
+        result = ftps_download(
+            host,
+            f"{RELEASE_NOTES_DIR}/{name}",
+            dest_dir / name,
+            user=user,
+            password=password,
+            timeout=timeout,
+        )
+        if result.ok or result.error is None or "550" not in result.error:
+            return result
+    assert result is not None  # candidates is never empty
+    # Every known name 550'd. The generic hint on result.error names ONE candidate
+    # (whichever was tried last) as a suggested retry -- but if that wasn't the first
+    # candidate, it was already tried and failed, making the hint circular. Make the
+    # exhausted-fallback case explicit instead of leaving that stale suggestion as the
+    # only signal.
+    tried = ", ".join(candidates)
+    return result._replace(
+        error=f"{result.error} (already tried every known name: {tried} -- BV-BRC's "
+        "flat-file name has drifted again; check the live RELEASE_NOTES/ listing and "
+        "add the new name to KNOWN_FLATFILE_NAMES)"
+    )
 
 
 def _describe_ftps_error(exc: BaseException) -> str:
@@ -374,12 +436,24 @@ def cmd_fetch_labels(args: argparse.Namespace) -> int:
     """Phase A: FTPS-download the AMR flat file (+ optional genome_metadata). No
     FASTAs -- that's fetch-fasta, gated behind the human checkpoint in `report`."""
     out_dir = Path(args.out_dir)
-    dest = out_dir / args.filename
-    if dest.exists() and not args.overwrite:
-        print(f"{dest} already exists; skipping (use --overwrite to re-download).")
+    # Tolerates the singular/plural filename drift (issue #41): --filename left unset
+    # (None) tries every KNOWN_FLATFILE_NAMES candidate on a clean "not found"; an
+    # explicit --filename pins that one name exclusively. The skip-if-exists check
+    # below checks every candidate, not just the first, so a file that landed under a
+    # fallback name on a previous run is still recognized.
+    existing = next(
+        (
+            out_dir / name
+            for name in _flatfile_candidates(args.filename)
+            if (out_dir / name).exists()
+        ),
+        None,
+    )
+    if existing is not None and not args.overwrite:
+        print(f"{existing} already exists; skipping (use --overwrite to re-download).")
     else:
-        result = ftps_download(
-            args.host, f"{RELEASE_NOTES_DIR}/{args.filename}", dest, timeout=args.timeout
+        result = ftps_download_flatfile(
+            args.host, out_dir, filename=args.filename, timeout=args.timeout
         )
         _print_result("AMR flat file", result)
         if not result.ok:
@@ -666,7 +740,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Phase A: FTPS-download the AMR flat file (+ optional genome_metadata).",
     )
     fetch_labels.add_argument("--host", default=DEFAULT_HOST)
-    fetch_labels.add_argument("--filename", default=DEFAULT_FLATFILE)
+    fetch_labels.add_argument(
+        "--filename",
+        default=None,
+        help=(f"AMR flat-file name; omit to try {list(KNOWN_FLATFILE_NAMES)} in order (issue #41)"),
+    )
     fetch_labels.add_argument("--out-dir", default="data/raw/bvbrc")
     fetch_labels.add_argument("--also-metadata", action="store_true")
     fetch_labels.add_argument("--timeout", type=float, default=60.0)
@@ -705,7 +783,7 @@ def build_parser() -> argparse.ArgumentParser:
     fetch_labels_https.add_argument("--taxon-id", type=int, default=KLEBSIELLA_PNEUMONIAE_TAXON_ID)
     fetch_labels_https.add_argument("--base-url", default=SOLR_BASE)
     fetch_labels_https.add_argument("--out-dir", default="data/raw/bvbrc")
-    fetch_labels_https.add_argument("--filename", default=DEFAULT_FLATFILE)
+    fetch_labels_https.add_argument("--filename", default=DEFAULT_LABELS_OUTPUT_FILENAME)
     fetch_labels_https.add_argument("--timeout", type=float, default=120.0)
     fetch_labels_https.set_defaults(func=cmd_fetch_labels_https)
 
