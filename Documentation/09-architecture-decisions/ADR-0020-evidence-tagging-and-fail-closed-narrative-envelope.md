@@ -35,9 +35,16 @@ narrative (EPIC 5) must fail closed when it cannot be trusted (ADR-0006). Two de
   a non-gate confidence to 0.99.
 
 **Fail-closed narrative:**
-- The reviewer runs a **deterministic pre-check before any LLM call** — a fabricated number, a
-  drug not evaluated, a verdict word the report never made, or causal language on a
-  statistical/no-signal row rejects outright.
+- The reviewer runs a **deterministic pre-check before any LLM call**, and every check is **bound
+  to the specific drug row it concerns** — a flattened global membership test would let a per-drug
+  verdict swap through in a mixed-verdict panel (where every verdict phrase appears *somewhere* in
+  the report). A per-drug narrative may assert only *its own* verdict phrase; a confidence-shaped
+  number (`N%`) must match one of the report's own numbers (not merely KB text); causal language on
+  a non-`known_mechanism` row is rejected in both the per-drug narrative and the summary/caveats.
+- The **deterministic renderer is verdict-aware**: a present-but-non-gating known-mechanism gene on
+  a `likely_to_work` row is rendered as "resistance-associated marker present, but the calibrated
+  model predicts susceptibility" — the judge-free fallback path can never print a resistance marker
+  as if it backed a susceptible call.
 - The pipeline returns a **`NarrativeEnvelope` alongside the report** (mirroring the `{ok, source,
   error}` pattern) carrying `review_status ∈ {llm_output_accepted, llm_output_rejected,
   llm_disabled}` and `source ∈ {llm, template}` — the frozen `GenomeReport` is not modified, and
@@ -54,9 +61,9 @@ present known-mechanism gene is a known mechanism); mutating `GenomeReport` to a
   validators hold across the whole synthetic cohort.
 - (+) A load-bearing (not advisory) review gate that costs nothing extra because the deterministic
   template must exist as the no-API-key fallback anyway.
-- (−) A present-but-non-gating known mechanism yields a `known_mechanism` row at model confidence,
-  which the narrative must word carefully (mechanism present, model-driven verdict) — enforced by
-  the reviewer's causal-language check.
+- (−) A present-but-non-gating known mechanism yields a `known_mechanism` row at model confidence;
+  the verdict-aware deterministic renderer (and the reviewer's causal-language check on the LLM
+  path) keep the wording honest so the category never reads as if it backed the verdict.
 - Pinned by `tests/report/test_builder_validators.py`, `tests/report/test_evidence.py`,
   `tests/report/test_reviewer.py`, `tests/report/test_pipeline.py`, and
   `tests/report/test_safety_invariants.py`.

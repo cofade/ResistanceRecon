@@ -48,6 +48,10 @@ class OpenAIBackend:
         return self._client
 
     def _schema_format(self, schema: type[T], tool_name: str) -> dict[str, Any]:
+        # strict=False deliberately: OpenAI strict mode requires every property to be `required`
+        # (no defaults), but the narrator/reviewer schemas have optional fields with defaults
+        # (citations/caveats/per_claim/evidence_ref). Groundedness does not depend on strict mode
+        # anyway -- parse_structured_response re-validates the response and fails closed.
         return {
             "type": "json_schema",
             "json_schema": {

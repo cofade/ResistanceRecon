@@ -34,7 +34,8 @@ def test_precheck_passes_a_grounded_narrative() -> None:
 
 
 def test_precheck_rejects_a_fabricated_number() -> None:
-    section = _section(summary="Meropenem resistance is 42% likely.")
+    # A non-percentage number absent from the report and citations (general number path).
+    section = _section(summary="Meropenem was supported by 4242 sequencing reads.")
     ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
     assert not ok
     assert "number" in reason
@@ -133,3 +134,45 @@ def test_review_fails_closed_on_llm_error() -> None:
     outcome = review_narrative(section, _REPORT, _NO_RETRIEVAL, MockLLMClient({"other": "{}"}))
     assert not outcome.passed
     assert "error" in outcome.reason
+
+
+def test_precheck_rejects_a_per_drug_verdict_swap_in_a_mixed_report() -> None:
+    # _REPORT has meropenem=likely_to_fail AND ceftriaxone=likely_to_work, so BOTH verdict
+    # phrases exist somewhere in the report -- a global membership check would miss this swap.
+    section = _section(
+        NLDrugNarrative(antibiotic="meropenem", narrative="Meropenem is LIKELY TO WORK."),
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason and "likely to work" in reason
+
+
+def test_precheck_rejects_causal_language_in_the_summary_for_a_statistical_drug() -> None:
+    stat_report = build_report(
+        GenomePredictionInputs(genome_id="g1", drugs=(_ceftriaxone_statistical_input(),))
+    )
+    section = _section(summary="For ceftriaxone, the detected gene confers resistance.")
+    ok, reason = deterministic_precheck(section, stat_report, _NO_RETRIEVAL)
+    assert not ok
+    assert "summary" in reason and "ceftriaxone" in reason
+
+
+def test_precheck_rejects_a_fabricated_confidence_even_if_the_digits_appear_in_kb_text() -> None:
+    from genome_firewall.kb.corpus import KBChunk
+    from genome_firewall.kb.retriever import RetrievedChunk
+
+    # A KB chunk mentioning "95% identity" must not license a fabricated 95% confidence.
+    retrieval = {
+        "meropenem": (
+            RetrievedChunk(
+                chunk=KBChunk(
+                    chunk_id="c", gene_family="g", text="95% identity to reference", source="s"
+                ),
+                score=1.0,
+            ),
+        )
+    }
+    section = _section(summary="Meropenem resistance is 95% likely.")
+    ok, reason = deterministic_precheck(section, _REPORT, retrieval)
+    assert not ok
+    assert "confidence" in reason

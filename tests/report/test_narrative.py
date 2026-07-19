@@ -36,3 +36,39 @@ def test_narrative_shows_known_mechanism_evidence() -> None:
     text = _narrative()
     assert "blaKPC-2" in text
     assert "known resistance mechanism" in text
+
+
+def test_known_gene_with_susceptible_verdict_is_rendered_directionally() -> None:
+    # A resistance-associated gene (AME) is present, but the model calls susceptible {S}. The
+    # judge-free fallback must NOT print a bare "known resistance mechanism" next to LIKELY TO WORK.
+    from genome_firewall.report.builder import build_report
+    from genome_firewall.report.inputs import DrugPredictionInput, GenomePredictionInputs
+    from genome_firewall.schemas import ConformalSet, ModelPrediction
+    from tests.report.conftest import vector
+
+    report = build_report(
+        GenomePredictionInputs(
+            genome_id="g1",
+            drugs=(
+                DrugPredictionInput(
+                    antibiotic="gentamicin",
+                    vector=vector(
+                        gene_presence={"aac(3)-IIa": True},
+                        gene_drug_subclass={"aac(3)-IIa": "GENTAMICIN"},
+                    ),
+                    model_prediction=ModelPrediction(
+                        probability_resistant=0.1, model_version="lr-v1"
+                    ),
+                    conformal_set=ConformalSet(labels=("S",), alpha=0.1),
+                ),
+            ),
+        )
+    )
+    row = report.predictions[0]
+    assert row.verdict == "likely_to_work"
+    assert row.evidence_category == "known_mechanism"  # the gene IS a known mechanism
+    text = render_deterministic_narrative(report)
+    assert "LIKELY TO WORK" in text
+    assert "but the calibrated model predicts susceptibility" in text
+    # never the bare parenthetical that implies the mechanism backs the susceptible call
+    assert "known resistance mechanism)." not in text
