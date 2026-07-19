@@ -61,11 +61,19 @@ def _template_envelope(
     )
 
 
+def _restates_disclaimer(caveat: str) -> bool:
+    """True when an LLM caveat restates the lab-confirmation disclaimer (which the pipeline
+    appends verbatim). Dropping it avoids the double disclaimer the model produces when it adds
+    its own; the canonical disclaimer from ``report.disclaimer`` still stands (golden rule #4)."""
+    lowered = caveat.lower()
+    return "confirm" in lowered and ("laborator" in lowered or "susceptibility test" in lowered)
+
+
 def _flatten(section: NLReportSection, report: GenomeReport) -> str:
     lines = [section.summary]
     lines.extend(f"{d.antibiotic}: {d.narrative}" for d in section.per_antibiotic)
-    lines.extend(section.caveats)
-    lines.append(report.disclaimer)  # disclaimer present on the LLM path too (golden rule #4)
+    lines.extend(c for c in section.caveats if not _restates_disclaimer(c))
+    lines.append(report.disclaimer)  # canonical disclaimer, exactly once (golden rule #4)
     return "\n".join(lines)
 
 
