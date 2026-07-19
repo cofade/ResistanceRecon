@@ -6,7 +6,13 @@ report pipeline serves the deterministic template (``review_status='llm_disabled
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+#: Reasoning effort accepted by OpenAI reasoning models (the API's supported values, verified
+#: live against gpt-5.6-luna). "xhigh" is the "Extra High" tier. Must match ``openai_model``.
+ReasoningEffort = Literal["none", "low", "medium", "high", "xhigh"]
 
 
 class LLMSettings(BaseSettings):
@@ -15,4 +21,7 @@ class LLMSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     openai_api_key: str | None = None
-    openai_model: str = "gpt-4o-2024-08-06"
+    #: Default model is the GPT-5.6 Luna reasoning model (maps to OPENAI_MODEL).
+    openai_model: str = "gpt-5.6-luna"
+    #: "Extra High" reasoning by default (maps to OPENAI_REASONING_EFFORT).
+    openai_reasoning_effort: ReasoningEffort = "xhigh"

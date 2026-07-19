@@ -48,13 +48,31 @@ def test_happy_path_maps_request_and_parses_response() -> None:
     kwargs = fake.last_kwargs
     assert kwargs is not None
     assert kwargs["model"] == "gpt-x"
-    assert kwargs["temperature"] == 0
+    # Reasoning models require reasoning_effort and reject an explicit temperature.
+    assert kwargs["reasoning_effort"] == "xhigh"
+    assert "temperature" not in kwargs
     assert kwargs["messages"] == [
         {"role": "system", "content": "sys"},
         {"role": "user", "content": "go"},
     ]
     assert kwargs["response_format"]["type"] == "json_schema"
     assert kwargs["response_format"]["json_schema"]["name"] == "echo_tool"
+
+
+def test_temperature_sent_only_when_configured_and_reasoning_can_be_disabled() -> None:
+    fake = _FakeCompletions(content='{"text": "a", "score": 0.1}')
+    client = SimpleNamespace(chat=SimpleNamespace(completions=fake))
+    backend = OpenAIBackend(
+        api_key="k",
+        model="m",
+        reasoning_effort=None,
+        temperature=0.0,
+        client_factory=lambda _key: client,
+    )
+    backend.complete_structured(_MESSAGES, schema=_Echo, tool_name="t")
+    assert fake.last_kwargs is not None
+    assert fake.last_kwargs["temperature"] == 0.0
+    assert "reasoning_effort" not in fake.last_kwargs
 
 
 def test_empty_content_is_a_refusal() -> None:

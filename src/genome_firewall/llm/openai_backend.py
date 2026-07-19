@@ -18,7 +18,9 @@ from genome_firewall.llm.types import LLMResponse, Message, T
 #: with a fake transport so the request/response mapping is covered without a key or network.
 ClientFactory = Callable[[str], Any]
 
-DEFAULT_OPENAI_MODEL = "gpt-4o-2024-08-06"
+DEFAULT_OPENAI_MODEL = "gpt-5.6-luna"
+#: "Extra High" reasoning by default; None omits the parameter (for non-reasoning models).
+DEFAULT_REASONING_EFFORT: str | None = "xhigh"
 
 
 def _default_client_factory(api_key: str) -> Any:
@@ -35,10 +37,17 @@ class OpenAIBackend:
         *,
         api_key: str,
         model: str = DEFAULT_OPENAI_MODEL,
+        reasoning_effort: str | None = DEFAULT_REASONING_EFFORT,
+        temperature: float | None = None,
         client_factory: ClientFactory | None = None,
     ) -> None:
         self._api_key = api_key
         self._model = model
+        # Reasoning models (gpt-5.x) REQUIRE reasoning_effort and REJECT an explicit temperature
+        # (verified live: gpt-5.6-luna only accepts the default temperature). Each is sent only
+        # when set, so the request shape stays valid for whatever model is configured.
+        self._reasoning_effort = reasoning_effort
+        self._temperature = temperature
         self._client_factory = client_factory or _default_client_factory
         self._client: Any | None = None
 
@@ -66,13 +75,17 @@ class OpenAIBackend:
     ) -> LLMResponse[T]:
         client = self._client_or_build()
         payload = [{"role": m.role, "content": m.content} for m in messages]
+        request: dict[str, Any] = {
+            "model": self._model,
+            "messages": payload,
+            "response_format": self._schema_format(schema, tool_name),
+        }
+        if self._reasoning_effort is not None:
+            request["reasoning_effort"] = self._reasoning_effort
+        if self._temperature is not None:
+            request["temperature"] = self._temperature
         try:
-            response = client.chat.completions.create(
-                model=self._model,
-                messages=payload,
-                response_format=self._schema_format(schema, tool_name),
-                temperature=0,
-            )
+            response = client.chat.completions.create(**request)
         except Exception as exc:
             # Normalize any SDK/transport failure (network, quota, 5xx) into a typed error.
             raise LLMBackendError(f"OpenAI call failed: {exc}") from exc
