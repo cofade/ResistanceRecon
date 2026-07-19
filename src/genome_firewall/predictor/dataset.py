@@ -230,6 +230,11 @@ def parse_mlst(raw: object) -> tuple[str | None, int | None]:
     text = str(raw).strip()
     if not text or text.lower() in {"nan", "none", "-"}:
         return None, None
+    # BV-BRC's HTTPS Data API returns genome.mlst as "MLST.<scheme>.<st>" (e.g.
+    # "MLST.klebsiella.258"); strip the optional leading "MLST." tag. This prefix was NOT
+    # anticipated and silently zeroed every ST on real data until caught (see §11.4).
+    if text.lower().startswith("mlst."):
+        text = text[len("mlst.") :]
     match = _MLST_RE.match(text)
     if not match:
         return None, None

@@ -1,0 +1,168 @@
+{
+  "alpha": 0.1,
+  "amrfinder_db_version": "2026-05-15.1",
+  "schema_version": "1.0.0",
+  "n_features": 186,
+  "drugs": {
+    "meropenem": {
+      "status": "trained",
+      "version": "v1",
+      "best_c": 1.0,
+      "conformal_coverage": 0.9411764705882353,
+      "no_call_rate": 0.6470588235294118,
+      "conformal_guarantee_available": false,
+      "alpha_sensitivity": [
+        {
+          "alpha": 0.05,
+          "coverage": 1.0,
+          "no_call_rate": 1.0
+        },
+        {
+          "alpha": 0.1,
+          "coverage": 0.9411764705882353,
+          "no_call_rate": 0.6470588235294118
+        },
+        {
+          "alpha": 0.2,
+          "coverage": 0.8823529411764706,
+          "no_call_rate": 0.5882352941176471
+        }
+      ],
+      "n": 23.0,
+      "resistant_recall": 0.0,
+      "susceptible_recall": 1.0,
+      "balanced_accuracy": 0.5,
+      "auroc": 0.045454545454545414,
+      "pr_auc": 0.045454545454545456,
+      "brier": 0.09595899594020582
+    },
+    "ceftriaxone": {
+      "status": "trained",
+      "version": "v1",
+      "best_c": 0.01,
+      "conformal_coverage": 1.0,
+      "no_call_rate": 1.0,
+      "conformal_guarantee_available": false,
+      "alpha_sensitivity": [
+        {
+          "alpha": 0.05,
+          "coverage": 1.0,
+          "no_call_rate": 1.0
+        },
+        {
+          "alpha": 0.1,
+          "coverage": 1.0,
+          "no_call_rate": 1.0
+        },
+        {
+          "alpha": 0.2,
+          "coverage": 1.0,
+          "no_call_rate": 0.03333333333333333
+        }
+      ],
+      "n": 10.0,
+      "resistant_recall": 0.0,
+      "susceptible_recall": 1.0,
+      "balanced_accuracy": 1.0,
+      "auroc": null,
+      "pr_auc": null,
+      "brier": 0.14931696946053952
+    },
+    "ciprofloxacin": {
+      "status": "trained",
+      "version": "v1",
+      "best_c": 100.0,
+      "conformal_coverage": 0.4642857142857143,
+      "no_call_rate": 0.07142857142857142,
+      "conformal_guarantee_available": false,
+      "alpha_sensitivity": [
+        {
+          "alpha": 0.05,
+          "coverage": 0.5,
+          "no_call_rate": 0.10714285714285714
+        },
+        {
+          "alpha": 0.1,
+          "coverage": 0.4642857142857143,
+          "no_call_rate": 0.07142857142857142
+        },
+        {
+          "alpha": 0.2,
+          "coverage": 0.39285714285714285,
+          "no_call_rate": 0.6071428571428571
+        }
+      ],
+      "n": 10.0,
+      "resistant_recall": 0.0,
+      "susceptible_recall": 1.0,
+      "balanced_accuracy": 1.0,
+      "auroc": null,
+      "pr_auc": null,
+      "brier": 0.006570747462014553
+    },
+    "gentamicin": {
+      "status": "trained",
+      "version": "v1",
+      "best_c": 10.0,
+      "conformal_coverage": 1.0,
+      "no_call_rate": 0.8421052631578947,
+      "conformal_guarantee_available": false,
+      "alpha_sensitivity": [
+        {
+          "alpha": 0.05,
+          "coverage": 1.0,
+          "no_call_rate": 1.0
+        },
+        {
+          "alpha": 0.1,
+          "coverage": 1.0,
+          "no_call_rate": 0.8421052631578947
+        },
+        {
+          "alpha": 0.2,
+          "coverage": 0.8421052631578947,
+          "no_call_rate": 0.05263157894736842
+        }
+      ],
+      "n": 18.0,
+      "resistant_recall": 0.5,
+      "susceptible_recall": 0.9285714285714286,
+      "balanced_accuracy": 0.7142857142857143,
+      "auroc": 0.875,
+      "pr_auc": 0.7611111111111112,
+      "brier": 0.11245530634859237
+    },
+    "trimethoprim-sulfamethoxazole": {
+      "status": "trained",
+      "version": "v1",
+      "best_c": 10.0,
+      "conformal_coverage": 0.9523809523809523,
+      "no_call_rate": 0.19047619047619047,
+      "conformal_guarantee_available": true,
+      "alpha_sensitivity": [
+        {
+          "alpha": 0.05,
+          "coverage": 1.0,
+          "no_call_rate": 1.0
+        },
+        {
+          "alpha": 0.1,
+          "coverage": 0.9523809523809523,
+          "no_call_rate": 0.19047619047619047
+        },
+        {
+          "alpha": 0.2,
+          "coverage": 0.9523809523809523,
+          "no_call_rate": 0.19047619047619047
+        }
+      ],
+      "n": 10.0,
+      "resistant_recall": 0.0,
+      "susceptible_recall": 1.0,
+      "balanced_accuracy": 1.0,
+      "auroc": null,
+      "pr_auc": null,
+      "brier": 0.08945100460553634
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "test_marginal": {
+    "n": 19,
+    "n_resistant": 5,
+    "n_susceptible": 14,
+    "balanced_accuracy": 0.7642857142857142,
+    "resistant_recall": 0.6,
+    "susceptible_recall": 0.9285714285714286,
+    "f1": 0.6666666666666666,
+    "auroc": 0.9,
+    "pr_auc": 0.8333333333333333
+  },
+  "test_gate_negative": {
+    "n": 18,
+    "n_resistant": 4,
+    "n_susceptible": 14,
+    "balanced_accuracy": 0.7142857142857143,
+    "resistant_recall": 0.5,
+    "susceptible_recall": 0.9285714285714286,
+    "f1": 0.5714285714285714,
+    "auroc": 0.875,
+    "pr_auc": 0.7611111111111112
+  },
+  "holdout_marginal": {
+    "n": 19,
+    "n_resistant": 17,
+    "n_susceptible": 2,
+    "balanced_accuracy": 0.9117647058823529,
+    "resistant_recall": 0.8235294117647058,
+    "susceptible_recall": 1.0,
+    "f1": 0.9032258064516129,
+    "auroc": 0.8823529411764706,
+    "pr_auc": 0.9866713713349118
+  },
+  "holdout_gate_negative": {
+    "n": 19,
+    "n_resistant": 17,
+    "n_susceptible": 2,
+    "balanced_accuracy": 0.9117647058823529,
+    "resistant_recall": 0.8235294117647058,
+    "susceptible_recall": 1.0,
+    "f1": 0.9032258064516129,
+    "auroc": 0.8823529411764706,
+    "pr_auc": 0.9866713713349118
+  }
+}

@@ -29,7 +29,7 @@ features/    Module 02 feature engineering (EPIC 3): mechanisms.py (shared AMR-m
              predicates), vocabulary.py (ordered feature vocabulary + engineered combination
              features -- QRDR counts, PMQR/RMTase/carbapenemase/ESBL flags), feature_matrix.py
              (GenomeFeatureVector -> fixed-order numeric rows). Trust-critical, LLM-free.
-predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, model_registry, experiment_tracking
+predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, errors, model_registry, experiment_tracking (LLM-free; sole verdict source)
 report/      Module 03a — deterministic report builder (+ jinja template) + additive LLM narrative sub-pipeline
 kb/          AMR-mechanism KB: hybrid BM25 + embedding + RRF retrieval (evidence RAG)
 llm/         provider-agnostic client + MockLLMClient (report narration + reviewer only)

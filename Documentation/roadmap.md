@@ -15,7 +15,11 @@
   Docker runner + envelope + MockAnnotator + fixtures (#16, validated against a real Docker run),
   `reader/feature_builder.py` + committed `data/reference/ReferenceGeneCatalog.txt` (ADR-0013) +
   `feature_schema.json` (#17). PR pending user manual test.
-- [ ] EPIC 3 — Predictor: split + target gate + LR + calibration + conformal + registry
+- [ ] EPIC 3 — Predictor: split + target gate + LR + calibration + conformal + registry. PR-A
+  (split/gate/LR+calibration + features/ + HTTPS fetch + batch feature-matrix builder, #18/#19/#20,
+  ADRs 0015–0018) and PR-B (conformal + predict + typed-compat registry + MLflow tracking + train
+  orchestration + real training run, #21/#22, ADR-0014) implemented on their branches; both pending
+  user manual test before merge.
 - [ ] EPIC 4 — Deterministic Decision Report (LLM-free MVP)
 - [ ] EPIC 5 — Evidence RAG + grounded LLM narrative + reviewer (fail-closed)
 - [ ] EPIC 6 — FastAPI backend + Streamlit UI (firewall table + disclaimer)
