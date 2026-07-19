@@ -45,7 +45,7 @@ def _evidence_phrase(prediction: AntibioticPrediction) -> str:
     return f"{label} present; evidence is inconclusive (no-call)"
 
 
-def _render_row(prediction: AntibioticPrediction) -> str:
+def render_row(prediction: AntibioticPrediction) -> str:
     verdict = _VERDICT_LABEL[prediction.verdict]
     confidence_pct = round(prediction.calibrated_confidence * 100)
     line = (
@@ -61,5 +61,5 @@ def _render_row(prediction: AntibioticPrediction) -> str:
 def render_deterministic_narrative(report: GenomeReport) -> str:
     """Render a deterministic, LLM-free narrative for one report."""
     header = f"Genome {report.genome_id} — per-antibiotic decision support."
-    rows = [_render_row(p) for p in sorted(report.predictions, key=_order_key)]
+    rows = [render_row(p) for p in sorted(report.predictions, key=_order_key)]
     return "\n".join([header, *rows, report.disclaimer])

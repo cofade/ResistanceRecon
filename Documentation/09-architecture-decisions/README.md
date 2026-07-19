@@ -26,3 +26,4 @@ One record per non-trivial, hard-to-reverse decision. Format: Title, Date, Statu
 | [0020](ADR-0020-evidence-tagging-and-fail-closed-narrative-envelope.md) | Evidence-category tagging policy & fail-closed narrative envelope | Accepted |
 | [0021](ADR-0021-default-llm-gpt56-luna-xhigh-reasoning.md) | Default LLM: GPT-5.6 Luna at Extra-High reasoning (temperature omitted) | Accepted |
 | [0022](ADR-0022-in-process-orchestrator-demo.md) | In-process orchestrator for the demo UI (clarifying ADR-0007) | Accepted |
+| [0023](ADR-0023-reviewer-per-drug-number-binding.md) | Reviewer per-drug number binding, published-string tripwire & disclaimer-dedup hardening | Accepted |

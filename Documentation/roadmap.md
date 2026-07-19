@@ -49,3 +49,4 @@
 - Expand the antibiotic panel (amikacin, piperacillin-tazobactam, cefepime); colistin as a harder ML-vs-rules case.
 - Richer AMR-mechanism KB; ResFinder/RGI cross-annotation via hAMRonization.
 - Deployment-view + quality-scenario arc42 chapters.
+- Bind free-text summary/caveat percents to the rendered-confidence set (symmetric with the per-drug binding shipped in issue #45 / ADR-0023) — closes the gene-digit→percent collision on the summary surface too; deferred out of #45's per-drug scope (PR #42 senior review).

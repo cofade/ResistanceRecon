@@ -67,9 +67,13 @@ Additive narrative (EPIC 5, optional; receives the FROZEN report):
     2. kb.EvidenceRAG.retrieve_for_genes(supporting_features, drug)  [BM25 (+optional dense) + RRF]
     3. narrator.generate_narrative (LLM, temp 0; verdicts are read-only context; output schema
        has no verdict field)
-    4. reviewer.review_narrative: deterministic pre-check (fabricated number/drug/verdict/causal)
-       BEFORE the LLM judge; then the LLM judge
-    5. overall_pass -> attach flattened narrative, review_status=llm_output_accepted, source=llm
+    4. reviewer.review_narrative: deterministic pre-check BEFORE the LLM judge -- rejects fabricated
+       drugs/verdicts/causal claims, and numbers bound PER-DRUG (a per-antibiotic N% must equal that
+       drug's own rendered confidence; free-text summary/caveats keep global membership; ADR-0023);
+       then the LLM judge
+    5. overall_pass -> attach flattened narrative (a fail-closed tripwire re-checks that every
+       published percent is one of the report's own numbers, ADR-0023),
+       review_status=llm_output_accepted, source=llm
        else -> deterministic template, review_status=llm_output_rejected, source=template
   The disclaimer is present on every branch; the LLM can never alter a verdict/confidence.
 ```

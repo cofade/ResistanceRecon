@@ -18,14 +18,17 @@ from genome_firewall.kb.retriever import RetrievedChunk
 from genome_firewall.llm.client import LLMClient
 from genome_firewall.llm.errors import LLMError
 from genome_firewall.llm.types import Message
-from genome_firewall.report.narrative import render_deterministic_narrative
+from genome_firewall.report.narrative import render_deterministic_narrative, render_row
 from genome_firewall.report.nl_schemas import NLReportSection, ReportVerdict
 from genome_firewall.schemas import AntibioticPrediction, GenomeReport
 
 REVIEWER_TOOL = "report_review"
 
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
-_PERCENT_RE = re.compile(r"(\d+(?:\.\d+)?)\s*%")
+#: A confidence-shaped token. ``[^\S\r\n]*`` matches intra-line whitespace only, so a digit ending
+#: one line and a ``%`` starting the next never form an ``N%`` token across a newline join -- the
+#: reorder/parser-differential in the published narrative (issue #45-A). Was ``\s*``.
+_PERCENT_RE = re.compile(r"(\d+(?:\.\d+)?)[^\S\r\n]*%")
 _VERDICT_PHRASES = ("likely to work", "likely to fail", "no call")
 #: Canonical lower-case verdict phrase per verdict literal (matches narrative.py rendering).
 _VERDICT_LABEL: dict[str, str] = {
@@ -146,19 +149,46 @@ def deterministic_precheck(
     allowed_numbers = _numbers(f"{canonical}\n{chunk_text}".lower())
     report_numbers = _numbers(canonical.lower())
 
-    prose = _section_prose(section).lower()
+    # (1a) Per-drug narratives: numbers bound to THAT drug's own rendered row (its confidence %,
+    # its evidence digits) or a KB chunk cited FOR that drug -- not merely present somewhere in the
+    # report. Closes the cross-drug collision where a digit from another drug's `OXA-48` reads as a
+    # 48% confidence (issue #45-B). A confidence-shaped N% must equal the drug's own confidence.
+    for drug_narrative in section.per_antibiotic:
+        row = by_drug.get(drug_narrative.antibiotic)
+        if row is None:
+            continue  # a fabricated-drug entry is rejected by the drug-name check in (2)
+        rendered = render_row(row).lower()
+        drug_percents = set(_PERCENT_RE.findall(rendered))
+        drug_chunks = " ".join(c.chunk.text for c in retrieval.get(drug_narrative.antibiotic, ()))
+        drug_allowed = _numbers(rendered) | _numbers(drug_chunks.lower())
+        narrative = drug_narrative.narrative.lower()
+        for percent in _PERCENT_RE.findall(narrative):
+            if percent not in drug_percents:
+                return False, (
+                    f"narrative for {drug_narrative.antibiotic} states a confidence ({percent}%) "
+                    "that is not that drug's calibrated confidence"
+                )
+        for number in _numbers(narrative):
+            if number not in drug_allowed:
+                return False, (
+                    f"narrative for {drug_narrative.antibiotic} contains a number ({number}) not "
+                    "in its own report row or a KB chunk cited for it"
+                )
 
-    # (1) Fabricated numbers. A confidence-shaped number (N%) must match one of the report's OWN
-    # numbers, not merely appear somewhere in the retrieved KB text; other numbers may be cited.
-    for percent in _PERCENT_RE.findall(prose):
+    # (1b) Free-text summary/caveats are overview prose (not bound to any one drug): a confidence-
+    # shaped number (N%) must match one of the report's OWN numbers, not merely the retrieved KB
+    # text; any other number must at least appear in the report or a cited chunk.
+    free_text = "\n".join([section.summary, *section.caveats]).lower()
+    for percent in _PERCENT_RE.findall(free_text):
         if percent not in report_numbers:
             return False, f"narrative states a confidence ({percent}%) not present in the report"
-    for number in _numbers(prose):
+    for number in _numbers(free_text):
         if number not in allowed_numbers:
             return False, f"narrative contains a number not in the report or citations: {number}"
 
     # (2) Fabricated drug names: a per-antibiotic entry for a drug not evaluated, or a panel drug
     # named anywhere in the prose but never evaluated in this report.
+    prose = _section_prose(section).lower()
     for drug_narrative in section.per_antibiotic:
         if drug_narrative.antibiotic not in evaluated:
             return False, (
@@ -169,11 +199,10 @@ def deterministic_precheck(
         if _contains(prose, drug) and drug not in evaluated:
             return False, f"narrative discusses {drug}, which was not evaluated in this report"
 
-    # (3) Per-drug narratives: verdict + causal language bound to their own drug (exact).
+    # (3) Per-drug narratives: verdict + causal language bound to their own drug (exact). Every
+    # per_antibiotic drug is guaranteed evaluated by check (2) above, so index directly.
     for drug_narrative in section.per_antibiotic:
-        row = by_drug.get(drug_narrative.antibiotic)
-        if row is None:
-            continue
+        row = by_drug[drug_narrative.antibiotic]
         violation = _bound_narrative_violation(
             drug_narrative.antibiotic, row, drug_narrative.narrative.lower()
         )
@@ -187,6 +216,19 @@ def deterministic_precheck(
             return False, violation
 
     return True, "deterministic pre-check passed"
+
+
+def published_percents_grounded(flattened: str, report: GenomeReport) -> bool:
+    """Tripwire (issue #45-A): every percent in the FINAL published narrative string must be one of
+    the report's own numbers. This already holds after a passing ``deterministic_precheck`` (strict
+    per-drug binding => each per-drug percent equals that drug's rendered confidence, and every
+    drug's confidence appears in the canonical render; free-text percents are checked against the
+    same report numbers). It is re-checked here on the flattened string the clinician actually sees,
+    so any future validated-vs-published divergence fails closed instead of shipping a fabricated
+    confidence. Reuses this module's own ``_PERCENT_RE``/``_numbers`` so it can never disagree with
+    the pre-check about what a percent is."""
+    report_numbers = _numbers(render_deterministic_narrative(report).lower())
+    return set(_PERCENT_RE.findall(flattened.lower())) <= report_numbers
 
 
 def _build_review_message(section: NLReportSection, report: GenomeReport) -> str:
