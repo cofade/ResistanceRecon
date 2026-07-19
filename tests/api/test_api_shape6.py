@@ -94,6 +94,9 @@ def test_predict_unknown_genome_is_503_without_traceback(client: TestClient) -> 
     assert body["ok"] is False
     assert isinstance(body["error"], str) and body["error"]
     assert not any(marker in body["error"] for marker in _TRACEBACK_MARKERS)
+    # The client 503 never leaks a filesystem path (the MockAnnotator fixture path is server-log
+    # only) -- no Windows/POSIX absolute path and no internal dir name.
+    assert ":\\" not in body["error"] and "demo_data" not in body["error"]
 
 
 @pytest.mark.integration

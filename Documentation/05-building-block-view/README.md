@@ -10,12 +10,14 @@ flowchart LR
     subgraph M2["Module 02 — Predictor (LLM-free)"]
         GATE["target_gate"] --> TR["train / calibration"] --> CO["conformal"] --> PR["predict"]
     end
-    subgraph M3["Module 03 — Decision Report"]
-        RB["report_builder\n(deterministic)"] --> API2["api (FastAPI)"] --> UI2["ui (Streamlit)"]
-        RB -.->|optional| NAR["kb (RAG) + llm (narrate/review)"]
+    subgraph M3["Module 03 — Decision Report + Demo surface"]
+        RB["report_builder\n(deterministic)"] -.->|optional| NAR["kb (RAG) + llm (narrate/review)"]
+        SVC["service.analyze_genome\n(in-process orchestrator, ADR-0022)"] --> RB
+        API2["api (FastAPI)"] --> SVC
+        UI2["ui (Streamlit, in-process)"] --> SVC
     end
     FB --> GATE
-    PR --> RB
+    PR --> SVC
 ```
 
 ## Level 1 — the package `genome_firewall`
@@ -45,8 +47,19 @@ kb/          AMR-mechanism KB (evidence RAG, retrieval-only): corpus.py (KBChunk
 llm/         provider-agnostic client: types.py, errors.py, client.py (LLMClient Protocol +
              parse_structured_response), mock.py (MockLLMClient, CI), openai_backend.py (lazy,
              structured outputs), settings.py, factory.py. Report narration + reviewer only.
-api/         Module 03b — FastAPI (POST /predict, GET /health, /antibiotics, /model-card)
-ui/          Streamlit demo (firewall table, evidence drill-down, calibration, disclaimer banner)
+service.py   Module 03b orchestrator (ADR-0022): analyze_genome = FASTA -> reader -> features ->
+             predict_genome (sovereign verdicts + compat guard) -> DrugPredictionInput adapter ->
+             build_report (ADR-0020 evidence) -> narrate_report. The one in-process pipeline api/
+             and ui/ both call; a safety-invariant test pins its report rows to predict_genome's
+             verdicts+confidence so the two frozen paths never drift. The adapter emits only
+             predictor primitives, never a verdict.
+api/         Module 03b — FastAPI (POST /predict, GET /health, /antibiotics, /model-card); async
+             lifespan (registry/retriever/LLM-client loaded once), CORS, structured
+             {ok:false,error} envelopes (503 tool/pipeline failure, 422 malformed request, never a
+             traceback; the client message carries no filesystem path)
+ui/          Streamlit demo (in-process, no HTTP hop): firewall table (ALLOW/BLOCK/REVIEW),
+             KNOWN-vs-STATISTICAL evidence badges, calibration note, non-dismissible disclaimer
+             banner on every render; render.py holds the pure, fully-tested presentation logic
 eval/        metrics harness (marginal + per-group + unseen-lineage)
 tracking/    error-tolerant MLflow wrapper
 schemas.py   Pydantic contracts crossing every boundary

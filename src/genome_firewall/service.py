@@ -107,9 +107,23 @@ def using_docker_annotator(annotator: Annotator) -> bool:
 class PipelineError(RuntimeError):
     """A tool/infra failure inside ``analyze_genome``: an ``ok=False`` annotation envelope, or
     a genome whose annotation basis is incompatible with the trained models. The API maps this
-    to a 503 ``{ok:false,error}`` envelope; the message is always one of predictor/annotation's
-    own already-safe, non-sensitive strings -- never a raw traceback.
+    to a 503 ``{ok:false,error}`` envelope.
+
+    ``str(self)`` is the **client-facing** message: safe by construction -- never a traceback and
+    never an absolute filesystem path (a MockAnnotator fixture-miss error, for one, embeds its
+    fixture path). ``detail`` carries the fuller diagnostic (annotation source + tool error) for
+    the **server log only**, so debuggability is not lost.
     """
+
+    def __init__(self, message: str, *, detail: str | None = None) -> None:
+        super().__init__(message)
+        self.detail = detail if detail is not None else message
+
+
+def _source_scheme(annotation: AnnotationResult) -> str:
+    """The annotation source's scheme only (``mock`` / ``docker``), dropping any path/tag that
+    follows the first colon -- so a client-facing error never carries a filesystem path."""
+    return annotation.source.split(":", 1)[0]
 
 
 @contextmanager
@@ -219,10 +233,17 @@ def analyze_genome(
     parse_fasta(io.StringIO(fasta_text), genome_id=genome_id, species=species)
     annotation = annotator.annotate(fasta_path, genome_id=genome_id)
     if not annotation.ok:
-        raise PipelineError(f"annotation failed ({annotation.source}): {annotation.error}")
+        # Client message names only the genome + source SCHEME (mock/docker); the raw
+        # annotation.error (which may embed a fixture path) goes to the server log via detail.
+        raise PipelineError(
+            f"annotation failed for genome_id={genome_id!r} (source: {_source_scheme(annotation)})",
+            detail=f"annotation failed ({annotation.source}): {annotation.error}",
+        )
     if annotation.data is None or annotation.amrfinder_db_version is None:
         raise PipelineError(
-            f"annotation reported ok=True but returned no usable data ({annotation.source})"
+            f"annotation returned no usable data for genome_id={genome_id!r} "
+            f"(source: {_source_scheme(annotation)})",
+            detail=f"ok=True but empty data ({annotation.source})",
         )
 
     vector = build_feature_vector(

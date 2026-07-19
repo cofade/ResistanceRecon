@@ -30,7 +30,14 @@
   offline-safe, ADR-0019), `report/{nl_schemas,narrator,reviewer,pipeline}.py` (deterministic pre-check
   then LLM judge, fail-closed to the template via `NarrativeEnvelope`). Same branch; draft PR pending
   user manual test. Real OpenAI path is the user's manual test (CI is mock-only).
-- [ ] EPIC 6 — FastAPI backend + Streamlit UI (firewall table + disclaimer)
+- [x] EPIC 6 — FastAPI backend + Streamlit UI. `service.py` in-process orchestrator
+  (`analyze_genome`; ADR-0022) that both surfaces call — FASTA → reader → features →
+  `predict_genome` (sovereign) → adapter → `build_report` → `narrate_report`, pinned to the
+  predictor by a verdict-reconciliation test. `api/` (POST /predict, GET /health, /antibiotics,
+  /model-card; structured `{ok,error}` 503/422 envelopes, never a traceback); `ui/` (Streamlit,
+  in-process: firewall table ALLOW/BLOCK/REVIEW, KNOWN-vs-STATISTICAL evidence badges,
+  non-dismissible disclaimer). Branched off `feat/epic4-5-report-and-llm`; `main` (PR #42)
+  merged in. Draft PR pending user manual test.
 - [ ] EPIC 7 — Eval harness + MODEL_CARD + DATASHEET
 - [ ] EPIC 8 — Finalize Documentation + ADRs + ground-truth
 - [ ] EPIC 9 — Submission (deploy, dataset publish, summary, videos, zip)

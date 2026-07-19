@@ -28,9 +28,13 @@ def handle_client_error(request: Request, exc: Exception) -> JSONResponse:
 
 
 def handle_pipeline_error(request: Request, exc: Exception) -> JSONResponse:
-    """A tool/infra failure inside the pipeline (annotation ok=False, predictor compat error)."""
+    """A tool/infra failure inside the pipeline (annotation ok=False, predictor compat error).
+
+    The client gets the safe ``str(exc)`` message; the fuller ``detail`` (which may include an
+    annotation source path) is logged server-side only.
+    """
     del request
-    logger.warning("pipeline error: %s", exc)
+    logger.warning("pipeline error: %s", getattr(exc, "detail", exc))
     return JSONResponse(status_code=503, content={"ok": False, "error": str(exc)})
 
 
