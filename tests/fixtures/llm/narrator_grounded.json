@@ -1,0 +1,16 @@
+{
+  "summary": "Decision support for this genome across the antibiotic panel; every result must be confirmed by laboratory testing.",
+  "per_antibiotic": [
+    {
+      "antibiotic": "meropenem",
+      "narrative": "Meropenem is LIKELY TO FAIL. A known resistance mechanism (a carbapenemase) was detected in the assembly.",
+      "citations": ["kpc"]
+    },
+    {
+      "antibiotic": "ceftriaxone",
+      "narrative": "Ceftriaxone is LIKELY TO WORK. No resistance signal was detected for this agent.",
+      "citations": []
+    }
+  ],
+  "caveats": ["This is decision support only; confirm every result with laboratory testing."]
+}
