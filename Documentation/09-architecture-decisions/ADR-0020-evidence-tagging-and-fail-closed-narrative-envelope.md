@@ -36,11 +36,13 @@ narrative (EPIC 5) must fail closed when it cannot be trusted (ADR-0006). Two de
 
 **Fail-closed narrative:**
 - The reviewer runs a **deterministic pre-check before any LLM call**, and every check is **bound
-  to the specific drug row it concerns** — a flattened global membership test would let a per-drug
-  verdict swap through in a mixed-verdict panel (where every verdict phrase appears *somewhere* in
-  the report). A per-drug narrative may assert only *its own* verdict phrase; a confidence-shaped
-  number (`N%`) must match one of the report's own numbers (not merely KB text); causal language on
-  a non-`known_mechanism` row is rejected in both the per-drug narrative and the summary/caveats.
+  to the specific drug row it concerns, in every prose field** — a flattened global membership test
+  would let a per-drug verdict swap through in a mixed-verdict panel (where every verdict phrase
+  appears *somewhere* in the report), and moving the swap from a per-drug narrative to the
+  summary/caveats must not weaken the guard. One helper (`_prose_violation`) validates verdict
+  phrases and causal language for the per-antibiotic narratives (bound to their own drug), the
+  summary, and each caveat (bound to the nearest named drug by proximity). A confidence-shaped
+  number (`N%`) must match one of the report's own numbers, not merely KB text.
 - The **deterministic renderer is verdict-aware**: a present-but-non-gating known-mechanism gene on
   a `likely_to_work` row is rendered as "resistance-associated marker present, but the calibrated
   model predicts susceptibility" — the judge-free fallback path can never print a resistance marker

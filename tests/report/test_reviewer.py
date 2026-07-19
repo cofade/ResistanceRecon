@@ -147,6 +147,25 @@ def test_precheck_rejects_a_per_drug_verdict_swap_in_a_mixed_report() -> None:
     assert "meropenem" in reason and "likely to work" in reason
 
 
+def test_precheck_rejects_a_verdict_swap_in_the_summary() -> None:
+    # Same swap class as the per-drug case, but in the free-text summary (served verbatim).
+    section = _section(summary="For meropenem, the drug is likely to work.")
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason and "likely to work" in reason
+
+
+def test_precheck_rejects_a_verdict_swap_in_a_caveat() -> None:
+    section = NLReportSection(
+        summary="Summary.",
+        per_antibiotic=(),
+        caveats=("Note that meropenem is likely to work here.",),
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason
+
+
 def test_precheck_rejects_causal_language_in_the_summary_for_a_statistical_drug() -> None:
     stat_report = build_report(
         GenomePredictionInputs(genome_id="g1", drugs=(_ceftriaxone_statistical_input(),))

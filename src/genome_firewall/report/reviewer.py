@@ -20,7 +20,7 @@ from genome_firewall.llm.errors import LLMError
 from genome_firewall.llm.types import Message
 from genome_firewall.report.narrative import render_deterministic_narrative
 from genome_firewall.report.nl_schemas import NLReportSection, ReportVerdict
-from genome_firewall.schemas import GenomeReport
+from genome_firewall.schemas import AntibioticPrediction, GenomeReport
 
 REVIEWER_TOOL = "report_review"
 
@@ -68,6 +68,68 @@ def _section_prose(section: NLReportSection) -> str:
     return "\n".join(parts)
 
 
+def _find_all(text: str, needle: str) -> list[int]:
+    positions: list[int] = []
+    i = text.find(needle)
+    while i != -1:
+        positions.append(i)
+        i = text.find(needle, i + 1)
+    return positions
+
+
+def _prose_violation(
+    where: str,
+    prose_lower: str,
+    by_drug: Mapping[str, AntibioticPrediction],
+    *,
+    bound: tuple[str, AntibioticPrediction] | None,
+) -> str | None:
+    """Validate verdict phrases and causal language in one piece of prose, attributing each to a
+    drug row: to ``bound`` when the prose is a single drug's own narrative, otherwise to the
+    nearest named drug (proximity). One helper, applied identically to every field (per-drug
+    narrative, summary, each caveat), so *which field* can never be why a check is strong or weak.
+    Returns a rejection reason, or ``None`` if clean.
+    """
+    if bound is not None:
+        occurrences: list[tuple[int, str, AntibioticPrediction]] = [(0, bound[0], bound[1])]
+    else:
+        occurrences = [
+            (pos, drug, row)
+            for drug, row in by_drug.items()
+            for pos in _find_all(prose_lower, drug)
+        ]
+
+    def nearest(pos: int) -> tuple[str, AntibioticPrediction] | None:
+        if not occurrences:
+            return None
+        _, drug, row = min(occurrences, key=lambda o: abs(o[0] - pos))
+        return drug, row
+
+    for phrase in _VERDICT_PHRASES:
+        for pos in _find_all(prose_lower, phrase):
+            attributed = nearest(pos)
+            if attributed is None:
+                continue
+            drug, row = attributed
+            if phrase != _VERDICT_LABEL[row.verdict]:
+                return (
+                    f"{where}: verdict '{phrase}' attributed to {drug}, whose verdict is "
+                    f"'{_VERDICT_LABEL[row.verdict]}'"
+                )
+    for phrase in _CAUSAL_PHRASES:
+        for pos in _find_all(prose_lower, phrase):
+            attributed = nearest(pos)
+            if attributed is None:
+                continue
+            drug, row = attributed
+            if row.evidence_category != "known_mechanism":
+                return (
+                    f"{where}: causal language attributed to {drug}, whose evidence is "
+                    f"{row.evidence_category}, not a known mechanism"
+                )
+    return None
+
+
 def deterministic_precheck(
     section: NLReportSection,
     report: GenomeReport,
@@ -77,9 +139,10 @@ def deterministic_precheck(
 
     Every check is bound to the specific drug row it concerns -- a flattened global membership
     test would let a per-drug verdict swap slip through in a mixed-verdict panel (where every
-    verdict phrase appears *somewhere* in the report).
+    verdict phrase appears *somewhere* in the report), whether the swap is in a per-drug narrative,
+    the summary, or a caveat.
     """
-    by_drug = {p.antibiotic: p for p in report.predictions}
+    by_drug: dict[str, AntibioticPrediction] = {p.antibiotic: p for p in report.predictions}
     evaluated = set(by_drug)
     canonical = render_deterministic_narrative(report)
     canonical_lower = canonical.lower()
@@ -111,43 +174,30 @@ def deterministic_precheck(
         if drug in prose and drug not in evaluated:
             return False, f"narrative discusses {drug}, which was not evaluated in this report"
 
-    # (3) Per-drug verdict binding: a drug's narrative may only assert THAT drug's verdict.
+    # (3+4) Verdict binding + causal language, applied per drug to EVERY prose field identically:
+    # a per-drug narrative binds to its own drug; the summary and each caveat bind by proximity.
     for drug_narrative in section.per_antibiotic:
         row = by_drug.get(drug_narrative.antibiotic)
         if row is None:
             continue
-        own_verdict = _VERDICT_LABEL[row.verdict]
-        narrative_lower = drug_narrative.narrative.lower()
-        for phrase in _VERDICT_PHRASES:
-            if phrase in narrative_lower and phrase != own_verdict:
-                return False, (
-                    f"narrative asserts '{phrase}' for {drug_narrative.antibiotic}, whose verdict "
-                    f"is '{own_verdict}'"
-                )
-    # The free-text summary/caveats may only use verdict phrases the report actually made.
+        violation = _prose_violation(
+            "narrative",
+            drug_narrative.narrative.lower(),
+            by_drug,
+            bound=(drug_narrative.antibiotic, row),
+        )
+        if violation:
+            return False, violation
+    for label, field in [("summary", section.summary), *[("caveat", c) for c in section.caveats]]:
+        violation = _prose_violation(label, field.lower(), by_drug, bound=None)
+        if violation:
+            return False, violation
+
+    # Global floor: a verdict phrase in the summary/caveats the report never made for ANY drug
+    # (catches a fabricated verdict when no drug is named to anchor the proximity check).
     for phrase in _VERDICT_PHRASES:
         if phrase in summary_prose and phrase not in canonical_lower:
             return False, f"summary asserts a verdict the report did not make: '{phrase}'"
-
-    # (4) Causal language attached to a non-known-mechanism row -- in its own narrative OR named
-    # in the summary/caveats. A statistical association is never described as a proven cause.
-    for drug_narrative in section.per_antibiotic:
-        row = by_drug.get(drug_narrative.antibiotic)
-        if row is None or row.evidence_category == "known_mechanism":
-            continue
-        if any(phrase in drug_narrative.narrative.lower() for phrase in _CAUSAL_PHRASES):
-            return False, (
-                f"narrative uses causal language for {drug_narrative.antibiotic}, whose evidence "
-                f"is {row.evidence_category}, not a known mechanism"
-            )
-    summary_has_causal = any(phrase in summary_prose for phrase in _CAUSAL_PHRASES)
-    if summary_has_causal:
-        for drug, row in by_drug.items():
-            if row.evidence_category != "known_mechanism" and drug in summary_prose:
-                return False, (
-                    f"summary uses causal language for {drug}, whose evidence is "
-                    f"{row.evidence_category}, not a known mechanism"
-                )
 
     return True, "deterministic pre-check passed"
 
