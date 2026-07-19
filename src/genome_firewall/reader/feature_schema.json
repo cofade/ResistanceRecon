@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "amrfinder_db_version": "2026-05-15.1",
+  "genome_feature_vector_json_schema": {
+    "additionalProperties": false,
+    "description": "Versioned, ML-ready feature vector built from AmrFeature calls (reader/feature_builder.py).\n\nTwo tables per the research findings: gene presence/absence and point mutations, each\nkept separate since they are mechanistically different (acquired gene vs. chromosomal\ntarget mutation). `gene_presence_method` keeps Method as an auxiliary QC column per gene\nrather than collapsing it away, and PARTIAL_CONTIG_END genes are flagged separately from\na hard PARTIAL cutoff since they are frequently assembly-fragmentation artifacts.",
+    "properties": {
+      "genome_id": {
+        "title": "Genome Id",
+        "type": "string"
+      },
+      "schema_version": {
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "amrfinder_db_version": {
+        "title": "Amrfinder Db Version",
+        "type": "string"
+      },
+      "gene_presence": {
+        "additionalProperties": {
+          "type": "boolean"
+        },
+        "title": "Gene Presence",
+        "type": "object"
+      },
+      "gene_presence_method": {
+        "additionalProperties": {
+          "enum": [
+            "ALLELEX",
+            "ALLELEP",
+            "EXACTX",
+            "EXACTP",
+            "BLASTX",
+            "BLASTP",
+            "PARTIALX",
+            "PARTIALP",
+            "PARTIAL_CONTIG_ENDX",
+            "PARTIAL_CONTIG_ENDP",
+            "INTERNAL_STOP",
+            "HMM",
+            "POINTX",
+            "POINTP",
+            "POINTN"
+          ],
+          "type": "string"
+        },
+        "title": "Gene Presence Method",
+        "type": "object"
+      },
+      "gene_hit_count": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "title": "Gene Hit Count",
+        "type": "object"
+      },
+      "gene_drug_class": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Gene Drug Class",
+        "type": "object"
+      },
+      "gene_drug_subclass": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Gene Drug Subclass",
+        "type": "object"
+      },
+      "point_mutations": {
+        "additionalProperties": {
+          "type": "boolean"
+        },
+        "title": "Point Mutations",
+        "type": "object"
+      },
+      "point_mutation_disrupt": {
+        "additionalProperties": {
+          "type": "boolean"
+        },
+        "title": "Point Mutation Disrupt",
+        "type": "object"
+      },
+      "partial_contig_end_genes": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Partial Contig End Genes",
+        "type": "array"
+      },
+      "unmapped_class_genes": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Unmapped Class Genes",
+        "type": "array"
+      }
+    },
+    "required": [
+      "genome_id",
+      "schema_version",
+      "amrfinder_db_version"
+    ],
+    "title": "GenomeFeatureVector",
+    "type": "object"
+  }
+}

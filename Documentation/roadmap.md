@@ -10,7 +10,11 @@
   provenance manifest shipped; feature_matrix (EPIC 2) and train/test splits (EPIC 3) are
   explicitly out of scope — see carry-forward comments on #11/#13/#17/#18. The actual live
   BV-BRC bulk pull (multi-GB FASTA download) is a separate operational step, not yet run.
-- [ ] EPIC 2 — Genome Reader (schemas + AMRFinderPlus runner + feature builder + MockAnnotator)
+- [x] EPIC 2 — Genome Reader (schemas + AMRFinderPlus runner + feature builder + MockAnnotator).
+  `schemas.py` (full cross-epic contract, issue #14), `reader/fasta_parser.py` (#15), `annotation/`
+  Docker runner + envelope + MockAnnotator + fixtures (#16, validated against a real Docker run),
+  `reader/feature_builder.py` + committed `data/reference/ReferenceGeneCatalog.txt` (ADR-0013) +
+  `feature_schema.json` (#17). PR pending user manual test.
 - [ ] EPIC 3 — Predictor: split + target gate + LR + calibration + conformal + registry
 - [ ] EPIC 4 — Deterministic Decision Report (LLM-free MVP)
 - [ ] EPIC 5 — Evidence RAG + grounded LLM narrative + reviewer (fail-closed)

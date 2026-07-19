@@ -136,9 +136,9 @@ Release automation is **deferred** (there is no `release.yml` yet). Interim rule
 
 ## Progress tracking
 
-**Current phase:** EPIC 0 — scaffolding & six-layer harness; process-hardening from issue #35 (change-control, evidence, and skill-routing rules transferred from the reference harness).
-**Completed:** research documentation (7 findings docs), reuse inventory, arc42 (12 chapters + 12 ADRs), repo skeleton, quality gates, CI + import-boundary gate, `.claude/` harness (senior-reviewer + skills), ground-truth log seeded.
-**Next up:** GitHub epics/issues + Project board, then EPIC 1 (BV-BRC data pipeline).
+**Current phase:** EPIC 2 — Genome Reader (Module 01): schemas.py + reader/ + annotation/ implemented; PR pending manual test.
+**Completed:** EPIC 0 scaffolding (research docs, arc42, ADRs 1-12, CI/harness); EPIC 1 BV-BRC data pipeline (PR #37, merged); EPIC 2 (#3/#14/#15/#16/#17) — `schemas.py` (full cross-epic contract), `reader/fasta_parser.py`, `annotation/` (Docker runner + MockAnnotator, validated against a real Docker run), `reader/feature_builder.py` + committed `data/reference/ReferenceGeneCatalog.txt` (ADR-0013) + `feature_schema.json`.
+**Next up:** user manual test of the EPIC 2 PR, then EPIC 3 (Predictor: split + target gate + LR + calibration + conformal + registry).
 
 Update this section at the start of each work session; do not reconstruct it from git history.
 
@@ -154,6 +154,7 @@ Format: symptom → root cause → prevention.
 - **Symptom:** an LLM narrative states a verdict the model didn't produce. **Root cause:** LLM given write access to a verdict field. **Prevention:** LLM output schemas contain no verdict/confidence field; reviewer + schema tests enforce it.
 - **Symptom:** inflated held-out accuracy. **Root cause:** near-identical genomes split across train/test. **Prevention:** homology-aware grouped split (MLST + Mash fallback); explicit no-leakage test.
 - **Symptom:** FTPS control-channel handshake (connect/login/PROT P/PASV) succeeds but every data transfer (`LIST`/`RETR`) fails with `425 Unable to build data connection`. **Root cause:** a consumer-grade router's FTP ALG can't track FTPS's TLS-encrypted control channel and mishandles the passive-mode data connection — a network constraint, not a code defect. **Prevention:** a dedicated error hint (VPN / disable router FTP-ALG / different network) instead of a generic message; `@pytest.mark.live` tests catch this class of failure that fixture-only tests never can. See Documentation/11-risks-and-technical-debt/README.md §11.4.
+- **Symptom:** a schema built from a pre-implementation research doc's paraphrase would reject 100% of real tool output. **Root cause:** AMRFinderPlus's actual `Method` values are X/P/N-suffixed (`ALLELEX`, `POINTX`, ...) and its columns are `Type`/`Subtype` (not "Element type"/"Element subtype"); the research doc's summary table used bare names that never appear in real output. **Prevention:** run the real tool at least once before finalizing a schema derived from documentation-paraphrase; caught before merge by a live Docker validation run during EPIC 2 implementation. See Documentation/11-risks-and-technical-debt/README.md §11.4.
 - **Symptom:** BV-BRC Solr query returns `HTTP 400` for `eq(evidence,Laboratory Method)`; a `json(nl,map)` facet request returns a dict and breaks code written for Solr's default flat list. **Root cause:** un-encoded space in an RQL literal; a wrongly-assumed facet response shape. **Prevention:** encode RQL literals (`_rql_value`); a live test against the real API (`numFound=85291`, matching the research doc exactly). See Documentation/11-risks-and-technical-debt/README.md §11.4.
 
 ## ADR triggers
