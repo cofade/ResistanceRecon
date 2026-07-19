@@ -45,7 +45,9 @@ def handle_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
     """
     del request
     logger.error("unexpected error in request handling", exc_info=exc)
+    # 500, not 503: an unexpected error is a (non-retryable) internal bug, whereas a PipelineError
+    # -> 503 signals a genuinely transient tool/infra failure the caller may retry.
     return JSONResponse(
-        status_code=503,
-        content={"ok": False, "error": "internal pipeline error; see server logs"},
+        status_code=500,
+        content={"ok": False, "error": "internal server error; see server logs"},
     )

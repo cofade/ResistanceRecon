@@ -42,9 +42,18 @@ primitives (`ModelPrediction`, `ConformalSet`, top features, `insufficient_data`
 `predict_genome` (golden rule #1) up front — for its fail-loud DB/schema compatibility guard
 and as the authoritative verdict source — while `build_report` re-derives the presentation
 rows and applies the honest ADR-0020 evidence-category tagging that `predict.py`'s own output
-does not carry. A safety-invariant test (`tests/service/test_verdict_reconciliation.py`) pins
-the two frozen paths to agree row-for-row on verdict + confidence, so they can never silently
-drift. The ~5 extra logistic-regression evaluations per genome this costs are negligible.
+does not carry. Because `build_report` checks `insufficient_data` *before* the gate while the
+sovereign path checks the gate *first*, the adapter must evaluate the deterministic gate and
+mark a drug `insufficient_data` **only when the gate does not fire** — otherwise an untrained
+drug carrying a called known mechanism would collapse to a `no_signal` no-call in the report
+while `predict_genome` forces `likely_to_fail` (a safety divergence caught in senior review;
+see §11.4). A safety-invariant test (`tests/service/test_verdict_reconciliation.py`) pins the
+two paths to agree on **verdict + calibrated confidence + conformal set** across the model,
+gate-fired, empty-set, and untrained-gate-firing branches. It deliberately does **not** assert
+`evidence_category` equality: the two paths differ there *by design* (predict.py tags model rows
+`statistical_association`; `build_report` applies the stronger ADR-0020 KNOWN-vs-STATISTICAL
+rollup) — that divergence is the intended benefit of routing the report through `build_report`,
+not a drift. The ~5 extra logistic-regression evaluations per genome this costs are negligible.
 
 **Bundled-demo vs upload.** The UI/API default to a `MockAnnotator` over committed demo
 fixtures so the demo works offline with no Docker (golden rule #6); real AMRFinderPlus is used
@@ -72,5 +81,8 @@ report-decoupled-from-predict boundary those packages were designed around.
 - (−) The real-AMRFinderPlus upload path and the real-OpenAI narrative path are not exercised
   in CI (Docker/keys forbidden there) — both are user manual-test items; CI covers the mock
   paths end-to-end.
+- One dependency is made explicit: `httpx>=0.27` is added to the `dev` group (FastAPI's
+  `TestClient` needs it for the ASGI transport). It is a test-only, already-transitive dep
+  pinned for CI robustness — not a new runtime dependency.
 - Pinned by `tests/service/*`, `tests/api/*`, `tests/ui/*`. Does not change the LLM boundary
   (ADR-0006) or any prediction method.

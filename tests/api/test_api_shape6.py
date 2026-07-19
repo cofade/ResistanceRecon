@@ -70,6 +70,28 @@ def test_predict_returns_envelope_with_disclaimer(client: TestClient) -> None:
 
 
 @pytest.mark.integration
+def test_predict_narrate_false_suppresses_the_llm() -> None:
+    # Inject a working LLM client into a fresh app so narrate=True WOULD produce an accepted LLM
+    # narrative; narrate=false must wire client=None and serve the deterministic template. A
+    # separate app instance keeps this state mutation out of the module-scoped client fixture.
+    from genome_firewall.llm.mock import MockLLMClient
+    from tests._demo import demo_report, passing_review, passing_section
+
+    app = create_app()
+    with TestClient(app) as tc:
+        report = demo_report("573.10001")
+        app.state.gf.client = MockLLMClient(
+            {"report_narrative": passing_section(report), "report_review": passing_review()}
+        )
+        files = {"fasta_file": ("g.fna", _fasta_bytes(), "text/plain")}
+        off = tc.post("/predict", files=files, data={"genome_id": "573.10001", "narrate": "false"})
+        on = tc.post("/predict", files=files, data={"genome_id": "573.10001", "narrate": "true"})
+
+    assert off.json()["envelope"]["review_status"] == "llm_disabled"
+    assert on.json()["envelope"]["review_status"] == "llm_output_accepted"
+
+
+@pytest.mark.integration
 def test_predict_invalid_genome_id_is_422(client: TestClient) -> None:
     response = client.post(
         "/predict",

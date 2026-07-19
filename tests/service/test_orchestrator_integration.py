@@ -14,7 +14,13 @@ from genome_firewall.kb.embedder import HashingBagOfWordsEmbedder
 from genome_firewall.kb.evidence_rag import EvidenceRAG
 from genome_firewall.llm.mock import MockLLMClient
 from genome_firewall.report.narrative import render_deterministic_narrative
-from tests._demo import demo_report, load_demo_registry, passing_review, passing_section
+from tests._demo import (
+    demo_report,
+    failing_review,
+    load_demo_registry,
+    passing_review,
+    passing_section,
+)
 
 
 def _analyze(genome_id: str, **kwargs: object):
@@ -59,6 +65,25 @@ def test_grounded_llm_narrative_is_accepted_end_to_end() -> None:
     assert envelope.review_status == "llm_output_accepted"
     assert envelope.source == "llm"
     assert envelope.grounding is not None and envelope.grounding.overall_pass
+    assert LAB_CONFIRMATION_DISCLAIMER in (envelope.report.narrative_summary or "")
+
+
+@pytest.mark.integration
+def test_llm_reviewer_rejection_fails_closed_to_template() -> None:
+    # The narrator produces a valid section, but the LLM reviewer rejects its grounding -> the
+    # safety-critical fail-closed path (the LLM said something the reviewer would not stand behind).
+    report = demo_report("573.10001")
+    client = MockLLMClient(
+        {"report_narrative": passing_section(report), "report_review": failing_review()}
+    )
+    retriever = EvidenceRAG.from_seed(embedder=HashingBagOfWordsEmbedder())
+
+    envelope = _analyze("573.10001", client=client, retriever=retriever)
+
+    assert envelope.review_status == "llm_output_rejected"
+    assert envelope.source == "template"
+    assert envelope.grounding is not None and not envelope.grounding.overall_pass
+    assert envelope.error is not None
     assert LAB_CONFIRMATION_DISCLAIMER in (envelope.report.narrative_summary or "")
 
 

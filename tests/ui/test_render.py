@@ -50,5 +50,16 @@ def test_evidence_lines_pair_description_with_source() -> None:
     assert lines and all(" — " in line for line in lines)
 
 
+def test_review_verdict_can_carry_a_known_mechanism_badge() -> None:
+    # meropenem on 573.10001: beta-lactamase genes are present (a curated known mechanism ->
+    # KNOWN MECHANISM badge) but the carbapenem gate did NOT fire and the model abstained -> a
+    # REVIEW row. Pin this REVIEW+KNOWN pairing so the honesty edge (a KNOWN badge next to REVIEW
+    # must not read as confirmed resistance) is a conscious, tested decision, not an accident.
+    rows = {r.antibiotic: r for r in render.firewall_rows(demo_report("573.10001"))}
+    mero = rows["meropenem"]
+    assert mero.label == "REVIEW"
+    assert mero.evidence_badge == "KNOWN MECHANISM"
+
+
 def test_disclaimer_text_is_the_canonical_constant() -> None:
     assert render.disclaimer_text() == LAB_CONFIRMATION_DISCLAIMER

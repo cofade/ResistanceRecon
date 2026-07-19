@@ -10,6 +10,8 @@ module allowed to combine with the ``streamlit`` API itself.
 
 from __future__ import annotations
 
+import logging
+
 import streamlit as st
 
 from genome_firewall.kb.embedder import HashingBagOfWordsEmbedder
@@ -29,6 +31,8 @@ from genome_firewall.service import (
     using_docker_annotator,
 )
 from genome_firewall.ui import render
+
+logger = logging.getLogger(__name__)
 
 st.set_page_config(page_title="Genome Firewall", page_icon="\U0001f9ec")
 
@@ -128,7 +132,16 @@ if run and genome_id:
         except FastaParseError as exc:
             st.error(f"Invalid FASTA: {exc}")
         except PipelineError as exc:
+            # Client-safe message on screen; the fuller detail (which may carry an annotation
+            # source path) to the server log only -- mirroring api/errors.handle_pipeline_error,
+            # since the in-process UI does not pass through the API exception handlers (ADR-0022).
+            logger.warning("pipeline error: %s", getattr(exc, "detail", exc))
             st.error(f"Analysis failed: {exc}")
+        except Exception:
+            # UI backstop: never dump a traceback into the page (the API hardens the same way via
+            # handle_unexpected_error); log the full exception server-side, show a generic message.
+            logger.exception("unexpected error in the UI pipeline")
+            st.error("Unexpected internal error; see server logs.")
 
     if envelope is not None:
         report = envelope.report
@@ -160,6 +173,10 @@ if run and genome_id:
         st.subheader("Narrative")
         st.write(report.narrative_summary)
         st.caption(f"Source: {envelope.source} · Review status: {envelope.review_status}")
+        if envelope.error:
+            # Surface WHY the LLM narrative was not used (rejected/errored), not just the status
+            # token -- otherwise the reason is invisible on the UI surface.
+            st.caption(f"LLM narrative not used: {envelope.error}")
 
         st.subheader("Calibration")
         st.caption(
@@ -169,3 +186,5 @@ if run and genome_id:
         )
 
     _disclaimer_banner()
+elif run:
+    st.warning("Enter a genome ID before analyzing.")

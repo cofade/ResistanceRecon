@@ -32,9 +32,11 @@ def test_pipeline_error_is_503_with_message() -> None:
     assert b"annotation failed" in response.body
 
 
-def test_unexpected_error_is_503_generic_without_leak() -> None:
+def test_unexpected_error_is_500_generic_without_leak() -> None:
+    # 500 (not 503): an unexpected error is a non-retryable internal bug, distinct from a
+    # PipelineError -> 503 which signals a transient tool/infra failure the caller may retry.
     secret = "sensitive internal detail /abs/path/x.py line 42"
     response = errors.handle_unexpected_error(_request(), RuntimeError(secret))
-    assert response.status_code == 503
+    assert response.status_code == 500
     assert b'"ok":false' in response.body
     assert secret.encode() not in response.body  # the raw exception text is never echoed

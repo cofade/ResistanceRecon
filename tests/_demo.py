@@ -61,3 +61,8 @@ def passing_section(report: GenomeReport) -> NLReportSection:
 def passing_review() -> ReportVerdict:
     """A reviewer verdict that accepts a narrative (the LLM-judge leg of the accepted path)."""
     return ReportVerdict(grounding_score=1.0, per_claim=(), overall_pass=True)
+
+
+def failing_review() -> ReportVerdict:
+    """A reviewer verdict that REJECTS a narrative -> the pipeline fails closed to the template."""
+    return ReportVerdict(grounding_score=0.0, per_claim=(), overall_pass=False)

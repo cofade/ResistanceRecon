@@ -11,6 +11,7 @@ and the report package's decoupled input contract.
 from __future__ import annotations
 
 import io
+import logging
 import os
 import tempfile
 from collections.abc import Iterator
@@ -33,11 +34,14 @@ from genome_firewall.predictor.errors import (
 )
 from genome_firewall.predictor.model_registry import DrugModel, PredictorRegistry
 from genome_firewall.predictor.predict import predict_genome
+from genome_firewall.predictor.target_gate import evaluate_gate
 from genome_firewall.reader.fasta_parser import FastaParseError, parse_fasta
 from genome_firewall.reader.feature_builder import build_feature_vector
 from genome_firewall.report import DrugPredictionInput, GenomePredictionInputs, build_report
 from genome_firewall.report.pipeline import NarrativeEnvelope, narrate_report
 from genome_firewall.schemas import AnnotationResult, GenomeFeatureVector, ModelPrediction
+
+logger = logging.getLogger(__name__)
 
 #: repo_root/models -- src-layout: service.py -> genome_firewall -> src -> repo_root.
 DEFAULT_MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
@@ -173,8 +177,18 @@ def to_prediction_inputs(
     for antibiotic in SUPPORTED_ANTIBIOTICS:
         drug_model = registry.get(antibiotic)
         if drug_model is None:
+            # No trained model -> insufficient_data, EXCEPT where the deterministic gate fires.
+            # The gate is authoritative over the model (predict.py evaluates it BEFORE the
+            # registry lookup), so a called known mechanism must still force likely_to_fail, not
+            # collapse to a no_signal no-call. build_report checks insufficient_data BEFORE
+            # gate.fired, so setting the flag on a gate-firing drug would swallow the gate and
+            # make the two frozen paths diverge (senior review P0); only flag it when the gate
+            # does not fire (build_report's own gate branch then handles the fired case).
+            gate_fired = evaluate_gate(antibiotic, vector).result.fired
             drugs.append(
-                DrugPredictionInput(antibiotic=antibiotic, vector=vector, insufficient_data=True)
+                DrugPredictionInput(
+                    antibiotic=antibiotic, vector=vector, insufficient_data=not gate_fired
+                )
             )
             continue
         row, _oov = build_feature_row(vector, drug_model.feature_schema)
@@ -239,13 +253,17 @@ def analyze_genome(
             f"annotation failed for genome_id={genome_id!r} (source: {_source_scheme(annotation)})",
             detail=f"annotation failed ({annotation.source}): {annotation.error}",
         )
-    if annotation.data is None or annotation.amrfinder_db_version is None:
+    if annotation.amrfinder_db_version is None:
         raise PipelineError(
-            f"annotation returned no usable data for genome_id={genome_id!r} "
+            f"annotation returned no reference DB version for genome_id={genome_id!r} "
             f"(source: {_source_scheme(annotation)})",
-            detail=f"ok=True but empty data ({annotation.source})",
+            detail=f"ok=True but amrfinder_db_version is None ({annotation.source})",
         )
-
+    # The AnnotationResult validator guarantees `data` is present when ok=True (schemas.py
+    # `_envelope_is_consistent`: "ok=True requires data"); the assert documents that invariant
+    # and narrows the type for build_feature_vector -- a data=None ok-envelope is unconstructable,
+    # so this never fires at runtime.
+    assert annotation.data is not None
     vector = build_feature_vector(
         genome_id, annotation.data, amrfinder_db_version=annotation.amrfinder_db_version
     )
@@ -262,4 +280,14 @@ def analyze_genome(
 
     inputs = to_prediction_inputs(vector, registry)
     report = build_report(inputs)
-    return narrate_report(report, client=client, retriever=retriever)
+    envelope = narrate_report(report, client=client, retriever=retriever)
+    if envelope.review_status == "llm_output_rejected":
+        # The LLM narrative was blocked (narrator error or reviewer grounding-rejection) and the
+        # pipeline fell back to the deterministic template. The verdict is unchanged (golden rule
+        # #1), but a blocked narrative -- the documented "LLM tried to state a verdict" tripwire --
+        # must be observable server-side, on BOTH the API and the in-process UI surface, not only
+        # in the response envelope a client may ignore.
+        logger.warning(
+            "LLM narrative rejected; served deterministic template instead: %s", envelope.error
+        )
+    return envelope
