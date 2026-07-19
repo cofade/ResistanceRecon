@@ -85,6 +85,15 @@ def test_catalog_resolves_a_blank_class_gene_and_stores_it() -> None:
     assert "blaSHV-12" not in vector.unmapped_class_genes
 
 
+def test_catalog_fills_a_blank_subclass_when_class_is_already_known() -> None:
+    """The catalog fallback must fire per-column, not only when the whole pair is blank."""
+    catalog = ReferenceGeneCatalog(_CATALOG_PATH)
+    vector = _vector_for("573.10003", catalog=catalog)
+
+    assert vector.gene_drug_class["blaTEM-1"] == "BETA-LACTAM"  # from the TSV directly
+    assert vector.gene_drug_subclass["blaTEM-1"] == "BETA-LACTAM"  # backfilled by the catalog
+
+
 def test_catalog_does_not_invent_a_class_for_a_gene_it_does_not_know() -> None:
     catalog = ReferenceGeneCatalog(_CATALOG_PATH)
     vector = _vector_for("573.10003", catalog=catalog)

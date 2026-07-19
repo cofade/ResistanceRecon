@@ -27,4 +27,6 @@ for the full run log (image tag, `amrfinder -V`, hit counts).
   flag), and an `AMR`-subtype row with blank Class/Subclass that IS resolvable via the
   catalog (`blaSHV-12` -- its real Class/Subclass, BETA-LACTAM/CEFIDEROCOL-CEPHALOSPORIN,
   is blanked here to simulate a TSV that didn't populate it, so `ReferenceGeneCatalog`
-  resolution can actually be exercised end-to-end).
+  resolution can actually be exercised end-to-end), and a row with Class populated but
+  Subclass blank (`blaTEM-1` -- exercises the fallback firing on a *partially* blank
+  Class/Subclass pair, not just a fully blank one).

@@ -3,3 +3,4 @@ Name	Protein id	Contig id	Start	Stop	Strand	Element symbol	Element name	Scope	Ty
 573.10003	NA	NC_009648.1	500000	500600	+	ydgH-like	putative distant AMR-adjacent efflux protein	plus	AMR	AMR	NA	NA	HMM	200	210	95.24	62.00	200	NA	NA	NF999999.1	putative distant AMR-adjacent efflux family
 573.10003	NA	NC_009648.1	600000	600450	+	newGene-1	newly-curated Plus-scope AMR gene, class not yet assigned	plus	AMR	AMR	NA	NA	EXACTX	150	150	100.00	100.00	150	WP_999999999.1	newly-curated Plus-scope AMR gene	NA	NA
 573.10003	NA	NC_009650.1	10117	10974	+	blaSHV-12	extended-spectrum class A beta-lactamase SHV-12	core	AMR	AMR	NA	NA	ALLELEX	286	286	100.00	100.00	286	WP_002904004.1	extended-spectrum class A beta-lactamase SHV-12	NA	NA
+573.10003	NA	NC_009650.1	21882	22739	+	blaTEM-1	broad-spectrum class A beta-lactamase TEM-1	core	AMR	AMR	BETA-LACTAM	NA	ALLELEX	286	286	100.00	100.00	286	WP_000027057.1	broad-spectrum class A beta-lactamase TEM-1	NA	NA

@@ -96,10 +96,12 @@ def build_feature_vector(
                 partial_contig_end_genes.add(feature.gene_symbol)
 
             resolved_class, resolved_subclass = feature.drug_class, feature.drug_subclass
-            if resolved_class is None and catalog is not None:
+            if catalog is not None and (resolved_class is None or resolved_subclass is None):
                 looked_up = catalog.lookup(feature.gene_symbol)
                 if looked_up is not None:
-                    resolved_class, resolved_subclass = looked_up
+                    catalog_class, catalog_subclass = looked_up
+                    resolved_class = resolved_class or catalog_class
+                    resolved_subclass = resolved_subclass or catalog_subclass
             if resolved_class is None:
                 unmapped_class_genes.add(feature.gene_symbol)
             else:

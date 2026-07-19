@@ -6,6 +6,7 @@ Never imported/run in CI -- MockAnnotator (mock.py) stands in for every non-live
 
 from __future__ import annotations
 
+import csv
 import re
 import subprocess
 from pathlib import Path
@@ -111,7 +112,7 @@ def run_amrfinder(
     db_version = db_version_match.group(1) if db_version_match else None
     try:
         features = parse_amrfinder_tsv(output_path)
-    except (ValidationError, KeyError, ValueError) as exc:
+    except (ValidationError, csv.Error, OSError, KeyError, ValueError) as exc:
         return AnnotationResult(
             ok=False,
             source=source,

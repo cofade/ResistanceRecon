@@ -8,6 +8,7 @@ real output are structurally identical by construction, not by discipline.
 
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -41,7 +42,7 @@ class MockAnnotator:
             )
         try:
             features = parse_amrfinder_tsv(fixture_path)
-        except (ValidationError, KeyError, ValueError) as exc:
+        except (ValidationError, csv.Error, OSError, KeyError, ValueError) as exc:
             return AnnotationResult(
                 ok=False,
                 source=source,
