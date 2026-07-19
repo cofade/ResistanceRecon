@@ -45,6 +45,17 @@ flowchart LR
 
 ## Quickstart
 
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/getting-started/installation/) (the project's package/venv manager — install it once per machine, before `uv sync`):
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+The official installer registers `uv` on PATH itself; open a new terminal afterward. (If you instead installed via a package manager like WinGet/Homebrew and `uv` isn't found, check that its install directory landed on PATH — package-manager shims don't always link it.)
+
 ```bash
 uv sync --all-extras
 uv run pytest                                          # quality gate (coverage >= 80)

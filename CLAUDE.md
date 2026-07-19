@@ -6,6 +6,8 @@ Genome Firewall turns a reconstructed *Klebsiella pneumoniae* genome (FASTA) int
 
 ## Quick reference
 
+Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) on PATH (see README's Quickstart for the install command and a PATH troubleshooting note).
+
 ```bash
 uv sync --all-extras                              # install (dev + optional groups)
 uv run pytest                                     # tests (cov >= 80)
