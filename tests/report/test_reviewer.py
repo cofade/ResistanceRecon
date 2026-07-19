@@ -5,12 +5,13 @@ from __future__ import annotations
 from genome_firewall.llm.mock import MockLLMClient
 from genome_firewall.report.builder import build_report
 from genome_firewall.report.inputs import GenomePredictionInputs
+from genome_firewall.report.narrative import render_row
 from genome_firewall.report.nl_schemas import (
     NLDrugNarrative,
     NLReportSection,
     ReportVerdict,
 )
-from genome_firewall.report.reviewer import deterministic_precheck, review_narrative
+from genome_firewall.report.reviewer import _PERCENT_RE, deterministic_precheck, review_narrative
 from tests.report.conftest import (
     make_prediction_inputs,
     meropenem_gate_input,
@@ -248,3 +249,92 @@ def test_precheck_rejects_a_fabricated_confidence_even_if_the_digits_appear_in_k
     ok, reason = deterministic_precheck(section, _REPORT, retrieval)
     assert not ok
     assert "confidence" in reason
+
+
+def test_precheck_rejects_a_panel_drug_named_in_prose_but_not_evaluated() -> None:
+    # A SUPPORTED panel drug named in free-text prose but absent from this report's predictions is a
+    # fabricated reference (stage-2 second loop). _REPORT does not evaluate trimethoprim-sulfa.
+    section = _section(summary="Unlike trimethoprim-sulfamethoxazole, this genome looks clean.")
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "trimethoprim-sulfamethoxazole" in reason
+
+
+def test_percent_regex_binds_only_within_a_line() -> None:
+    # #45-A: a digit ending one line and a '%' starting the next must NOT form an N% token, so the
+    # reorder differential between the validated and the published string cannot smuggle a percent.
+    assert _PERCENT_RE.findall("coverage was 88\n% of the reference") == []
+    assert _PERCENT_RE.findall("confidence 88%") == ["88"]
+    assert _PERCENT_RE.findall("confidence 88 %") == ["88"]
+
+
+def test_render_row_emits_exactly_one_percent_token() -> None:
+    # drug_report_percents relies on render_row printing exactly one '%' (the confidence). Pin it so
+    # a future evidence description carrying a '%' cannot silently widen the per-drug percent set.
+    for row in _REPORT.predictions:
+        assert len(_PERCENT_RE.findall(render_row(row))) == 1
+
+
+def test_precheck_rejects_a_per_drug_percent_from_another_drugs_confidence() -> None:
+    # 82% is gentamicin's calibrated confidence, present somewhere in the report, so the OLD
+    # global membership check accepted it inside meropenem's narrative. Per-drug binding rejects
+    # it (#45-B).
+    section = _section(
+        NLDrugNarrative(
+            antibiotic="meropenem", narrative="Meropenem confidence is 82% by the model."
+        )
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason and "82" in reason and "confidence" in reason
+
+
+def test_precheck_rejects_a_per_drug_percent_equal_to_a_gene_digit() -> None:
+    # '2' is a digit of meropenem's own blaKPC-2 evidence (in drug_numbers) but is NOT a confidence
+    # (not in drug_report_percents); stating it as '2%' must be rejected -- the OXA-48->48% class.
+    section = _section(
+        NLDrugNarrative(antibiotic="meropenem", narrative="Support was only 2% of reads.")
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason and "confidence" in reason
+
+
+def test_precheck_accepts_a_per_drug_narrative_stating_its_own_confidence() -> None:
+    # Positive control: the drug's own rendered confidence percent is a legitimate echo.
+    section = _section(
+        NLDrugNarrative(antibiotic="meropenem", narrative="Meropenem was called at 99% confidence.")
+    )
+    ok, _ = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert ok
+
+
+def test_precheck_scopes_citation_numbers_per_drug() -> None:
+    from genome_firewall.kb.corpus import KBChunk
+    from genome_firewall.kb.retriever import RetrievedChunk
+
+    # A number cited only in meropenem's chunk is allowed in meropenem's narrative but rejected
+    # in ceftriaxone's, whose retrieval carries no such number -- per-drug KB scoping (#45-B).
+    retrieval = {
+        "meropenem": (
+            RetrievedChunk(
+                chunk=KBChunk(
+                    chunk_id="c", gene_family="g", text="assembled at 7777x depth", source="s"
+                ),
+                score=1.0,
+            ),
+        )
+    }
+    ok_mero, _ = deterministic_precheck(
+        _section(NLDrugNarrative(antibiotic="meropenem", narrative="Assembled at 7777x depth.")),
+        _REPORT,
+        retrieval,
+    )
+    assert ok_mero
+    ok_cef, reason = deterministic_precheck(
+        _section(NLDrugNarrative(antibiotic="ceftriaxone", narrative="Assembled at 7777x depth.")),
+        _REPORT,
+        retrieval,
+    )
+    assert not ok_cef
+    assert "ceftriaxone" in reason and "7777" in reason
