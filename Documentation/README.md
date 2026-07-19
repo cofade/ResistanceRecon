@@ -16,7 +16,7 @@ arc42-structured architecture & research documentation for **Genome Firewall** (
 | 6 | Runtime view | [`06-runtime-view/`](06-runtime-view/) |
 | 7 | Deployment view | [`07-deployment-view/`](07-deployment-view/) |
 | 8 | Crosscutting concepts (golden rules) | [`08-crosscutting-concepts/`](08-crosscutting-concepts/) |
-| 9 | Architecture decisions (ADRs 0001–0008) | [`09-architecture-decisions/`](09-architecture-decisions/) |
+| 9 | Architecture decisions (ADRs 0001–0024) | [`09-architecture-decisions/`](09-architecture-decisions/) |
 | 10 | Quality requirements | [`10-quality-requirements/`](10-quality-requirements/) |
 | 11 | Risks & technical debt | [`11-risks-and-technical-debt/`](11-risks-and-technical-debt/) |
 | 12 | Glossary | [`12-glossary/`](12-glossary/) |
@@ -27,8 +27,8 @@ arc42-structured architecture & research documentation for **Genome Firewall** (
 |---|---|
 | [`roadmap.md`](roadmap.md) | Epic/milestone roadmap |
 | [`research-findings/`](research-findings/) | Web-grounded research + reuse-grounded design (7 docs, with sources) |
-| `MODEL_CARD.md` | Responsible-AI model card — *created in EPIC 7 (needs real metrics)* |
-| `DATASHEET.md` | Dataset datasheet — *created in EPIC 7* |
+| [`MODEL_CARD.md`](MODEL_CARD.md) | Responsible-AI model card — built from real held-out eval numbers (EPIC 7) |
+| [`DATASHEET.md`](DATASHEET.md) | Dataset datasheet for the BV-BRC training corpus (EPIC 7) |
 | `reuse-inventory.md` | Which prior-project files we reuse — **local only, gitignored** (references private repos) |
 
 ## Provenance

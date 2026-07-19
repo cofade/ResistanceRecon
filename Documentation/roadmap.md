@@ -45,7 +45,9 @@
   → `models/eval_summary.json`. Top-level `MODEL_CARD.md` + `DATASHEET.md` from real numbers (only
   gentamicin has both-class unseen-lineage data — it generalizes, AUROC 0.882; the rest are thin,
   stated honestly). Draft PR pending user manual test.
-- [ ] EPIC 8 — Finalize Documentation + ADRs + ground-truth
+- [x] EPIC 8 — Finalize Documentation + ADRs + ground-truth. arc42 master index current
+  through ADR-0024; ADR chapter index, `ground-truth/decisions.jsonl`, `research-findings/`,
+  and `MODEL_CARD.md`/`DATASHEET.md` all current at submission.
 - [ ] EPIC 9 — Submission (deploy, dataset publish, summary, videos, zip)
 
 ## Follow-up (post-hackathon)
