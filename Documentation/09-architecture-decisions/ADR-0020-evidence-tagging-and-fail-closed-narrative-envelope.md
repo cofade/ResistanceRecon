@@ -35,14 +35,16 @@ narrative (EPIC 5) must fail closed when it cannot be trusted (ADR-0006). Two de
   a non-gate confidence to 0.99.
 
 **Fail-closed narrative:**
-- The reviewer runs a **deterministic pre-check before any LLM call**, and every check is **bound
-  to the specific drug row it concerns, in every prose field** — a flattened global membership test
-  would let a per-drug verdict swap through in a mixed-verdict panel (where every verdict phrase
-  appears *somewhere* in the report), and moving the swap from a per-drug narrative to the
-  summary/caveats must not weaken the guard. One helper (`_prose_violation`) validates verdict
-  phrases and causal language for the per-antibiotic narratives (bound to their own drug), the
-  summary, and each caveat (bound to the nearest named drug by proximity). A confidence-shaped
-  number (`N%`) must match one of the report's own numbers, not merely KB text.
+- The reviewer runs a **deterministic pre-check before any LLM call**. Per-drug verdict and causal
+  claims are validated **only where attribution is exact — inside each drug's own per-antibiotic
+  narrative** (bound to that drug; a narrative may assert only its own verdict, and causal language
+  only if its evidence is a known mechanism). The **free-text `summary`/`caveats` may not state a
+  verdict or causal phrase at all** — those belong in the per-antibiotic narratives — so no
+  proximity heuristic is load-bearing (a proximity guess is defeated by a plural/aggregate sentence
+  such as "both are likely to work"). The narrator prompt mirrors this contract. A confidence-shaped
+  number (`N%`) must match one of the report's own numbers, not merely KB text. This makes the
+  guard's strength independent of *which field* a claim lands in, and removes both the multi-drug
+  masking hole and the contrastive false-reject that per-drug proximity attribution would have.
 - The **deterministic renderer is verdict-aware**: a present-but-non-gating known-mechanism gene on
   a `likely_to_work` row is rendered as "resistance-associated marker present, but the calibrated
   model predicts susceptibility" — the judge-free fallback path can never print a resistance marker

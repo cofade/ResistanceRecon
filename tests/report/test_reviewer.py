@@ -147,15 +147,15 @@ def test_precheck_rejects_a_per_drug_verdict_swap_in_a_mixed_report() -> None:
     assert "meropenem" in reason and "likely to work" in reason
 
 
-def test_precheck_rejects_a_verdict_swap_in_the_summary() -> None:
-    # Same swap class as the per-drug case, but in the free-text summary (served verbatim).
+def test_precheck_rejects_any_verdict_phrase_in_the_summary() -> None:
+    # The free-text summary may not state a per-drug verdict at all (they belong in per_antibiotic).
     section = _section(summary="For meropenem, the drug is likely to work.")
     ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
     assert not ok
-    assert "meropenem" in reason and "likely to work" in reason
+    assert "summary" in reason and "likely to work" in reason
 
 
-def test_precheck_rejects_a_verdict_swap_in_a_caveat() -> None:
+def test_precheck_rejects_a_verdict_phrase_in_a_caveat() -> None:
     section = NLReportSection(
         summary="Summary.",
         per_antibiotic=(),
@@ -163,17 +163,23 @@ def test_precheck_rejects_a_verdict_swap_in_a_caveat() -> None:
     )
     ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
     assert not ok
-    assert "meropenem" in reason
+    assert "caveat" in reason and "likely to work" in reason
 
 
-def test_precheck_rejects_causal_language_in_the_summary_for_a_statistical_drug() -> None:
-    stat_report = build_report(
-        GenomePredictionInputs(genome_id="g1", drugs=(_ceftriaxone_statistical_input(),))
-    )
-    section = _section(summary="For ceftriaxone, the detected gene confers resistance.")
-    ok, reason = deterministic_precheck(section, stat_report, _NO_RETRIEVAL)
+def test_precheck_rejects_a_plural_verdict_statement_in_the_summary() -> None:
+    # A plural/aggregate sentence covering several drugs must not slip a wrong verdict through
+    # (the proximity-attribution hole the outright ban closes).
+    section = _section(summary="Meropenem and ceftriaxone are both likely to work.")
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
     assert not ok
-    assert "summary" in reason and "ceftriaxone" in reason
+    assert "likely to work" in reason
+
+
+def test_precheck_rejects_causal_language_in_the_summary() -> None:
+    section = _section(summary="For ceftriaxone, the detected gene confers resistance.")
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "summary" in reason and "causal" in reason
 
 
 def test_precheck_rejects_a_fabricated_confidence_even_if_the_digits_appear_in_kb_text() -> None:

@@ -23,7 +23,10 @@ _SYSTEM = (
     "invent a drug, gene, or number. (2) Render NO CALL literally as an abstention -- never "
     "soften it into 'probably'. (3) Only describe a resistance mechanism as causing/conferring "
     "resistance when its evidence is a KNOWN resistance mechanism; for a statistical "
-    "association say the model weighted it, not that it causes resistance. (4) Keep it concise."
+    "association say the model weighted it, not that it causes resistance. (4) State each drug's "
+    "verdict (LIKELY TO WORK / LIKELY TO FAIL / NO CALL) and any mechanism/causal claim ONLY "
+    "inside that drug's per_antibiotic narrative; keep the `summary` and `caveats` as a high-level "
+    "overview free of any per-drug verdict phrase or causal claim. (5) Keep it concise."
 )
 
 

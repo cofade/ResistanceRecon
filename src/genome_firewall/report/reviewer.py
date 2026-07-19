@@ -68,65 +68,46 @@ def _section_prose(section: NLReportSection) -> str:
     return "\n".join(parts)
 
 
-def _find_all(text: str, needle: str) -> list[int]:
-    positions: list[int] = []
-    i = text.find(needle)
-    while i != -1:
-        positions.append(i)
-        i = text.find(needle, i + 1)
-    return positions
-
-
-def _prose_violation(
-    where: str,
-    prose_lower: str,
-    by_drug: Mapping[str, AntibioticPrediction],
-    *,
-    bound: tuple[str, AntibioticPrediction] | None,
+def _bound_narrative_violation(
+    drug: str, row: AntibioticPrediction, prose_lower: str
 ) -> str | None:
-    """Validate verdict phrases and causal language in one piece of prose, attributing each to a
-    drug row: to ``bound`` when the prose is a single drug's own narrative, otherwise to the
-    nearest named drug (proximity). One helper, applied identically to every field (per-drug
-    narrative, summary, each caveat), so *which field* can never be why a check is strong or weak.
-    Returns a rejection reason, or ``None`` if clean.
-    """
-    if bound is not None:
-        occurrences: list[tuple[int, str, AntibioticPrediction]] = [(0, bound[0], bound[1])]
-    else:
-        occurrences = [
-            (pos, drug, row)
-            for drug, row in by_drug.items()
-            for pos in _find_all(prose_lower, drug)
-        ]
-
-    def nearest(pos: int) -> tuple[str, AntibioticPrediction] | None:
-        if not occurrences:
-            return None
-        _, drug, row = min(occurrences, key=lambda o: abs(o[0] - pos))
-        return drug, row
-
+    """A single drug's own narrative: it may assert only THAT drug's verdict, and use causal
+    language only if that drug's evidence is a known mechanism. Attribution is exact (the entry
+    is, by contract, about this one drug) -- no proximity guessing."""
+    own_verdict = _VERDICT_LABEL[row.verdict]
     for phrase in _VERDICT_PHRASES:
-        for pos in _find_all(prose_lower, phrase):
-            attributed = nearest(pos)
-            if attributed is None:
-                continue
-            drug, row = attributed
-            if phrase != _VERDICT_LABEL[row.verdict]:
+        if phrase in prose_lower and phrase != own_verdict:
+            return (
+                f"narrative for {drug} asserts verdict '{phrase}', but its verdict is "
+                f"'{own_verdict}'"
+            )
+    if row.evidence_category != "known_mechanism":
+        for phrase in _CAUSAL_PHRASES:
+            if phrase in prose_lower:
                 return (
-                    f"{where}: verdict '{phrase}' attributed to {drug}, whose verdict is "
-                    f"'{_VERDICT_LABEL[row.verdict]}'"
-                )
-    for phrase in _CAUSAL_PHRASES:
-        for pos in _find_all(prose_lower, phrase):
-            attributed = nearest(pos)
-            if attributed is None:
-                continue
-            drug, row = attributed
-            if row.evidence_category != "known_mechanism":
-                return (
-                    f"{where}: causal language attributed to {drug}, whose evidence is "
+                    f"narrative for {drug} uses causal language ('{phrase}'), but its evidence is "
                     f"{row.evidence_category}, not a known mechanism"
                 )
+    return None
+
+
+def _free_text_violation(where: str, prose_lower: str) -> str | None:
+    """The free-text summary/caveats are overview prose. Per-drug verdict and causal claims belong
+    in the per-antibiotic narratives (where attribution is exact), so any verdict or causal phrase
+    here is rejected outright -- unambiguous, with no proximity guessing that a plural/aggregate
+    sentence ("both are likely to work") could defeat."""
+    for phrase in _VERDICT_PHRASES:
+        if phrase in prose_lower:
+            return (
+                f"{where} states a per-drug verdict ('{phrase}'); verdicts belong in the "
+                "per-antibiotic narrative"
+            )
+    for phrase in _CAUSAL_PHRASES:
+        if phrase in prose_lower:
+            return (
+                f"{where} states a causal claim ('{phrase}'); mechanism claims belong in the "
+                "per-antibiotic narrative"
+            )
     return None
 
 
@@ -137,21 +118,19 @@ def deterministic_precheck(
 ) -> tuple[bool, str]:
     """Reject fabricated drugs/numbers/verdicts and mis-attributed causal language.
 
-    Every check is bound to the specific drug row it concerns -- a flattened global membership
-    test would let a per-drug verdict swap slip through in a mixed-verdict panel (where every
-    verdict phrase appears *somewhere* in the report), whether the swap is in a per-drug narrative,
-    the summary, or a caveat.
+    Per-drug verdict/causal claims are validated only where attribution is exact -- inside each
+    drug's own per-antibiotic narrative (bound to that drug). The free-text summary/caveats may
+    not state a verdict or causal phrase at all, so no proximity heuristic (which a plural sentence
+    could defeat) is ever load-bearing.
     """
     by_drug: dict[str, AntibioticPrediction] = {p.antibiotic: p for p in report.predictions}
     evaluated = set(by_drug)
     canonical = render_deterministic_narrative(report)
-    canonical_lower = canonical.lower()
     chunk_text = " ".join(c.chunk.text for chunks in retrieval.values() for c in chunks)
     allowed_numbers = _numbers(f"{canonical}\n{chunk_text}".lower())
-    report_numbers = _numbers(canonical_lower)
+    report_numbers = _numbers(canonical.lower())
 
     prose = _section_prose(section).lower()
-    summary_prose = "\n".join([section.summary, *section.caveats]).lower()
 
     # (1) Fabricated numbers. A confidence-shaped number (N%) must match one of the report's OWN
     # numbers, not merely appear somewhere in the retrieved KB text; other numbers may be cited.
@@ -174,30 +153,22 @@ def deterministic_precheck(
         if drug in prose and drug not in evaluated:
             return False, f"narrative discusses {drug}, which was not evaluated in this report"
 
-    # (3+4) Verdict binding + causal language, applied per drug to EVERY prose field identically:
-    # a per-drug narrative binds to its own drug; the summary and each caveat bind by proximity.
+    # (3) Per-drug narratives: verdict + causal language bound to their own drug (exact).
     for drug_narrative in section.per_antibiotic:
         row = by_drug.get(drug_narrative.antibiotic)
         if row is None:
             continue
-        violation = _prose_violation(
-            "narrative",
-            drug_narrative.narrative.lower(),
-            by_drug,
-            bound=(drug_narrative.antibiotic, row),
+        violation = _bound_narrative_violation(
+            drug_narrative.antibiotic, row, drug_narrative.narrative.lower()
         )
         if violation:
             return False, violation
-    for label, field in [("summary", section.summary), *[("caveat", c) for c in section.caveats]]:
-        violation = _prose_violation(label, field.lower(), by_drug, bound=None)
+
+    # (4) Free-text summary/caveats: no verdict or causal phrase permitted at all.
+    for where, field in [("summary", section.summary), *[("caveat", c) for c in section.caveats]]:
+        violation = _free_text_violation(where, field.lower())
         if violation:
             return False, violation
-
-    # Global floor: a verdict phrase in the summary/caveats the report never made for ANY drug
-    # (catches a fabricated verdict when no drug is named to anchor the proximity check).
-    for phrase in _VERDICT_PHRASES:
-        if phrase in summary_prose and phrase not in canonical_lower:
-            return False, f"summary asserts a verdict the report did not make: '{phrase}'"
 
     return True, "deterministic pre-check passed"
 
