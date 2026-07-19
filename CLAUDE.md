@@ -73,6 +73,8 @@ Every code, documentation, CI, or refactor change follows this. A feature branch
 
 Automated tests and senior review are necessary but **never sufficient** — manual testing is the final, user-owned gate. Use `/finalize-epic` for the mechanical steps 6–10.
 
+**The manual-testing checklist contains ONLY what you cannot run yourself.** Anything you can execute — loading an artifact, running the pipeline on local/fixture data, exercising an error path, inspecting committed metrics, running an opt-in or live test suite (`GF_RUN_LIVE=1`) — you MUST run and report as part of your own verification; never hand a runnable command to the user as if it were their task. Litmus test: if you ran a check to obtain its "expected output", it does not belong on the checklist. Reserve the checklist for genuinely human-owned judgment: visual/UX assessment, behaviour on the user's own hardware/infra, subjective quality or scientific-acceptability calls, and steps needing credentials or an environment you lack.
+
 **Deferral safety.** When a plan defers scope out of the issue being worked (e.g. "build X" narrows to "build the input Y that X needs"), post a carry-forward comment on both the source issue and the issue that inherits the deferred work *before* starting implementation — so nothing is silently dropped. State what was deferred, why, and which issue now owns it.
 
 ## Evidence hierarchy (weakest → sovereign)
