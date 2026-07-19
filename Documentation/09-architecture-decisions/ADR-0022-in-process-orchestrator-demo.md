@@ -40,9 +40,10 @@ pipeline (parse → annotate → features → `predict_genome` → adapter → `
 primitives (`ModelPrediction`, `ConformalSet`, top features, `insufficient_data`) into the
 `report.inputs` contract; it asserts **no** verdict. `analyze_genome` still calls the sovereign
 `predict_genome` (golden rule #1) up front — for its fail-loud DB/schema compatibility guard
-and as the authoritative verdict source — while `build_report` re-derives the presentation
-rows and applies the honest ADR-0020 evidence-category tagging that `predict.py`'s own output
-does not carry. Because `build_report` checks `insufficient_data` *before* the gate while the
+and as the fail-loud DB/schema compatibility guard (its rows are computed and discarded; the
+served rows are pinned to it by test, not consumed directly) — while `build_report` re-derives
+the presentation rows and applies the honest ADR-0020 evidence-category tagging that
+`predict.py`'s own output does not carry. Because `build_report` checks `insufficient_data` *before* the gate while the
 sovereign path checks the gate *first*, the adapter must evaluate the deterministic gate and
 mark a drug `insufficient_data` **only when the gate does not fire** — otherwise an untrained
 drug carrying a called known mechanism would collapse to a `no_signal` no-call in the report
