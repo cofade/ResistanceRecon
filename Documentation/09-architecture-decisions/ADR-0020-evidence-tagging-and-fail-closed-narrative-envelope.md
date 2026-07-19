@@ -1,0 +1,78 @@
+# ADR-0020 — Evidence-category tagging policy & the fail-closed narrative envelope
+
+- **Date:** 2026-07-19
+- **Status:** Accepted
+- **Origin:** Agent-proposed / human-approved (EPIC 4+5 planning session, issues #23/#26).
+  **Safety-critical.**
+
+## Context
+
+The deterministic report builder (EPIC 4) must set each row's `evidence_category`
+(KNOWN_MECHANISM / STATISTICAL_ASSOCIATION / NO_SIGNAL) honestly (golden rule #3), and the LLM
+narrative (EPIC 5) must fail closed when it cannot be trusted (ADR-0006). Two decisions were open:
+
+1. **What anchors the KNOWN_MECHANISM tag** — the deterministic *gate firing* (narrow: only when
+   the gate forces `likely_to_fail`) or *curated-KB membership* (broader: any gene/mutation that
+   is a known mechanism, per `features/mechanisms.py`). A gate-anchored row-category rule trips
+   the `AntibioticPrediction` validator when a lone KB-member gene (e.g. a single `qnrB`) is
+   present but the gate did not fire: the row would be labelled `statistical_association` while
+   the only cited item is `known_mechanism`.
+2. **Where the LLM review outcome is recorded**, given `GenomeReport` is frozen
+   (`schemas.py`, `extra='forbid'`) and carries only `narrative_summary: str | None`.
+
+## Decision
+
+**Tagging (deterministic, LLM-free):**
+- Per-`EvidenceItem`: a supporting gene/mutation is `known_mechanism` **iff it is a member of the
+  curated mechanism KB for that drug** (`features/mechanisms.py` predicates — the same source the
+  gate uses); any feature the model merely weighted is `statistical_association`.
+- Row-level `evidence_category` = the **strongest category among the cited items**
+  (`known_mechanism` > `statistical_association` > `no_signal`). This satisfies all three
+  `AntibioticPrediction` validators by construction and eliminates the lone-KB-member footgun.
+- A gate hit still forces `likely_to_fail` at `KNOWN_MECHANISM_CONFIDENCE = 0.99` (ADR-0018);
+  every other row keeps the calibrated model confidence, even when it is `known_mechanism`.
+  **Category and confidence are independent axes** — a present known-mechanism gene never inflates
+  a non-gate confidence to 0.99.
+
+**Fail-closed narrative:**
+- The reviewer runs a **deterministic pre-check before any LLM call**. Per-drug verdict and causal
+  claims are validated **only where attribution is exact — inside each drug's own per-antibiotic
+  narrative** (bound to that drug; a narrative may assert only its own verdict, and causal language
+  only if its evidence is a known mechanism). The **free-text `summary`/`caveats` may not state a
+  verdict or causal phrase at all** — those belong in the per-antibiotic narratives — so no
+  proximity heuristic is load-bearing (a proximity guess is defeated by a plural/aggregate sentence
+  such as "both are likely to work"). The narrator prompt mirrors this contract. A confidence-shaped
+  number (`N%`) must match one of the report's own numbers, not merely KB text. This makes the
+  guard's strength independent of *which field* a claim lands in, and removes both the multi-drug
+  masking hole and the contrastive false-reject that per-drug proximity attribution would have.
+- The **deterministic renderer is verdict-aware**: a present-but-non-gating known-mechanism gene on
+  a `likely_to_work` row is rendered as "resistance-associated marker present, but the calibrated
+  model predicts susceptibility" — the judge-free fallback path can never print a resistance marker
+  as if it backed a susceptible call.
+- The pipeline returns a **`NarrativeEnvelope` alongside the report** (mirroring the `{ok, source,
+  error}` pattern) carrying `review_status ∈ {llm_output_accepted, llm_output_rejected,
+  llm_disabled}` and `source ∈ {llm, template}` — the frozen `GenomeReport` is not modified, and
+  the review outcome stays machine-readable. Any disable/error/rejection falls back to the
+  deterministic template; the disclaimer is present on every branch.
+
+Rejected: gate-anchored row category (validator footgun, and less honest — it would deny that a
+present known-mechanism gene is a known mechanism); mutating `GenomeReport` to add a status field
+(breaks the frozen contract).
+
+## Consequences
+
+- (+) Honest, auditable, reproducible KNOWN vs STATISTICAL separation with no LLM involvement;
+  validators hold across the whole synthetic cohort.
+- (+) A load-bearing (not advisory) review gate that costs nothing extra because the deterministic
+  template must exist as the no-API-key fallback anyway.
+- (−) A present-but-non-gating known mechanism yields a `known_mechanism` row at model confidence;
+  the verdict-aware deterministic renderer (and the reviewer's causal-language check on the LLM
+  path) keep the wording honest so the category never reads as if it backed the verdict.
+- (−) The unambiguous contract sacrifices some legitimate narrator freedom: a per-antibiotic
+  narrative may not reference another drug, and the free-text summary/caveats may not state a
+  verdict/causal phrase (so an honest aggregate overview like "several agents returned a no call"
+  is rejected). This fails *safe* — the deterministic template is served — and is the deliberate
+  price of a guard whose strength does not depend on parsing which drug a phrase refers to.
+- Pinned by `tests/report/test_builder_validators.py`, `tests/report/test_evidence.py`,
+  `tests/report/test_reviewer.py`, `tests/report/test_pipeline.py`, and
+  `tests/report/test_safety_invariants.py`.

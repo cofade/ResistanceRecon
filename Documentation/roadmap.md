@@ -20,8 +20,16 @@
   ADRs 0015–0018) and PR-B (conformal + predict + typed-compat registry + MLflow tracking + train
   orchestration + real training run, #21/#22, ADR-0014) implemented on their branches; both pending
   user manual test before merge.
-- [ ] EPIC 4 — Deterministic Decision Report (LLM-free MVP)
-- [ ] EPIC 5 — Evidence RAG + grounded LLM narrative + reviewer (fail-closed)
+- [x] EPIC 4 — Deterministic Decision Report (LLM-free MVP). `report/{inputs,evidence,builder,narrative}.py`:
+  `build_report` composes verdicts from predictor primitives (gate/model/conformal), assembles KNOWN vs
+  STATISTICAL evidence deterministically (ADR-0020), and emits a `GenomeReport` with the mandatory
+  disclaimer; pure-Python deterministic narrative is the demo safety net. Decoupled from `predict.py`.
+  Implemented on `feat/epic4-5-report-and-llm`; draft PR pending user manual test.
+- [x] EPIC 5 — Evidence RAG + grounded LLM narrative + reviewer (fail-closed). `llm/` (provider-agnostic
+  client + MockLLMClient + OpenAI backend, no verdict field), `kb/` (BM25 + optional embedding + RRF,
+  offline-safe, ADR-0019), `report/{nl_schemas,narrator,reviewer,pipeline}.py` (deterministic pre-check
+  then LLM judge, fail-closed to the template via `NarrativeEnvelope`). Same branch; draft PR pending
+  user manual test. Real OpenAI path is the user's manual test (CI is mock-only).
 - [ ] EPIC 6 — FastAPI backend + Streamlit UI (firewall table + disclaimer)
 - [ ] EPIC 7 — Eval harness + MODEL_CARD + DATASHEET
 - [ ] EPIC 8 — Finalize Documentation + ADRs + ground-truth

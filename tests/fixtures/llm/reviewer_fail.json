@@ -1,0 +1,7 @@
+{
+  "grounding_score": 0.35,
+  "per_claim": [
+    {"claim": "an unsupported claim in the narrative", "supported": false, "evidence_ref": null}
+  ],
+  "overall_pass": false
+}

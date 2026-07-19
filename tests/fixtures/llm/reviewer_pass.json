@@ -1,0 +1,8 @@
+{
+  "grounding_score": 1.0,
+  "per_claim": [
+    {"claim": "meropenem is likely to fail", "supported": true, "evidence_ref": "kpc"},
+    {"claim": "ceftriaxone is likely to work", "supported": true, "evidence_ref": null}
+  ],
+  "overall_pass": true
+}
