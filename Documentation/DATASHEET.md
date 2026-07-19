@@ -1,10 +1,13 @@
 # Datasheet — Genome Firewall training/evaluation dataset
 
-> Follows the *Datasheets for Datasets* framing (Gebru et al., 2021). Every figure is drawn from
-> a committed artifact — the label-ingestion manifest (`data/processed/dataset_manifest.json`,
-> reproducible via `scripts/build_dataset.py`) and the model registry — not from memory.
-> The processed data itself is gitignored (large; reproducible via the scripts / release assets);
-> its provenance and shape are recorded here.
+> Follows the *Datasheets for Datasets* framing (Gebru et al., 2021). Every aggregate figure below
+> traces to a **committed** artifact — [`ground-truth/dataset_composition.json`](../ground-truth/dataset_composition.json)
+> (the source-pull funnel, SIR distribution, per-drug panel splits, MLST coverage, and modelled-subset
+> shape) plus the committed `models/` registry/metrics — not from memory. That composition file is
+> distilled from the label-ingestion manifest `data/processed/dataset_manifest.json` and the training
+> feature matrix, both of which are **gitignored** (large; reproducible via `scripts/build_dataset.py`
+> → `scripts/build_feature_matrix.py`) — so the underlying manifest is not itself committed, but the
+> aggregate counts distilled from it are.
 
 ## Motivation
 
@@ -14,6 +17,9 @@ The dataset is self-sourced from BV-BRC lab-measured antimicrobial susceptibilit
 model-generated labels so the ground truth is genuine wet-lab measurement (ADR-0001).
 
 ## Composition
+
+> All counts in this section are the committed aggregates in
+> [`ground-truth/dataset_composition.json`](../ground-truth/dataset_composition.json).
 
 ### Source labels (full BV-BRC *K. pneumoniae* lab-AST pull)
 
