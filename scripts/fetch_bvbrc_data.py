@@ -167,6 +167,202 @@ def lab_ast_facet_rql(taxon_id: int) -> str:
     )
 
 
+# ---------------------------------------------------------------------------
+# HTTPS Data API path (ADR-0016) -- primary; FTPS above is the documented fallback.
+# Avoids the router-ALG FTPS `425` pitfall (Documentation/11-risks §11.4). The
+# genome_sequence collection returns contig FASTA over HTTPS; genome_amr returns lab-AST
+# rows; genome returns MLST + the contig-count/length used to detect truncation.
+# ---------------------------------------------------------------------------
+
+#: The Data API caps a single response at 25,000 rows; a naive query defaults to 25 and
+#: SILENTLY truncates a multi-contig assembly's FASTA (§11.4). Always request this limit and
+#: sanity-check the result against the genome record before trusting a downloaded FASTA.
+GENOME_SEQUENCE_LIMIT = 25000
+
+#: genome_amr fields mapped 1:1 onto the flat-file columns dataset.parse_amr_flatfile expects.
+_GENOME_AMR_FIELDS = (
+    "genome_id",
+    "genome_name",
+    "taxon_id",
+    "antibiotic",
+    "resistant_phenotype",
+    "evidence",
+    "laboratory_typing_method",
+    "measurement",
+    "measurement_value",
+    "measurement_unit",
+    "testing_standard",
+    "testing_standard_year",
+)
+_GENOME_METADATA_FIELDS = ("genome_id", "genome_name", "taxon_id", "mlst")
+
+
+def solr_query(
+    collection: str,
+    rql: str,
+    *,
+    base_url: str = SOLR_BASE,
+    accept: str = "application/json",
+    timeout: float = 120.0,
+) -> bytes:
+    """POST an RQL query to a BV-BRC Data API collection and return the raw response body.
+
+    ``accept`` selects the representation: ``application/json`` for records,
+    ``application/dna+fasta`` for genome_sequence contig FASTA. stdlib urllib only.
+    """
+    if not base_url.startswith("https://"):
+        raise ValueError("base_url must be https")
+    request = urllib.request.Request(
+        f"{base_url}/{collection}/",
+        data=rql.encode("utf-8"),
+        method="POST",
+        headers={"Content-Type": "application/rqlquery+x-www-form-urlencoded", "Accept": accept},
+    )
+    # base_url is asserted https:// above, closing the file:/custom-scheme risk B310 warns of;
+    # the suppression marker on the next line is bare and trailing (bandit parses any text
+    # after `# nosec` as further test IDs -- see the same convention on solr_facet above).
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # nosec B310
+        body: bytes = response.read()
+    return body
+
+
+def solr_select_records(
+    collection: str,
+    base_rql: str,
+    *,
+    page_size: int = GENOME_SEQUENCE_LIMIT,
+    max_records: int | None = None,
+    base_url: str = SOLR_BASE,
+    timeout: float = 120.0,
+) -> list[dict[str, Any]]:
+    """Page a record query with ``limit(count,start)`` until the API stops returning a full
+    page (the Data API caps a page at 25,000 rows -- paging is mandatory for full pulls)."""
+    records: list[dict[str, Any]] = []
+    start = 0
+    while True:
+        rql = f"{base_rql}&limit({page_size},{start})"
+        payload = json.loads(solr_query(collection, rql, base_url=base_url, timeout=timeout))
+        if not isinstance(payload, list) or not payload:
+            break
+        records.extend(payload)
+        if len(payload) < page_size or (max_records is not None and len(records) >= max_records):
+            break
+        start += page_size
+    return records if max_records is None else records[:max_records]
+
+
+def _fasta_contig_count(text: str) -> int:
+    return sum(1 for line in text.splitlines() if line.startswith(">"))
+
+
+def _fasta_total_length(text: str) -> int:
+    return sum(len(line.strip()) for line in text.splitlines() if line and not line.startswith(">"))
+
+
+def fasta_sanity_problem(
+    n_contigs: int,
+    total_length: int,
+    *,
+    expected_contigs: int | None = None,
+    expected_length: int | None = None,
+    limit_ceiling: int | None = None,
+    length_tolerance: float = 0.01,
+) -> str | None:
+    """Return a human-readable problem string if a downloaded FASTA looks truncated/empty,
+    else None. The core guard against the genome_sequence default-limit truncation pitfall
+    (§11.4): a silently-truncated FASTA would make every downstream feature wrong with no
+    visible error. Pure -- pinned by offline tests."""
+    if n_contigs == 0 or total_length == 0:
+        return "empty FASTA (no contigs/sequence returned)"
+    if limit_ceiling is not None and n_contigs >= limit_ceiling:
+        return (
+            f"contig count {n_contigs} reached the limit({limit_ceiling}) ceiling -- the "
+            "response may be truncated; raise the limit or page the query"
+        )
+    if expected_contigs is not None and n_contigs != expected_contigs:
+        return (
+            f"contig count {n_contigs} != genome-record contigs {expected_contigs} "
+            "(genome_sequence default-limit truncation?)"
+        )
+    if expected_length is not None and expected_length > 0:
+        relative = abs(total_length - expected_length) / expected_length
+        if relative > length_tolerance:
+            return (
+                f"total length {total_length} differs from genome_length {expected_length} "
+                f"by {relative:.1%} (> {length_tolerance:.0%} tolerance)"
+            )
+    return None
+
+
+def genome_contig_expectation(
+    genome_id: str, *, base_url: str = SOLR_BASE, timeout: float = 60.0
+) -> tuple[int | None, int | None]:
+    """(contig count, genome length) from the genome record, for the FASTA sanity check."""
+    records = solr_select_records(
+        "genome",
+        f"eq(genome_id,{genome_id})&select(genome_id,contigs,genome_length)",
+        page_size=1,
+        max_records=1,
+        base_url=base_url,
+        timeout=timeout,
+    )
+    if not records:
+        return None, None
+
+    def _as_int(value: object) -> int | None:
+        try:
+            return int(value)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            return None
+
+    return _as_int(records[0].get("contigs")), _as_int(records[0].get("genome_length"))
+
+
+def https_fasta_download(
+    genome_id: str,
+    dest: Path,
+    *,
+    base_url: str = SOLR_BASE,
+    timeout: float = 120.0,
+    verify_against_genome_record: bool = True,
+) -> FetchResult:
+    """Download one genome's contig FASTA over HTTPS (genome_sequence, application/dna+fasta),
+    sanity-check it against the genome record, and write it atomically. No FTPS."""
+    source = f"https_genome_sequence:{genome_id}"
+    expected_contigs: int | None = None
+    expected_length: int | None = None
+    try:
+        if verify_against_genome_record:
+            expected_contigs, expected_length = genome_contig_expectation(
+                genome_id, base_url=base_url, timeout=timeout
+            )
+        rql = f"eq(genome_id,{genome_id})&sort(+sequence_id)&limit({GENOME_SEQUENCE_LIMIT})"
+        body = solr_query(
+            "genome_sequence",
+            rql,
+            accept="application/dna+fasta",
+            base_url=base_url,
+            timeout=timeout,
+        )
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        return FetchResult(ok=False, source=source, error=f"{type(exc).__name__}: {exc}")
+    text = body.decode("utf-8")
+    problem = fasta_sanity_problem(
+        _fasta_contig_count(text),
+        _fasta_total_length(text),
+        expected_contigs=expected_contigs,
+        expected_length=expected_length,
+        limit_ceiling=GENOME_SEQUENCE_LIMIT,
+    )
+    if problem:
+        return FetchResult(ok=False, source=source, error=problem)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".part")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(dest)
+    return FetchResult(ok=True, source=source, path=dest)
+
+
 def _print_result(label: str, result: FetchResult) -> None:
     if result.ok:
         print(f"{label}: OK -> {result.path}")
@@ -337,6 +533,44 @@ def cmd_crosscheck(args: argparse.Namespace) -> int:
     return 0
 
 
+def _write_tsv(records: list[dict[str, Any]], fields: tuple[str, ...], dest: Path) -> None:
+    frame = pd.DataFrame.from_records(records) if records else pd.DataFrame(columns=list(fields))
+    for field in fields:
+        if field not in frame.columns:
+            frame[field] = ""
+    frame[list(fields)].to_csv(dest, sep="\t", index=False)
+
+
+def cmd_fetch_labels_https(args: argparse.Namespace) -> int:
+    """HTTPS Data API alternative to Phase-A fetch-labels (ADR-0016): pull lab-AST rows
+    (genome_amr, evidence=='Laboratory Method') + genome metadata (with MLST) over HTTPS,
+    writing the same flat-file TSVs the FTPS path produces so build_dataset is unchanged."""
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    base_rql = (
+        f"and(eq(taxon_id,{args.taxon_id}),eq(evidence,{_rql_value(LAB_EVIDENCE)}))"
+        f"&select({','.join(_GENOME_AMR_FIELDS)})"
+    )
+    meta_rql = f"eq(taxon_id,{args.taxon_id})&select({','.join(_GENOME_METADATA_FIELDS)})"
+    try:
+        amr_records = solr_select_records(
+            "genome_amr", base_rql, base_url=args.base_url, timeout=args.timeout
+        )
+        meta_records = solr_select_records(
+            "genome", meta_rql, base_url=args.base_url, timeout=args.timeout
+        )
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        print(f"HTTPS labels fetch FAILED: {type(exc).__name__}: {exc}")
+        return 1
+    amr_path = out_dir / args.filename
+    _write_tsv(amr_records, _GENOME_AMR_FIELDS, amr_path)
+    print(f"HTTPS lab-AST rows: {len(amr_records)} -> {amr_path}")
+    meta_path = out_dir / DEFAULT_METADATA_FILE
+    _write_tsv(meta_records, _GENOME_METADATA_FIELDS, meta_path)
+    print(f"HTTPS genome metadata: {len(meta_records)} -> {meta_path}")
+    return 0
+
+
 def _download_with_retries(
     host: str, remote_path: str, dest: Path, *, retries: int, backoff: float, timeout: float
 ) -> FetchResult:
@@ -390,15 +624,20 @@ def cmd_fetch_fasta(args: argparse.Namespace) -> int:
         if dest.exists() and dest.stat().st_size > 0 and not args.overwrite:
             skipped += 1
             continue
-        remote_path = f"genomes/{genome_id}/{genome_id}.fna"
-        result = _download_with_retries(
-            args.host,
-            remote_path,
-            dest,
-            retries=args.retries,
-            backoff=args.backoff,
-            timeout=args.timeout,
-        )
+        if getattr(args, "transport", "https") == "https":
+            result = https_fasta_download(
+                genome_id, dest, base_url=args.base_url, timeout=args.timeout
+            )
+        else:
+            remote_path = f"genomes/{genome_id}/{genome_id}.fna"
+            result = _download_with_retries(
+                args.host,
+                remote_path,
+                dest,
+                retries=args.retries,
+                backoff=args.backoff,
+                timeout=args.timeout,
+            )
         if result.ok:
             downloaded += 1
         else:
@@ -459,6 +698,17 @@ def build_parser() -> argparse.ArgumentParser:
     crosscheck.add_argument("--timeout", type=float, default=60.0)
     crosscheck.set_defaults(func=cmd_crosscheck)
 
+    fetch_labels_https = sub.add_parser(
+        "fetch-labels-https",
+        help="Phase A (ADR-0016): HTTPS Data API pull of lab-AST rows + metadata (no FTPS).",
+    )
+    fetch_labels_https.add_argument("--taxon-id", type=int, default=KLEBSIELLA_PNEUMONIAE_TAXON_ID)
+    fetch_labels_https.add_argument("--base-url", default=SOLR_BASE)
+    fetch_labels_https.add_argument("--out-dir", default="data/raw/bvbrc")
+    fetch_labels_https.add_argument("--filename", default=DEFAULT_FLATFILE)
+    fetch_labels_https.add_argument("--timeout", type=float, default=120.0)
+    fetch_labels_https.set_defaults(func=cmd_fetch_labels_https)
+
     fetch_fasta = sub.add_parser(
         "fetch-fasta",
         help="Phase B: FTPS-download .fna for selected genome_ids. Run only after `report` review.",
@@ -476,6 +726,13 @@ def build_parser() -> argparse.ArgumentParser:
     fetch_fasta.add_argument("--backoff", type=float, default=2.0)
     fetch_fasta.add_argument("--timeout", type=float, default=60.0)
     fetch_fasta.add_argument("--overwrite", action="store_true")
+    fetch_fasta.add_argument(
+        "--transport",
+        choices=("https", "ftps"),
+        default="https",
+        help="https = Data API genome_sequence (default, ADR-0016); ftps = legacy fallback.",
+    )
+    fetch_fasta.add_argument("--base-url", default=SOLR_BASE)
     fetch_fasta.set_defaults(func=cmd_fetch_fasta)
 
     return parser
