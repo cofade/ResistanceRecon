@@ -17,3 +17,9 @@ One record per non-trivial, hard-to-reverse decision. Format: Title, Date, Statu
 | [0011](ADR-0011-pyarrow-parquet-engine.md) | Add pyarrow as the Parquet engine | Accepted |
 | [0012](ADR-0012-pure-python-bvbrc-fetch.md) | Pure Python for the BV-BRC fetch, not WSL2/p3-CLI | Accepted |
 | [0013](ADR-0013-pinned-reference-gene-catalog.md) | Commit a pinned copy of NCBI's ReferenceGeneCatalog.txt | Accepted |
+| [0015](ADR-0015-homology-split-mlst-singleton-fallback.md) | MLST-ST split, singleton fallback (Mash deferred) | Accepted |
+| [0016](ADR-0016-https-bvbrc-data-api-fetch.md) | HTTPS BV-BRC Data API fetch; FTPS fallback | Accepted |
+| [0017](ADR-0017-binary-sir-collapse-policy.md) | Binary SIR collapse (R/S only) | Accepted |
+| [0018](ADR-0018-deterministic-gate-one-directional.md) | One-directional resistance-only gate | Accepted |
+
+> ADR-0014 (MLflow experiment tracking) is reserved for EPIC 3 PR-B (predict + registry + tracking).

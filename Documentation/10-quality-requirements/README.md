@@ -22,3 +22,13 @@
 | External tool fails mid-demo | Graceful `{ok:false}` envelope → 503 / deterministic fallback | manual outage rehearsal |
 
 These trace directly to the challenge's *Success Criteria* and *Responsibility Requirement* sections (see [`01-introduction-and-goals/challenge-brief.md`](../01-introduction-and-goals/challenge-brief.md)).
+
+## 10.3 Realization status (EPIC 3 PR-A)
+
+The Predictor's training foundation implements the *Correctness* and *Confidence* rows above:
+
+- **No data leakage** — `predictor/split.py` (MLST-ST grouping + singleton fallback, [ADR-0015](../09-architecture-decisions/ADR-0015-homology-split-mlst-singleton-fallback.md)) enforces group-disjoint train/calibration/test/holdout via `no_leakage_check`; a too-clonal drug (fewer than `MIN_DISTINCT_GROUPS` groups) is reported *insufficient data* rather than split unsafely.
+- **Generalize beyond clones** — an explicit leave-one-group-out unseen-lineage holdout plus `per_fold_class_balance` (flags StratifiedGroupKFold degradation on a dominant clone).
+- **Class imbalance / R-recall headline** — `predictor/train.py` uses `class_weight='balanced'`, PR-AUC-scored C selection, and reports resistant-recall as the headline metric on the gate-negative subset.
+- **Trustworthy confidence** — `predictor/calibration.py` sigmoid calibration on the homology-grouped fold ([ADR-0004](../09-architecture-decisions/ADR-0004-calibration-and-conformal-prediction-for-no-call.md); Brier + reliability). First-class no-call (conformal) and evidence-integrity/no-call surfacing land in PR-B.
+- **Known vs statistical evidence** — the one-directional gate ([ADR-0018](../09-architecture-decisions/ADR-0018-deterministic-gate-one-directional.md)) tags deterministic hits `known_mechanism`; model coefficients are `statistical_association` (assembled in PR-B's report path).

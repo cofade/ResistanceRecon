@@ -25,10 +25,11 @@ reader/      Module 01 — FASTA parse (fasta_parser.py) + feature builder (feat
              ReferenceGeneCatalog lookup, feature_schema.json) -- the raw-annotation-to-vector step
 annotation/  AMRFinderPlus Docker/WSL2 wrapper (envelope, amrfinder.py) + MockAnnotator (mock.py,
              fixtures, CI) -- the only place a subprocess/Docker call happens (golden rule #6)
-features/    RESERVED for EPIC 3's per-drug ML feature engineering (QRDR mutation counts, AME maps)
-             built on top of reader/'s GenomeFeatureVector -- a different concern from the raw-
-             annotation-to-vector step above, which lives in reader/ per EPIC 2 (issue #17)
-predictor/   Module 02 (the star) — dataset, split, target_gate, train, calibration, conformal, predict, model_registry
+features/    Module 02 feature engineering (EPIC 3): mechanisms.py (shared AMR-mechanism
+             predicates), vocabulary.py (ordered feature vocabulary + engineered combination
+             features -- QRDR counts, PMQR/RMTase/carbapenemase/ESBL flags), feature_matrix.py
+             (GenomeFeatureVector -> fixed-order numeric rows). Trust-critical, LLM-free.
+predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, model_registry, experiment_tracking
 report/      Module 03a — deterministic report builder (+ jinja template) + additive LLM narrative sub-pipeline
 kb/          AMR-mechanism KB: hybrid BM25 + embedding + RRF retrieval (evidence RAG)
 llm/         provider-agnostic client + MockLLMClient (report narration + reviewer only)

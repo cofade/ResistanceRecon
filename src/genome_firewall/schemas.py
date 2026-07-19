@@ -197,6 +197,37 @@ class ModelPrediction(_StrictModel):
     model_version: str
 
 
+class ModelFeatureSchema(_StrictModel):
+    """The ordered feature contract a trained model was fitted on -- shipped as each
+    model's feature_schema.json and validated by predictor/predict.py before inference.
+
+    Distinct from reader/feature_builder.write_feature_schema()'s *structural* schema:
+    this pins the exact ordered gene/mutation/engineered feature vocabulary (so a genome's
+    GenomeFeatureVector maps to the same columns the model saw at train time), the three
+    independent version stamps, and a content hash over the vocabulary. predict.py raises a
+    typed error -- never silently reindexes/pads -- when a genome's vector disagrees
+    (research-findings/architecture.md, issue #22).
+    """
+
+    #: reader/feature_builder.SCHEMA_VERSION the vocabulary was built under.
+    schema_version: str
+    #: Pinned AMRFinderPlus DB version the training annotations were called with (ADR-0013).
+    amrfinder_db_version: str
+    #: features/vocabulary.ENGINEERED_SPEC_VERSION -- bumped when engineered columns change.
+    engineered_feature_spec_version: str
+    #: The ordered, de-duplicated feature vocabulary (gene presence ++ point mutations ++
+    #: engineered columns). Column order IS the contract -- a model's coef_ aligns to it.
+    feature_names: tuple[str, ...] = Field(min_length=1)
+    #: SHA-256 over the ordered feature_names, for a cheap exact-identity check.
+    vocabulary_sha256: str
+
+    @model_validator(mode="after")
+    def _feature_names_are_unique(self) -> Self:
+        if len(set(self.feature_names)) != len(self.feature_names):
+            raise ValueError("feature_names must not contain duplicates (ordered vocabulary)")
+        return self
+
+
 class ConformalSet(_StrictModel):
     """Split-conformal prediction set at the configured alpha (ADR-0004)."""
 
