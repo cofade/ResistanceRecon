@@ -29,7 +29,7 @@ features/    Module 02 feature engineering (EPIC 3): mechanisms.py (shared AMR-m
              predicates), vocabulary.py (ordered feature vocabulary + engineered combination
              features -- QRDR counts, PMQR/RMTase/carbapenemase/ESBL flags), feature_matrix.py
              (GenomeFeatureVector -> fixed-order numeric rows). Trust-critical, LLM-free.
-predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, model_registry, experiment_tracking
+predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, errors, model_registry, experiment_tracking (LLM-free; sole verdict source)
 report/      Module 03a. Deterministic core: inputs.py (DrugPredictionInput/GenomePredictionInputs —
              the decoupled builder input, not in schemas.py), evidence.py (KNOWN/STATISTICAL/NO_SIGNAL
              tagging, ADR-0020), builder.py (build_report -> GenomeReport, zero-LLM), narrative.py

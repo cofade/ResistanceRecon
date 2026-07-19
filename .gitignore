@@ -26,8 +26,14 @@ mlruns/
 data/raw/
 data/interim/
 data/processed/
-models/
+# models/: commit the small TEXT artifacts (feature_schema/metrics/conformal/coefficients JSON,
+# model_card.md, registry.json, results_summary.json) as reproducible ground-truth; the binary
+# models (*.joblib, caught globally above) and MLflow runs (mlruns/) stay out.
+models/*
 !models/.gitkeep
+!models/*/
+!models/**/*.json
+!models/**/*.md
 
 # Secrets
 .env

@@ -33,7 +33,17 @@ The Predictor's training foundation implements the *Correctness* and *Confidence
 - **Trustworthy confidence** — `predictor/calibration.py` sigmoid calibration on the homology-grouped fold ([ADR-0004](../09-architecture-decisions/ADR-0004-calibration-and-conformal-prediction-for-no-call.md); Brier + reliability). First-class no-call (conformal) and evidence-integrity/no-call surfacing land in PR-B.
 - **Known vs statistical evidence** — the one-directional gate ([ADR-0018](../09-architecture-decisions/ADR-0018-deterministic-gate-one-directional.md)) tags deterministic hits `known_mechanism`; model coefficients are `statistical_association` (assembled in PR-B's report path).
 
-## 10.4 Realization status (EPIC 4 + 5 — Decision Report & LLM narrative)
+## 10.4 Realization status (EPIC 3 PR-B)
+
+PR-B completes the *Safety & honesty* row — first-class no-call, evidence integrity, and fail-loud version safety:
+
+- **First-class no-call (conformal)** — `predictor/conformal.py` fits class-conditional (Mondrian) LAC split-conformal thresholds ([ADR-0004](../09-architecture-decisions/ADR-0004-calibration-and-conformal-prediction-for-no-call.md)); `predict.py` maps the prediction set to a verdict via `schemas.verdict_for_conformal_set` ({S}→work, {R}→fail, {S,R}→no-call ambiguous, {}→no-call novel/OOD). Coverage is fit on the calibration fold and reported empirically on the INDEPENDENT test fold, with an α-sensitivity table over {0.05, 0.10, 0.20} (`models/results_summary.json`).
+- **Guarantee-availability is surfaced, never stripped** — when a per-drug calibration set is below the finite-sample floor (n ≥ ⌈1/α⌉−1 per class), `conformal_guarantee_available` is `false` and every affected verdict carries an explicit `statistical_association` caveat in `supporting_features` (not only the model card). The flag reflects calibration-set *size*, not model quality, so a guarantee-void-but-strong model (e.g. gentamicin, AUROC 0.875) is flagged, not silently discarded or downgraded.
+- **Evidence integrity (Ground-Truth-First)** — `known_mechanism` (gate) vs `statistical_association` (model). Per-genome statistical evidence cites the FULL signed L2-LR coefficient of each PRESENT feature (the exact closed-form linear attribution), so a genome carrying any resistance determinant can never be reported as having "no known determinants".
+- **Fail-loud version safety** — a genome whose AMRFinderPlus DB version, feature `schema_version`, or engineered-feature spec version disagrees with the trained models raises a typed error (`AmrfinderDbVersionMismatchError` / `FeatureSchemaMismatchError`) before ANY verdict, on both `predict_genome` and the single-drug `predict_antibiotic` entry. Novel genes absent from the vocabulary are dropped as OOV, not an error.
+- **Real-run coverage (130-genome/67-ST subset)** — gate-negative headline metrics + conformal behaviour are recorded per drug in `models/results_summary.json` and `model_card.md`; the beta-lactam gate-negative residual is thin (`conformal_guarantee_available=false` for 4/5) and flagged as technical debt (§11), not hidden.
+
+## 10.5 Realization status (EPIC 4 + 5 — Decision Report & LLM narrative)
 
 Module 03a implements the *Evidence honesty*, *LLM must never decide*, *Human stays in the loop*, and *External tool fails* rows above:
 

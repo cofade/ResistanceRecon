@@ -1,0 +1,8 @@
+{
+  "alpha": 0.1,
+  "tau_s": 1.0,
+  "tau_r": 0.10176463230242216,
+  "n_cal_susceptible": 8,
+  "n_cal_resistant": 19,
+  "guarantee_available": false
+}
