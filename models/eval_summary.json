@@ -1,0 +1,5954 @@
+{
+  "eval_schema": "genome-firewall-eval/1",
+  "alpha": 0.1,
+  "seed": 0,
+  "backend": "mlst_st",
+  "amrfinder_db_version": "2026-05-15.1",
+  "schema_version": "1.0.0",
+  "n_features": 186,
+  "dataset": {
+    "n_genomes": 130,
+    "n_features": 186,
+    "genome_ids_sha256": "c1d86ecaebff94835840dec496f90a65c56425dbcf963d16cc45e1b53b6aa31d"
+  },
+  "drugs": {
+    "meropenem": {
+      "antibiotic": "meropenem",
+      "model_version": "v1",
+      "alpha": 0.1,
+      "seed": 0,
+      "backend": "mlst_st",
+      "n_groups": 67,
+      "population": "gate_negative",
+      "split_sizes": {
+        "n_train": 60,
+        "n_calibration": 16,
+        "n_test": 34,
+        "n_holdout": 18
+      },
+      "overall": {
+        "label": "overall",
+        "n": 23,
+        "metrics": {
+          "n": 23,
+          "n_resistant": 1,
+          "n_susceptible": 22,
+          "single_class": false,
+          "balanced_accuracy": 0.5,
+          "resistant_recall": 0.0,
+          "susceptible_recall": 1.0,
+          "f1": 0.0,
+          "auroc": 0.045454545454545414,
+          "pr_auc": 0.045454545454545456,
+          "brier": 0.07110672949224835
+        },
+        "selective": {
+          "n": 23,
+          "n_called": 1,
+          "coverage": 0.9565217391304348,
+          "no_call_rate": 0.9565217391304348,
+          "empty_rate": 0.0,
+          "ambiguous_rate": 0.9565217391304348,
+          "accuracy_on_called": 0.0
+        },
+        "reliability": [
+          {
+            "bin_lower": 0.0,
+            "bin_upper": 0.1,
+            "count": 5,
+            "mean_predicted": 0.08840474234121747,
+            "fraction_positive": 0.2
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "count": 14,
+            "mean_predicted": 0.1402661284978264,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "count": 2,
+            "mean_predicted": 0.26544155913682865,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "count": 1,
+            "mean_predicted": 0.3399036394995886,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "count": 1,
+            "mean_predicted": 0.46009018044593075,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          }
+        ]
+      },
+      "per_group": [
+        {
+          "label": "singleton:573.12902",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.006207603307969173
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.07878834500082593,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:111",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.026216464048462635
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.1619149901907252,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:13",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.009319008396281381
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.09653501124608305,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:1536",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.016881592524314645
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.12992918272780232,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2267",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.009319008396281381
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.09653501124608305,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:258",
+          "n": 7,
+          "metrics": {
+            "n": 7,
+            "n_resistant": 0,
+            "n_susceptible": 7,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.07802062688301967
+          },
+          "selective": {
+            "n": 7,
+            "n_called": 1,
+            "coverage": 0.8571428571428571,
+            "no_call_rate": 0.8571428571428571,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.8571428571428571,
+            "accuracy_on_called": 0.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 4,
+              "mean_predicted": 0.1832816739952856,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.290394916290542,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 1,
+              "mean_predicted": 0.3399036394995886,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 1,
+              "mean_predicted": 0.46009018044593075,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:405",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.0578345752930717
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.24048820198311538,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:466",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.007914536601944829
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.08896368136461547,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:492",
+          "n": 6,
+          "metrics": {
+            "n": 6,
+            "n_resistant": 0,
+            "n_susceptible": 6,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.0149645616535065
+          },
+          "selective": {
+            "n": 6,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 6,
+              "mean_predicted": 0.12178761457484662,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:528",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 1,
+            "n_susceptible": 0,
+            "single_class": true,
+            "balanced_accuracy": 0.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 0.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": 1.0,
+            "brier": 0.8441903843523985
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.08120166284847986,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:8",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.011015316499263562
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10495387796200559,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:86",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.010624530799547687
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10307536465881499,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      ],
+      "unseen_lineage": {
+        "holdout_group": "st:klebsiella:307",
+        "slice": {
+          "label": "st:klebsiella:307",
+          "n": 4,
+          "metrics": {
+            "n": 4,
+            "n_resistant": 1,
+            "n_susceptible": 3,
+            "single_class": false,
+            "balanced_accuracy": 0.5,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": 0.33333333333333337,
+            "pr_auc": 0.3333333333333333,
+            "brier": 0.219216592080928
+          },
+          "selective": {
+            "n": 4,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 3,
+              "mean_predicted": 0.16258181116682038,
+              "fraction_positive": 0.3333333333333333
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 1,
+              "mean_predicted": 0.30824129825382746,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      },
+      "reproducibility": {
+        "compared_sets": [
+          "test_marginal",
+          "test_gate_negative",
+          "holdout_marginal",
+          "holdout_gate_negative"
+        ],
+        "mismatched_sets": [],
+        "committed_match": true,
+        "max_abs_delta": 0.0
+      }
+    },
+    "ceftriaxone": {
+      "antibiotic": "ceftriaxone",
+      "model_version": "v1",
+      "alpha": 0.1,
+      "seed": 0,
+      "backend": "mlst_st",
+      "n_groups": 66,
+      "population": "gate_negative",
+      "split_sizes": {
+        "n_train": 66,
+        "n_calibration": 15,
+        "n_test": 30,
+        "n_holdout": 16
+      },
+      "overall": {
+        "label": "overall",
+        "n": 10,
+        "metrics": {
+          "n": 10,
+          "n_resistant": 0,
+          "n_susceptible": 10,
+          "single_class": true,
+          "balanced_accuracy": 1.0,
+          "resistant_recall": 0.0,
+          "susceptible_recall": 1.0,
+          "f1": 0.0,
+          "auroc": null,
+          "pr_auc": null,
+          "brier": 0.07870942774540021
+        },
+        "selective": {
+          "n": 10,
+          "n_called": 0,
+          "coverage": 1.0,
+          "no_call_rate": 1.0,
+          "empty_rate": 0.0,
+          "ambiguous_rate": 1.0,
+          "accuracy_on_called": null
+        },
+        "reliability": [
+          {
+            "bin_lower": 0.0,
+            "bin_upper": 0.1,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "count": 8,
+            "mean_predicted": 0.24662110059091402,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "count": 1,
+            "mean_predicted": 0.3148853117713985,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "count": 1,
+            "mean_predicted": 0.4430131343158773,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          }
+        ]
+      },
+      "per_group": [
+        {
+          "label": "st:Klebsiella_pneumoniae:253",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.04789674361086667
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.2188532467450887,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:101",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.0550498736297512
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.23462709483295233,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:188",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.06920593767172357
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.26307021433777633,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:218",
+          "n": 2,
+          "metrics": {
+            "n": 2,
+            "n_resistant": 0,
+            "n_susceptible": 2,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.05079241456377586
+          },
+          "selective": {
+            "n": 2,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 2,
+              "mean_predicted": 0.2253717252979527,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2330",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.056115087273414806
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.23688623276462228,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:309",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.09915275956937084
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 1,
+              "mean_predicted": 0.3148853117713985,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:353",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.19626063717637754
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 1,
+              "mean_predicted": 0.4430131343158773,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:661",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.08423549407297211
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.29023351645351386,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:966",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.07759291532197368
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.2785550489974534,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      ],
+      "unseen_lineage": {
+        "holdout_group": "st:klebsiella:258",
+        "slice": {
+          "label": "st:klebsiella:258",
+          "n": 5,
+          "metrics": {
+            "n": 5,
+            "n_resistant": 4,
+            "n_susceptible": 1,
+            "single_class": false,
+            "balanced_accuracy": 0.5,
+            "resistant_recall": 1.0,
+            "susceptible_recall": 0.0,
+            "f1": 0.8888888888888888,
+            "auroc": 0.25,
+            "pr_auc": 0.8041666666666667,
+            "brier": 0.1706769384799769
+          },
+          "selective": {
+            "n": 5,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 4,
+              "mean_predicted": 0.8690059071894936,
+              "fraction_positive": 0.75
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 1,
+              "mean_predicted": 0.9641899575687978,
+              "fraction_positive": 1.0
+            }
+          ]
+        }
+      },
+      "reproducibility": {
+        "compared_sets": [
+          "test_marginal",
+          "test_gate_negative",
+          "holdout_marginal",
+          "holdout_gate_negative"
+        ],
+        "mismatched_sets": [],
+        "committed_match": true,
+        "max_abs_delta": 0.0
+      }
+    },
+    "ciprofloxacin": {
+      "antibiotic": "ciprofloxacin",
+      "model_version": "v1",
+      "alpha": 0.1,
+      "seed": 0,
+      "backend": "mlst_st",
+      "n_groups": 66,
+      "population": "gate_negative",
+      "split_sizes": {
+        "n_train": 65,
+        "n_calibration": 27,
+        "n_test": 28,
+        "n_holdout": 6
+      },
+      "overall": {
+        "label": "overall",
+        "n": 10,
+        "metrics": {
+          "n": 10,
+          "n_resistant": 0,
+          "n_susceptible": 10,
+          "single_class": true,
+          "balanced_accuracy": 1.0,
+          "resistant_recall": 0.0,
+          "susceptible_recall": 1.0,
+          "f1": 0.0,
+          "auroc": null,
+          "pr_auc": null,
+          "brier": 0.01454520587723292
+        },
+        "selective": {
+          "n": 10,
+          "n_called": 10,
+          "coverage": 1.0,
+          "no_call_rate": 0.0,
+          "empty_rate": 0.0,
+          "ambiguous_rate": 0.0,
+          "accuracy_on_called": 1.0
+        },
+        "reliability": [
+          {
+            "bin_lower": 0.0,
+            "bin_upper": 0.1,
+            "count": 1,
+            "mean_predicted": 0.07659307338289402,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "count": 9,
+            "mean_predicted": 0.12367463179223666,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          }
+        ]
+      },
+      "per_group": [
+        {
+          "label": "st:klebsiella:111",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.012313270068765697
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.11096517502696825,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:1224",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.02148518090746502
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.1465782415894836,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:14",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.011903350560374988
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10910247733381212,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2330",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.01103158751017203
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10503136441164625,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2599",
+          "n": 2,
+          "metrics": {
+            "n": 2,
+            "n_resistant": 0,
+            "n_susceptible": 2,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.017839761862953787
+          },
+          "selective": {
+            "n": 2,
+            "n_called": 2,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 2,
+              "mean_predicted": 0.13272464097716927,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2793",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.0058664988902373885
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.07659307338289402,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:36",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.01482315563403466
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.12175038248003436,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:4731",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.015009842630804572
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.12251466292164613,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:661",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.017339648844567276
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.13168010041220077,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      ],
+      "unseen_lineage": {
+        "holdout_group": "st:klebsiella:37",
+        "slice": {
+          "label": "st:klebsiella:37",
+          "n": 4,
+          "metrics": {
+            "n": 4,
+            "n_resistant": 0,
+            "n_susceptible": 4,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.008864901227179187
+          },
+          "selective": {
+            "n": 4,
+            "n_called": 4,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 3,
+              "mean_predicted": 0.08427757842426571,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.1164554514955915,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      },
+      "reproducibility": {
+        "compared_sets": [
+          "test_marginal",
+          "test_gate_negative",
+          "holdout_marginal",
+          "holdout_gate_negative"
+        ],
+        "mismatched_sets": [],
+        "committed_match": true,
+        "max_abs_delta": 0.0
+      }
+    },
+    "gentamicin": {
+      "antibiotic": "gentamicin",
+      "model_version": "v1",
+      "alpha": 0.1,
+      "seed": 0,
+      "backend": "mlst_st",
+      "n_groups": 65,
+      "population": "gate_negative",
+      "split_sizes": {
+        "n_train": 70,
+        "n_calibration": 13,
+        "n_test": 19,
+        "n_holdout": 19
+      },
+      "overall": {
+        "label": "overall",
+        "n": 18,
+        "metrics": {
+          "n": 18,
+          "n_resistant": 4,
+          "n_susceptible": 14,
+          "single_class": false,
+          "balanced_accuracy": 0.7142857142857143,
+          "resistant_recall": 0.5,
+          "susceptible_recall": 0.9285714285714286,
+          "f1": 0.5714285714285714,
+          "auroc": 0.875,
+          "pr_auc": 0.7611111111111112,
+          "brier": 0.1244684271902683
+        },
+        "selective": {
+          "n": 18,
+          "n_called": 2,
+          "coverage": 1.0,
+          "no_call_rate": 0.8888888888888888,
+          "empty_rate": 0.0,
+          "ambiguous_rate": 0.8888888888888888,
+          "accuracy_on_called": 1.0
+        },
+        "reliability": [
+          {
+            "bin_lower": 0.0,
+            "bin_upper": 0.1,
+            "count": 5,
+            "mean_predicted": 0.08417922485805145,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "count": 6,
+            "mean_predicted": 0.14491832774366728,
+            "fraction_positive": 0.16666666666666666
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "count": 3,
+            "mean_predicted": 0.262449546956731,
+            "fraction_positive": 0.3333333333333333
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "count": 1,
+            "mean_predicted": 0.4234438457915447,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "count": 1,
+            "mean_predicted": 0.5422147696399683,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "count": 2,
+            "mean_predicted": 0.6044499909908139,
+            "fraction_positive": 1.0
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          }
+        ]
+      },
+      "per_group": [
+        {
+          "label": "st:Klebsiella_pneumoniae:307",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 1,
+            "n_susceptible": 0,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 1.0,
+            "susceptible_recall": 0.0,
+            "f1": 1.0,
+            "auroc": null,
+            "pr_auc": 1.0,
+            "brier": 0.1559225703739124
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 1,
+              "mean_predicted": 0.6051296790414448,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:101",
+          "n": 2,
+          "metrics": {
+            "n": 2,
+            "n_resistant": 0,
+            "n_susceptible": 2,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.09276130192151127
+          },
+          "selective": {
+            "n": 2,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.0788537462920377,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 1,
+              "mean_predicted": 0.4234438457915447,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:14",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.024018203129439253
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.15497807306015665,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:152",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.056797995905083436
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.23832330122143625,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:188",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.008501206142855485
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.09220198556894252,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:1966",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 1,
+            "n_susceptible": 0,
+            "single_class": true,
+            "balanced_accuracy": 0.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 0.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": 1.0,
+            "brier": 0.5163950204227944
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.28139369580917656,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2975",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 1,
+            "n_susceptible": 0,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 1.0,
+            "susceptible_recall": 0.0,
+            "f1": 1.0,
+            "auroc": null,
+            "pr_auc": 1.0,
+            "brier": 0.1569979728321144
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 1,
+              "mean_predicted": 0.603770302940183,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:35",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.011752612490700245
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10840946679464965,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:393",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.07162669678427597
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.2676316438395803,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:418",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.03404863584052818
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.18452272445562953,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:45",
+          "n": 4,
+          "metrics": {
+            "n": 4,
+            "n_resistant": 0,
+            "n_susceptible": 4,
+            "single_class": true,
+            "balanced_accuracy": 0.75,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 0.75,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.07877258989179686
+          },
+          "selective": {
+            "n": 4,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 3,
+              "mean_predicted": 0.08328013080975903,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 1,
+              "mean_predicted": 0.5422147696399683,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:466",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.011752612490700245
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.10840946679464965,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:514",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.018001004091029293
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.13416782062413213,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:528",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 1,
+            "n_susceptible": 0,
+            "single_class": true,
+            "balanced_accuracy": 0.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 0.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": 1.0,
+            "brier": 0.6740041955111857
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 0,
+            "coverage": 1.0,
+            "no_call_rate": 1.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 1.0,
+            "accuracy_on_called": null
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.17902241473278596,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      ],
+      "unseen_lineage": {
+        "holdout_group": "st:klebsiella:307",
+        "slice": {
+          "label": "st:klebsiella:307",
+          "n": 19,
+          "metrics": {
+            "n": 19,
+            "n_resistant": 17,
+            "n_susceptible": 2,
+            "single_class": false,
+            "balanced_accuracy": 0.9117647058823529,
+            "resistant_recall": 0.8235294117647058,
+            "susceptible_recall": 1.0,
+            "f1": 0.9032258064516129,
+            "auroc": 0.8823529411764706,
+            "pr_auc": 0.9866713713349118,
+            "brier": 0.20569038271810697
+          },
+          "selective": {
+            "n": 19,
+            "n_called": 11,
+            "coverage": 1.0,
+            "no_call_rate": 0.42105263157894735,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.42105263157894735,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.11109281036260552,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 1,
+              "mean_predicted": 0.2613155768393826,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 3,
+              "mean_predicted": 0.43532815504753414,
+              "fraction_positive": 0.6666666666666666
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 7,
+              "mean_predicted": 0.5554546772112642,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 4,
+              "mean_predicted": 0.6306399572001031,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 3,
+              "mean_predicted": 0.7531776676021306,
+              "fraction_positive": 1.0
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      },
+      "reproducibility": {
+        "compared_sets": [
+          "test_marginal",
+          "test_gate_negative",
+          "holdout_marginal",
+          "holdout_gate_negative"
+        ],
+        "mismatched_sets": [],
+        "committed_match": true,
+        "max_abs_delta": 0.0
+      }
+    },
+    "trimethoprim-sulfamethoxazole": {
+      "antibiotic": "trimethoprim-sulfamethoxazole",
+      "model_version": "v1",
+      "alpha": 0.1,
+      "seed": 0,
+      "backend": "mlst_st",
+      "n_groups": 66,
+      "population": "gate_negative",
+      "split_sizes": {
+        "n_train": 68,
+        "n_calibration": 21,
+        "n_test": 21,
+        "n_holdout": 19
+      },
+      "overall": {
+        "label": "overall",
+        "n": 10,
+        "metrics": {
+          "n": 10,
+          "n_resistant": 0,
+          "n_susceptible": 10,
+          "single_class": true,
+          "balanced_accuracy": 1.0,
+          "resistant_recall": 0.0,
+          "susceptible_recall": 1.0,
+          "f1": 0.0,
+          "auroc": null,
+          "pr_auc": null,
+          "brier": 0.015959162013368278
+        },
+        "selective": {
+          "n": 10,
+          "n_called": 10,
+          "coverage": 1.0,
+          "no_call_rate": 0.0,
+          "empty_rate": 0.0,
+          "ambiguous_rate": 0.0,
+          "accuracy_on_called": 1.0
+        },
+        "reliability": [
+          {
+            "bin_lower": 0.0,
+            "bin_upper": 0.1,
+            "count": 4,
+            "mean_predicted": 0.08379101083366167,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.1,
+            "bin_upper": 0.2,
+            "count": 6,
+            "mean_predicted": 0.14567542826922056,
+            "fraction_positive": 0.0
+          },
+          {
+            "bin_lower": 0.2,
+            "bin_upper": 0.30000000000000004,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.30000000000000004,
+            "bin_upper": 0.4,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.4,
+            "bin_upper": 0.5,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.5,
+            "bin_upper": 0.6000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.6000000000000001,
+            "bin_upper": 0.7000000000000001,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.7000000000000001,
+            "bin_upper": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.8,
+            "bin_upper": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          },
+          {
+            "bin_lower": 0.9,
+            "bin_upper": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "fraction_positive": null
+          }
+        ]
+      },
+      "per_group": [
+        {
+          "label": "st:klebsiella:1180",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.006869835654443023
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.08288447173290678,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2267",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.00665770202219382
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.08159474261368695,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:2793",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.0062777961671543325
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.07923254487364603,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:492",
+          "n": 6,
+          "metrics": {
+            "n": 6,
+            "n_resistant": 0,
+            "n_susceptible": 6,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.02190379433669157
+          },
+          "selective": {
+            "n": 6,
+            "n_called": 6,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 6,
+              "mean_predicted": 0.14567542826922056,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        },
+        {
+          "label": "st:klebsiella:8",
+          "n": 1,
+          "metrics": {
+            "n": 1,
+            "n_resistant": 0,
+            "n_susceptible": 1,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.00836352026974219
+          },
+          "selective": {
+            "n": 1,
+            "n_called": 1,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 1,
+              "mean_predicted": 0.09145228411440684,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      ],
+      "unseen_lineage": {
+        "holdout_group": "st:klebsiella:307",
+        "slice": {
+          "label": "st:klebsiella:307",
+          "n": 2,
+          "metrics": {
+            "n": 2,
+            "n_resistant": 0,
+            "n_susceptible": 2,
+            "single_class": true,
+            "balanced_accuracy": 1.0,
+            "resistant_recall": 0.0,
+            "susceptible_recall": 1.0,
+            "f1": 0.0,
+            "auroc": null,
+            "pr_auc": null,
+            "brier": 0.07483890222190054
+          },
+          "selective": {
+            "n": 2,
+            "n_called": 2,
+            "coverage": 1.0,
+            "no_call_rate": 0.0,
+            "empty_rate": 0.0,
+            "ambiguous_rate": 0.0,
+            "accuracy_on_called": 1.0
+          },
+          "reliability": [
+            {
+              "bin_lower": 0.0,
+              "bin_upper": 0.1,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.1,
+              "bin_upper": 0.2,
+              "count": 1,
+              "mean_predicted": 0.1370226407437247,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.2,
+              "bin_upper": 0.30000000000000004,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.30000000000000004,
+              "bin_upper": 0.4,
+              "count": 1,
+              "mean_predicted": 0.36180464392737866,
+              "fraction_positive": 0.0
+            },
+            {
+              "bin_lower": 0.4,
+              "bin_upper": 0.5,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.5,
+              "bin_upper": 0.6000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.6000000000000001,
+              "bin_upper": 0.7000000000000001,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.7000000000000001,
+              "bin_upper": 0.8,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.8,
+              "bin_upper": 0.9,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            },
+            {
+              "bin_lower": 0.9,
+              "bin_upper": 1.0,
+              "count": 0,
+              "mean_predicted": null,
+              "fraction_positive": null
+            }
+          ]
+        }
+      },
+      "reproducibility": {
+        "compared_sets": [
+          "test_marginal",
+          "test_gate_negative",
+          "holdout_marginal",
+          "holdout_gate_negative"
+        ],
+        "mismatched_sets": [],
+        "committed_match": true,
+        "max_abs_delta": 0.0
+      }
+    }
+  },
+  "skipped": {}
+}

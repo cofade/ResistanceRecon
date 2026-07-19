@@ -60,7 +60,12 @@ api/         Module 03b — FastAPI (POST /predict, GET /health, /antibiotics, /
 ui/          Streamlit demo (in-process, no HTTP hop): firewall table (ALLOW/BLOCK/REVIEW),
              KNOWN-vs-STATISTICAL evidence badges, calibration note, non-dismissible disclaimer
              banner on every render; render.py holds the pure, fully-tested presentation logic
-eval/        metrics harness (marginal + per-group + unseen-lineage)
+eval/        Module 03c held-out evaluation (EPIC 7): schemas.py (eval-local report types),
+             metrics.py (_metric_set-parity classification + reliability + selective pair),
+             scoring.py (reproduce the homology split + re-score the committed model),
+             runner.py (evaluate_registry -> EvalReport with a committed-metrics ReproCheck).
+             Re-scores models/ on the reproduced split for per-ST + unseen-lineage metrics;
+             consumes predictor/features, LLM-free. scripts/run_eval.py -> eval_summary.json. ADR-0024
 tracking/    error-tolerant MLflow wrapper
 schemas.py   Pydantic contracts crossing every boundary
 constants.py canonical disclaimer, supported species/antibiotics

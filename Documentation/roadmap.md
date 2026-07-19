@@ -38,7 +38,13 @@
   in-process: firewall table ALLOW/BLOCK/REVIEW, KNOWN-vs-STATISTICAL evidence badges,
   non-dismissible disclaimer). Branched off `feat/epic4-5-report-and-llm`; `main` (PR #42)
   merged in. Draft PR pending user manual test.
-- [ ] EPIC 7 — Eval harness + MODEL_CARD + DATASHEET
+- [x] EPIC 7 — Eval harness + MODEL_CARD + DATASHEET. `eval/{schemas,metrics,scoring,runner}.py`
+  re-scores the committed models on the reproduced homology split (ADR-0024) for per-ST +
+  unseen-lineage metrics + the selective-prediction pair + reliability, cross-checked bit-for-bit
+  against each committed `metrics.json` (all 5 drugs matched, max delta 0.0); `scripts/run_eval.py`
+  → `models/eval_summary.json`. Top-level `MODEL_CARD.md` + `DATASHEET.md` from real numbers (only
+  gentamicin has both-class unseen-lineage data — it generalizes, AUROC 0.882; the rest are thin,
+  stated honestly). Draft PR pending user manual test.
 - [ ] EPIC 8 — Finalize Documentation + ADRs + ground-truth
 - [ ] EPIC 9 — Submission (deploy, dataset publish, summary, videos, zip)
 
