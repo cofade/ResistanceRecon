@@ -1176,6 +1176,7 @@ api = [
 ]
 dev = [
     { name = "bandit" },
+    { name = "httpx" },
     { name = "mypy" },
     { name = "pandas-stubs" },
     { name = "pre-commit" },
@@ -1213,6 +1214,7 @@ requires-dist = [
     { name = "biopython", specifier = ">=1.83" },
     { name = "crepes", marker = "extra == 'ml'", specifier = ">=0.7" },
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.111" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27" },
     { name = "jinja2", marker = "extra == 'api'", specifier = ">=3.1" },
     { name = "joblib", specifier = ">=1.4" },
     { name = "mapie", marker = "extra == 'ml'", specifier = ">=0.9" },

@@ -102,6 +102,44 @@ sequenceDiagram
     end
 ```
 
+## EPIC 6 — the demo surface (in-process orchestrator)
+
+`genome_firewall/service.py:analyze_genome` is the single pipeline both demo surfaces call
+(ADR-0022): `parse_fasta -> annotate -> build_feature_vector -> predict_genome -> adapter ->
+build_report -> narrate_report -> NarrativeEnvelope`. The **Streamlit UI calls it in-process**
+(no HTTP hop, one deploy process); **FastAPI wraps the same function** as a separate, reusable
+surface.
+
+- The adapter `to_prediction_inputs` emits only predictor primitives (`ModelPrediction`,
+  `ConformalSet`, top features, `insufficient_data`) into the decoupled `report.inputs` contract —
+  never a verdict. `analyze_genome` still calls the sovereign `predict_genome` first (golden rule
+  #1) for its fail-loud DB/schema compat guard; `build_report` re-derives the presentation rows
+  with honest ADR-0020 evidence tagging, and `tests/service/test_verdict_reconciliation.py` pins
+  the two frozen paths to agree row-for-row on verdict + confidence.
+- Errors are typed and structured, never a traceback: a malformed upload -> `FastaParseError` ->
+  **422**; a tool/infra failure (annotation `ok=False`, DB/schema mismatch) -> `PipelineError` ->
+  **503 `{ok:false,error}`** (client message carries no filesystem path; the fuller detail is
+  server-log only). The disclaimer is present on every branch and every UI view.
+- Offline by default: `MockAnnotator` over bundled demo fixtures + no OpenAI key (deterministic
+  template, `review_status=llm_disabled`). Real AMRFinderPlus is opt-in via `GF_USE_DOCKER=1`; the
+  real OpenAI narrative is key-gated — both are manual-test only, never CI.
+
+```mermaid
+sequenceDiagram
+    participant C as UI (in-process) / API client
+    participant S as service.analyze_genome
+    participant P as predictor (sovereign)
+    participant B as report.build_report
+    participant N as narrate_report
+    C->>S: FASTA + genome_id
+    S->>S: parse_fasta (StringIO) -> annotate -> build_feature_vector
+    S->>P: predict_genome (compat guard + sovereign verdicts)
+    S->>S: to_prediction_inputs (primitives only, no verdict)
+    S->>B: build_report (ADR-0020 evidence)
+    S->>N: narrate_report (client optional; fail-closed to template)
+    N-->>C: NarrativeEnvelope (report + review_status + source + disclaimer)
+```
+
 ## Training scenario (offline)
 
 ```mermaid
