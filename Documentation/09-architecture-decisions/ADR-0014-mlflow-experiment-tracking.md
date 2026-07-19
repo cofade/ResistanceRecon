@@ -14,12 +14,12 @@ Track training with MLflow against a **local file store** (`<project>/mlruns`, g
 
 Kept from the reference implementation: the tracker/null split; lazy `import mlflow` inside each method (broken/absent mlflow can't stop import or training); blanket crash-safety (a tracking error degrades that run to *untracked*, never aborts training); `to_mlflow_uri()` (a bare Windows drive path is parsed by MLflow as URI scheme `c` and rejected → converted to a `file://` URI); the `MLFLOW_ALLOW_FILE_STORE=true` opt-out (mlflow 3.x raises on the file store otherwise, silently degrading the documented default to untracked); and a cached `mlflow_available()`. Dropped: all Qt/PyQt signals, the run-deep-link URL builders, and the browser-launching `mlflow ui` server (GUI coupling).
 
-Tracking is **strictly off the inference/verdict path**. `predictor/predict.py` never imports it; a run with tracking entirely absent (the `NullTracker` default that `train_and_register` uses when no tracker is passed) produces byte-identical models. `mlflow` stays an optional extra — every use is lazy and guarded, so the package imports and trains without it.
+Tracking is **strictly off the inference/verdict path**. `predictor/predict.py` never imports it; a run with tracking entirely absent (the `NullTracker` default that `train_and_register` uses when no tracker is passed) produces the same models (tracking observes training only; it is never a model input). `mlflow` stays an optional extra — every use is lazy and guarded, so the package imports and trains without it.
 
 ## Consequences
 
 - (+) Reproducible, comparable training runs (params + metrics + artifacts) at **zero** new-dependency cost (extra + gitignore + mypy override already existed) and zero GUI baggage.
-- (+) A tracking failure can never corrupt or abort a training run, and never touches a verdict — proven by the `NullTracker` byte-identical property and the crash-safety test (`tests/predictor/test_experiment_tracking.py`).
+- (+) A tracking failure can never corrupt or abort a training run, and never touches a verdict — backed by the `NullTracker` inertness property (tracking is never a model input) and the crash-safety test (`tests/predictor/test_experiment_tracking.py`).
 - (−) Local file store only (no remote/DB backend) — sufficient for the single-machine hackathon run; a remote URI is a one-line `tracking_uri` change later.
 - (−) `experiment_tracking.py` lives under `predictor/` but is **non-trust-critical**; its thin mlflow-live wrappers are covered only when the `tracking` extra is installed (always true under `uv sync --all-extras`, including CI). The crash-safety + null-inert branches are covered unconditionally.
 - Recorded in `Documentation/reuse-inventory.md` (gitignored). Pinned by `tests/predictor/test_experiment_tracking.py`.

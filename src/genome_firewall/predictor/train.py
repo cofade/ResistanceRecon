@@ -62,7 +62,6 @@ class TrainingConfig(_Frozen):
     c_grid: tuple[float, ...] = (0.01, 0.1, 1.0, 10.0, 100.0)
     n_splits: int = 5
     calibration_method: str = "sigmoid"
-    top_k_coefficients: int = 20
 
 
 DEFAULT_TRAINING_CONFIG = TrainingConfig()
@@ -171,16 +170,21 @@ def _evaluate_subset(
     return marginal, gate_negative
 
 
-def _top_coefficients(
-    model: Any, feature_names: Sequence[str], top_k: int
-) -> tuple[SignedCoefficient, ...]:
+def _signed_coefficients(model: Any, feature_names: Sequence[str]) -> tuple[SignedCoefficient, ...]:
+    """The FULL signed coefficient vector (one per feature), sorted by descending |weight|.
+
+    Persisted whole (not a display top-k) so predict.py's per-genome attribution can cite every
+    PRESENT feature -- otherwise a genome carrying a lower-ranked resistance determinant would be
+    reported, falsely, as having 'no known determinants' (the declare-works-from-absence overclaim
+    ADR-0018 forbids). The model card slices the head of this vector for readability.
+    """
     weights = np.asarray(model.coef_, dtype=float).ravel()
     pairs = [
         SignedCoefficient(feature=name, coefficient=float(weight))
         for name, weight in zip(feature_names, weights, strict=True)
     ]
     pairs.sort(key=lambda c: (-abs(c.coefficient), c.feature))
-    return tuple(pairs[:top_k])
+    return tuple(pairs)
 
 
 def train_one_antibiotic(
@@ -292,7 +296,5 @@ def train_one_antibiotic(
             holdout_gate_negative=holdout_gate_negative,
         ),
         calibration=calibration,
-        coefficients=_top_coefficients(
-            best_model, feature_schema.feature_names, config.top_k_coefficients
-        ),
+        coefficients=_signed_coefficients(best_model, feature_schema.feature_names),
     )

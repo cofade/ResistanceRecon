@@ -186,6 +186,7 @@ def _model(
     tau_s: float,
     tau_r: float,
     coefficients: tuple[SignedCoefficient, ...],
+    guarantee_available: bool = True,
 ) -> DrugModel:
     schema = ModelFeatureSchema(
         schema_version=_SCHEMA_V,
@@ -200,7 +201,7 @@ def _model(
         tau_r=tau_r,
         n_cal_susceptible=50,
         n_cal_resistant=50,
-        guarantee_available=True,
+        guarantee_available=guarantee_available,
     )
     return DrugModel(
         antibiotic="gentamicin",
@@ -273,3 +274,35 @@ def test_model_empty_set_is_no_signal() -> None:
     assert prediction.evidence_category == "no_signal"
     assert prediction.conformal_set is not None
     assert prediction.conformal_set.labels == ()
+
+
+def test_guarantee_void_is_surfaced_on_the_verdict() -> None:
+    # A model whose conformal finite-sample guarantee is unavailable must SAY so on every
+    # affected verdict -- never leave the safeguard visible only in the model card.
+    model = _model(
+        0.95, tau_s=0.5, tau_r=0.5, coefficients=(_DRIVER, _PROTECTOR), guarantee_available=False
+    )
+    prediction = predict_antibiotic(_vector(("driverGene",)), "gentamicin", _registry_for(model))
+    assert prediction.verdict == "likely_to_fail"
+    assert any("UNAVAILABLE" in feature for feature in prediction.supporting_features)
+
+
+def test_predict_antibiotic_also_fails_loud_on_compat() -> None:
+    # The fail-loud guard lives on the public single-drug entry too, not only predict_genome.
+    registry = _registry_with_exploding_meropenem()
+    with pytest.raises(AmrfinderDbVersionMismatchError):
+        predict_antibiotic(_carbapenemase_vector(db="2099-01-01.9"), "meropenem", registry)
+
+
+def test_engineered_spec_version_mismatch_raises() -> None:
+    # Running-code engineered-feature spec differs from the trained model's -> fail loud.
+    registry = PredictorRegistry(
+        amrfinder_db_version=_DB,
+        schema_version=_SCHEMA_V,
+        engineered_feature_spec_version="999",  # != the running code's ENGINEERED_SPEC_VERSION
+        entries={},
+        drugs={},
+    )
+    clean = GenomeFeatureVector(genome_id="t", schema_version=_SCHEMA_V, amrfinder_db_version=_DB)
+    with pytest.raises(FeatureSchemaMismatchError):
+        predict_genome(clean, registry)

@@ -26,8 +26,12 @@ never sees a genome before this returns; it may only narrate these verdicts down
 
 from __future__ import annotations
 
+import numpy as np
+import numpy.typing as npt
+
 from genome_firewall.constants import KNOWN_MECHANISM_CONFIDENCE, SUPPORTED_ANTIBIOTICS
 from genome_firewall.features.feature_matrix import build_feature_row
+from genome_firewall.features.vocabulary import ENGINEERED_SPEC_VERSION
 from genome_firewall.predictor.calibration import predict_resistant_proba
 from genome_firewall.predictor.conformal import predict_set
 from genome_firewall.predictor.errors import (
@@ -60,6 +64,16 @@ def _check_compatibility(vector: GenomeFeatureVector, registry: PredictorRegistr
     if registry.schema_version is not None and vector.schema_version != registry.schema_version:
         raise FeatureSchemaMismatchError(
             expected=registry.schema_version, actual=vector.schema_version
+        )
+    # The engineered columns are derived at predict time by THIS code's features.vocabulary, not
+    # carried on the vector -- so the mismatch to catch is running-code vs trained-model, which a
+    # bumped schema_version need not cover. Compare the running spec version against the model's.
+    if (
+        registry.engineered_feature_spec_version is not None
+        and registry.engineered_feature_spec_version != ENGINEERED_SPEC_VERSION
+    ):
+        raise FeatureSchemaMismatchError(
+            expected=registry.engineered_feature_spec_version, actual=ENGINEERED_SPEC_VERSION
         )
 
 
@@ -112,13 +126,15 @@ def _no_model_prediction(
 
 
 def _present_contributions(
-    vector: GenomeFeatureVector, drug_model: DrugModel
+    row: npt.NDArray[np.float64], drug_model: DrugModel
 ) -> list[tuple[str, float]]:
-    """Present (nonzero) features paired with their signed LR coefficient -- the exact
-    per-genome linear attribution (coef*x, x in {0,1}) against an all-absent reference.
-    Sorted by descending |contribution|."""
+    """Present (nonzero) features paired with their signed LR coefficient -- the exact per-genome
+    linear attribution (coef*x, x in {0,1}) against an all-absent reference; the sigmoid calibrator
+    is a monotone transform of the decision function, so these directional weights explain the
+    score the served probability monotonically maps from. The full coefficient vector is persisted
+    (train._signed_coefficients), so every present feature has its real weight. Sorted by |weight|.
+    """
     coef_by_feature = {c.feature: c.coefficient for c in drug_model.coefficients}
-    row, _oov = build_feature_row(vector, drug_model.feature_schema)
     present = [
         (name, coef_by_feature.get(name, 0.0))
         for name, value in zip(drug_model.feature_schema.feature_names, row, strict=True)
@@ -129,7 +145,7 @@ def _present_contributions(
 
 
 def _model_evidence(
-    vector: GenomeFeatureVector,
+    row: npt.NDArray[np.float64],
     drug_model: DrugModel,
     *,
     antibiotic: str,
@@ -137,13 +153,30 @@ def _model_evidence(
     p_resistant: float,
 ) -> tuple[tuple[str, ...], tuple[EvidenceItem, ...]]:
     """Statistical-association supporting_features + EvidenceItems for a model-based verdict."""
-    contributions = _present_contributions(vector, drug_model)
+    contributions = _present_contributions(row, drug_model)
     source = (
         f"per-drug L2 logistic regression ({drug_model.version}); "
         f"calibrated p(resistant)={p_resistant:.3f}"
     )
     features: list[str] = []
     evidence: list[EvidenceItem] = []
+
+    # Surface a void conformal guarantee in EVERY affected verdict, never only in the model card:
+    # a small calibration set can strip the finite-sample coverage guarantee (guarantee_available
+    # reflects calibration-set SIZE, not model quality -- gentamicin is guarantee-void yet strong),
+    # so the honest move is to flag it on the verdict, not to silently downgrade a useful model.
+    if not drug_model.conformal.guarantee_available:
+        caveat = (
+            f"conformal finite-sample coverage guarantee UNAVAILABLE for {antibiotic} "
+            "(calibration set below the n>=ceil(1/alpha)-1 floor); treat as lower-confidence "
+            "and confirm by lab testing"
+        )
+        features.append(caveat)
+        evidence.append(
+            EvidenceItem(
+                description=caveat, source=source, evidence_category="statistical_association"
+            )
+        )
 
     if verdict == "likely_to_fail":
         drivers = [(name, weight) for name, weight in contributions if weight > 0][:_TOP_K_EVIDENCE]
@@ -237,7 +270,7 @@ def _model_prediction(
         confidence = max(p_resistant, 1.0 - p_resistant)
 
     features, evidence = _model_evidence(
-        vector,
+        row,
         drug_model,
         antibiotic=drug_model.antibiotic,
         verdict=verdict,
@@ -258,7 +291,12 @@ def _model_prediction(
 def predict_antibiotic(
     vector: GenomeFeatureVector, antibiotic: str, registry: PredictorRegistry
 ) -> AntibioticPrediction:
-    """The verdict for one (genome, antibiotic): gate -> model -> conformal, in that order."""
+    """The verdict for one (genome, antibiotic): gate -> model -> conformal, in that order.
+
+    Fails loud on an annotation/schema-version mismatch BEFORE any verdict (the guard lives here,
+    on the public single-drug entry, not only in predict_genome -- so no caller can bypass it).
+    """
+    _check_compatibility(vector, registry)
     gate = evaluate_gate(antibiotic, vector)
     if gate.result.fired:
         return _gate_prediction(antibiotic, gate)
@@ -278,10 +316,11 @@ def predict_genome(
     """Every panel drug's verdict for one genome -- the per-genome firewall table.
 
     Raises AmrfinderDbVersionMismatchError / FeatureSchemaMismatchError up front if the
-    genome's annotation basis disagrees with the trained models (fail loud). Always returns
-    one row per constants.SUPPORTED_ANTIBIOTICS, in that order.
+    genome's annotation basis disagrees with the trained models (fail loud): predict_antibiotic
+    runs the compat check per drug, so the first (meropenem) call raises before any row is
+    built -- an incompatible genome yields no partial table. Always returns one row per
+    constants.SUPPORTED_ANTIBIOTICS, in that order.
     """
-    _check_compatibility(vector, registry)
     return tuple(
         predict_antibiotic(vector, antibiotic, registry) for antibiotic in SUPPORTED_ANTIBIOTICS
     )

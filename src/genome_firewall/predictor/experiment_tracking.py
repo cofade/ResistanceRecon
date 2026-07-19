@@ -179,9 +179,9 @@ class MLflowTracker:
 class NullTracker:
     """No-op stand-in used when training is invoked without a tracker (tests/programmatic).
 
-    Matches :class:`MLflowTracker`'s surface so callers need no ``None`` checks, and proves
-    tracking is off the model-output path: with tracking entirely absent, training produces
-    byte-identical models.
+    Matches :class:`MLflowTracker`'s surface so callers need no ``None`` checks, and keeps
+    tracking off the model-output path: it observes training only and is never a model input,
+    so a run with tracking entirely absent produces the same models.
     """
 
     active = False
