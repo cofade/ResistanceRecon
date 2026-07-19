@@ -109,6 +109,7 @@ class DrugTrainingResult:
     status: str  # "trained" | "insufficient_data"
     min_n: MinNGateResult
     split: SplitResult
+    reason: str | None = None  # why insufficient_data (min-n, too-clonal, or thin cal fold)
     model_version: str | None = None
     feature_schema: ModelFeatureSchema | None = None
     uncalibrated_model: Any = None
@@ -220,7 +221,11 @@ def train_one_antibiotic(
     )
     if not split.min_n.ok or split.split is None or split.holdout is None:
         return DrugTrainingResult(
-            antibiotic=antibiotic, status="insufficient_data", min_n=split.min_n, split=split
+            antibiotic=antibiotic,
+            status="insufficient_data",
+            min_n=split.min_n,
+            split=split,
+            reason=split.reason,
         )
 
     x = feature_matrix.loc[genome_ids].to_numpy(dtype=np.float64)
@@ -249,10 +254,19 @@ def train_one_antibiotic(
     best_c = float(grid.best_params_["C"])
 
     cal_idx = list(split.split.calibration_index)
-    calibrated = calibrate(
-        best_model, x[cal_idx], [y_int[i] for i in cal_idx], method=config.calibration_method
-    )
-    calibration = calibration_report(calibrated, x[cal_idx], [y_int[i] for i in cal_idx])
+    cal_labels = [y_int[i] for i in cal_idx]
+    if min(cal_labels.count(0), cal_labels.count(1)) < 2:
+        # Too few of a class in the calibration fold to fit a reliable calibrator -- degrade to
+        # insufficient_data rather than raising deep inside sklearn (guards calibrate()'s floor).
+        return DrugTrainingResult(
+            antibiotic=antibiotic,
+            status="insufficient_data",
+            min_n=split.min_n,
+            split=split,
+            reason="calibration fold has <2 samples of a class; cannot fit a reliable calibrator",
+        )
+    calibrated = calibrate(best_model, x[cal_idx], cal_labels, method=config.calibration_method)
+    calibration = calibration_report(calibrated, x[cal_idx], cal_labels)
 
     test_marginal, test_gate_negative = _evaluate_subset(
         calibrated, x, y_int, genome_ids, split.split.test_index, gate_positive

@@ -45,3 +45,16 @@ def test_calibrate_is_warning_free_on_an_imbalanced_fold() -> None:
     messages = [str(item.message) for item in caught]
     assert not any("n_splits" in m or "populated" in m for m in messages), messages
     assert 0.0 <= predict_resistant_proba(calibrated, x).max() <= 1.0
+
+
+def test_calibrate_rejects_a_degenerate_minority_of_one() -> None:
+    # A calibration fold with a single minority-class sample can't support any KFold; calibrate
+    # raises a clear error (train_one_antibiotic gates on this upstream so it never fires there).
+    import pytest
+
+    rng = np.random.RandomState(2)
+    x = rng.rand(20, 3)
+    y = [1] + [0] * 19  # minority == 1
+    model = LogisticRegression().fit(x, y)
+    with pytest.raises(ValueError, match="minority class"):
+        calibrate(model, x, y)

@@ -59,6 +59,14 @@ def calibrate(
         # FrozenEstimator the base is not refit, so predictions are fold-independent and the
         # cv choice does not change the fitted calibrator -- only silences the warning.
         minority = min(y_cal.count(0), y_cal.count(1)) if y_cal else 0
+        if minority < 2:
+            # A fold with <2 of a class supports no StratifiedKFold; the upstream min-n and
+            # grouped-split gates (and train_one_antibiotic's cal-fold check) should prevent
+            # this, so raise a clear error rather than let sklearn's deep guard fire.
+            raise ValueError(
+                f"calibration fold has only {minority} sample(s) of the minority class; "
+                "need >=2 (upstream min-n / grouped-split gates should prevent this)"
+            )
         n_splits = max(2, min(5, minority))
         cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=0)
         calibrated = CalibratedClassifierCV(FrozenEstimator(prefit_model), method=method, cv=cv)

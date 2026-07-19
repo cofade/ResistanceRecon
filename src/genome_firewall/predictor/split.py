@@ -113,6 +113,10 @@ class SplitResult(_Frozen):
     split: ThreeWaySplit | None = None
     fold_balance: tuple[FoldBalance, ...] = ()
     degraded: bool = False
+    #: Why no model can be built (min-n failure OR too-clonal to split); None when ok. Note
+    #: min_n.ok reflects the R/S COUNT gate only -- a drug can clear it yet still be reported
+    #: insufficient (split is None) for lack of homology-group diversity.
+    reason: str | None = None
 
 
 class ClusterBackend(Protocol):
@@ -333,27 +337,22 @@ def make_split(
     n_groups = len(set(groups))
 
     min_n = evaluate_min_n(y)
-    if not min_n.ok:
-        return SplitResult(
-            antibiotic=antibiotic, backend=backend_name, seed=seed, n_groups=n_groups, min_n=min_n
-        )
 
     def _insufficient(reason: str) -> SplitResult:
-        # min-n (R/S counts) passed, but the drug can't be split -- report it as insufficient
-        # data (never crash on a too-clonal drug). n_resistant/n_susceptible carry the real
-        # counts; the reason names the group-diversity cause.
+        # No model can be built. min_n is left untouched (it reports only the R/S COUNT gate);
+        # `reason` carries the actual cause (count failure or too-clonal-to-split). split stays
+        # None, which is what train_one_antibiotic branches on.
         return SplitResult(
             antibiotic=antibiotic,
             backend=backend_name,
             seed=seed,
             n_groups=n_groups,
-            min_n=MinNGateResult(
-                ok=False,
-                n_resistant=min_n.n_resistant,
-                n_susceptible=min_n.n_susceptible,
-                reason=reason,
-            ),
+            min_n=min_n,
+            reason=reason,
         )
+
+    if not min_n.ok:
+        return _insufficient(min_n.reason or "insufficient min-n")
 
     if n_groups < MIN_DISTINCT_GROUPS:
         return _insufficient(
@@ -362,26 +361,24 @@ def make_split(
             "train/calibration/test split (labels too clonal to split without leakage)"
         )
 
+    holdout = leave_one_group_out_holdout(y, groups)
+    remaining = list(holdout.remaining_index)
+    y_rem = [y[i] for i in remaining]
+    groups_rem = [groups[i] for i in remaining]
+    # Scope the try tightly to the ONLY call that can raise the too-clonal ValueError
+    # (StratifiedGroupKFold). A Pydantic ValidationError from ThreeWaySplit -- also a
+    # ValueError -- must surface, not be laundered into insufficient_data, so its construction
+    # is outside the try. A genuine leak raises LeakageError (a RuntimeError) and is unaffected.
     try:
-        holdout = leave_one_group_out_holdout(y, groups)
-        remaining = list(holdout.remaining_index)
-        y_rem = [y[i] for i in remaining]
-        groups_rem = [groups[i] for i in remaining]
         local = three_way_grouped_split(y_rem, groups_rem, n_splits=n_splits, seed=seed)
-        split = ThreeWaySplit(
-            train_index=tuple(remaining[i] for i in local.train_index),
-            calibration_index=tuple(remaining[i] for i in local.calibration_index),
-            test_index=tuple(remaining[i] for i in local.test_index),
-        )
-        train_y = [y[i] for i in split.train_index]
-        train_groups = [groups[i] for i in split.train_index]
-        inner_folds = make_grouped_folds(train_y, train_groups, n_splits=n_splits, seed=seed)
     except ValueError as exc:
-        # StratifiedGroupKFold raises when a dominant clone leaves a fold with too few groups
-        # of a class -- degrade to insufficient data rather than aborting the whole run.
-        # (A genuine leak raises LeakageError, a RuntimeError, and is NOT swallowed here.)
         return _insufficient(f"grouped split could not be formed (too clonal/imbalanced): {exc}")
 
+    split = ThreeWaySplit(
+        train_index=tuple(remaining[i] for i in local.train_index),
+        calibration_index=tuple(remaining[i] for i in local.calibration_index),
+        test_index=tuple(remaining[i] for i in local.test_index),
+    )
     no_leakage_check(
         groups,
         split.train_index,
@@ -389,6 +386,14 @@ def make_split(
         split.test_index,
         holdout.holdout_index,
     )
+
+    train_y = [y[i] for i in split.train_index]
+    train_groups = [groups[i] for i in split.train_index]
+    try:
+        inner_folds = make_grouped_folds(train_y, train_groups, n_splits=n_splits, seed=seed)
+    except ValueError as exc:
+        return _insufficient(f"inner CV folds could not be formed (too clonal/imbalanced): {exc}")
+
     balances = per_fold_class_balance(inner_folds, train_y)
 
     return SplitResult(

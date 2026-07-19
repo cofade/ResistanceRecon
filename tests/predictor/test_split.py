@@ -102,9 +102,10 @@ def test_make_split_reports_insufficient_data_on_a_too_clonal_drug() -> None:
     sts = ["258" if i % 2 == 0 else "512" for i in range(40)]
     metadata = pd.DataFrame({"genome_id": genome_ids, "mlst_scheme": ["kp"] * 40, "mlst_st": sts})
     result = make_split(genome_ids, y, metadata, antibiotic="meropenem")
-    assert result.min_n.ok is False
+    # the R/S COUNT gate passed (20/20); the drug is insufficient for lack of group diversity
+    assert result.min_n.ok is True
     assert result.split is None and result.holdout is None
-    assert result.min_n.reason is not None and "group" in result.min_n.reason.lower()
+    assert result.reason is not None and "group" in result.reason.lower()
 
 
 def test_make_split_short_circuits_on_min_n_failure() -> None:
