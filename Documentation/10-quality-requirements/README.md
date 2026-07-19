@@ -32,3 +32,13 @@ The Predictor's training foundation implements the *Correctness* and *Confidence
 - **Class imbalance / R-recall headline** — `predictor/train.py` uses `class_weight='balanced'`, PR-AUC-scored C selection, and reports resistant-recall as the headline metric on the gate-negative subset.
 - **Trustworthy confidence** — `predictor/calibration.py` sigmoid calibration on the homology-grouped fold ([ADR-0004](../09-architecture-decisions/ADR-0004-calibration-and-conformal-prediction-for-no-call.md); Brier + reliability). First-class no-call (conformal) and evidence-integrity/no-call surfacing land in PR-B.
 - **Known vs statistical evidence** — the one-directional gate ([ADR-0018](../09-architecture-decisions/ADR-0018-deterministic-gate-one-directional.md)) tags deterministic hits `known_mechanism`; model coefficients are `statistical_association` (assembled in PR-B's report path).
+
+## 10.4 Realization status (EPIC 4 + 5 — Decision Report & LLM narrative)
+
+Module 03a implements the *Evidence honesty*, *LLM must never decide*, *Human stays in the loop*, and *External tool fails* rows above:
+
+- **Known vs statistical evidence** — `report/evidence.py` sets `evidence_category` deterministically by curated-KB membership (`features/mechanisms.py`), never by the LLM; the row category is the strongest cited item ([ADR-0020](../09-architecture-decisions/ADR-0020-evidence-tagging-and-fail-closed-narrative-envelope.md)). Pinned by `tests/report/test_evidence.py`, `tests/report/test_builder_validators.py`.
+- **LLM must never decide** — `report/nl_schemas.py` (`NLReportSection`, `ReportVerdict`) carry no verdict/confidence/SIR field; `report/pipeline.py`'s `NarrativeEnvelope` keeps the review outcome machine-readable without touching the frozen report. Pinned by `tests/report/test_nl_schemas.py` + the still-green import-boundary gate (`tests/report/test_safety_invariants.py`).
+- **Human stays in the loop** — the disclaimer is present on every narrative branch (accepted / rejected / disabled), verified by `tests/report/test_safety_invariants.py`.
+- **External tool / LLM fails mid-demo** — `report/reviewer.py` runs a deterministic pre-check *before* any LLM call and `report/pipeline.py` fails closed to the deterministic template on disable, error, or rejection (`review_status` records which). Pinned by `tests/report/test_pipeline.py` and integration shape #5 (`tests/report/test_integration_narrative_shape5.py`).
+- **Offline-safe evidence RAG** — hybrid BM25 + optional dense retrieval with RRF, the dense leg behind an `Embedder` Protocol so CI never loads model weights ([ADR-0019](../09-architecture-decisions/ADR-0019-evidence-rag-offline-embedding-and-rrf.md)). Pinned by `tests/kb/`.

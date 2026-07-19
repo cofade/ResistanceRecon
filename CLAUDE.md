@@ -139,6 +139,7 @@ Release automation is **deferred** (there is no `release.yml` yet). Interim rule
 **Current phase:** EPIC 3 — Predictor (Module 02). PR-A (training foundation, issues #18/#19/#20) implemented on branch `feat/epic3-training-foundation`: `schemas.ModelFeatureSchema`, `features/{mechanisms,vocabulary,feature_matrix}`, `predictor/{subset,split,target_gate,train,calibration}`, `scripts/fetch_bvbrc_data.py` HTTPS additions + `scripts/build_feature_matrix.py`. ADRs 0015–0018. HTTPS non-FTPS path validated live. Draft PR pending manual test.
 **Completed:** EPIC 0 scaffolding; EPIC 1 BV-BRC data pipeline (PR #37); EPIC 2 Genome Reader (PR #38); EPIC 3 PR-A core (split/gate/LR+calibration + features/ + HTTPS fetch + batch feature-matrix builder), all local gates green (188 passed, cov 96.8%).
 **Next up:** manual test + merge of EPIC 3 PR-A, then PR-B (#21 conformal + #22 predict/registry + MLflow experiment tracking + real training run).
+**Parallel package (Module 03a):** EPIC 4 + EPIC 5 implemented on `feat/epic4-5-report-and-llm` (forked off `main`, schema-decoupled from the EPIC 3 predict-registry session): `report/{inputs,evidence,builder,narrative,nl_schemas,narrator,reviewer,pipeline}.py`, `llm/` (client + MockLLMClient + OpenAI backend), `kb/` (BM25+embedding+RRF evidence RAG, offline-safe). ADRs 0019–0020. All local gates green (285 passed, cov 97.2%). Draft PR pending manual test; real OpenAI path is mock-only in CI.
 
 Update this section at the start of each work session; do not reconstruct it from git history.
 

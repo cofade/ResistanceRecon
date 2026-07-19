@@ -30,9 +30,21 @@ features/    Module 02 feature engineering (EPIC 3): mechanisms.py (shared AMR-m
              features -- QRDR counts, PMQR/RMTase/carbapenemase/ESBL flags), feature_matrix.py
              (GenomeFeatureVector -> fixed-order numeric rows). Trust-critical, LLM-free.
 predictor/   Module 02 (the star) — dataset, subset, split, target_gate, train, calibration, conformal, predict, model_registry, experiment_tracking
-report/      Module 03a — deterministic report builder (+ jinja template) + additive LLM narrative sub-pipeline
-kb/          AMR-mechanism KB: hybrid BM25 + embedding + RRF retrieval (evidence RAG)
-llm/         provider-agnostic client + MockLLMClient (report narration + reviewer only)
+report/      Module 03a. Deterministic core: inputs.py (DrugPredictionInput/GenomePredictionInputs —
+             the decoupled builder input, not in schemas.py), evidence.py (KNOWN/STATISTICAL/NO_SIGNAL
+             tagging, ADR-0020), builder.py (build_report -> GenomeReport, zero-LLM), narrative.py
+             (pure-Python deterministic render — no jinja2). Additive LLM narrative (receives the
+             frozen report): nl_schemas.py (NLReportSection/ReportVerdict — no verdict field),
+             narrator.py, reviewer.py (deterministic pre-check + LLM judge, fail-closed), pipeline.py
+             (narrate_report -> NarrativeEnvelope). Narrator/reviewer live here, not a separate agents/.
+kb/          AMR-mechanism KB (evidence RAG, retrieval-only): corpus.py (KBChunk + seed loader),
+             seed/ (committed curated mechanism_chunks.jsonl), embedder.py (Embedder Protocol;
+             HashingBagOfWordsEmbedder for CI, lazy SentenceTransformerEmbedder for prod),
+             retriever.py (BM25 + optional dense, RRF fusion), evidence_rag.py, loader.py (offline
+             catalog distiller). ADR-0019.
+llm/         provider-agnostic client: types.py, errors.py, client.py (LLMClient Protocol +
+             parse_structured_response), mock.py (MockLLMClient, CI), openai_backend.py (lazy,
+             structured outputs), settings.py, factory.py. Report narration + reviewer only.
 api/         Module 03b — FastAPI (POST /predict, GET /health, /antibiotics, /model-card)
 ui/          Streamlit demo (firewall table, evidence drill-down, calibration, disclaimer banner)
 eval/        metrics harness (marginal + per-group + unseen-lineage)

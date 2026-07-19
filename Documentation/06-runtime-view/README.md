@@ -41,6 +41,58 @@ sequenceDiagram
 8. Response -> UI: firewall rule table + evidence + calibration + non-dismissible disclaimer banner.
 ```
 
+## Decision report + narrative sub-pipeline (EPIC 4 + 5)
+
+The deterministic builder and the additive narrative are two separable steps in Module 03a.
+
+```
+Deterministic (EPIC 4, zero-LLM — the green floor and demo fallback):
+  report.build_report(GenomePredictionInputs) per drug:
+    1. evaluate_gate(drug, vector)  [re-run; pure]
+    2. off-panel (target_present is None) or insufficient_data -> no_call / no_signal / 0.0
+    3. gate fired -> forced likely_to_fail, confidence 0.99, known_mechanism evidence (ADR-0018)
+    4. else verdict = verdict_for_conformal_set(conformal_set); confidence from ModelPrediction
+    5. report.evidence.assemble_evidence -> EvidenceItem[] + row category (ADR-0020:
+       known_mechanism iff a curated-KB gene is cited; strongest-cited wins; else statistical/no_signal)
+  -> GenomeReport (+ mandatory disclaimer; narrative_summary=None)
+
+Additive narrative (EPIC 5, optional; receives the FROZEN report):
+  report.narrate_report(report, client, retriever) -> NarrativeEnvelope
+    1. client is None -> template, review_status=llm_disabled
+    2. kb.EvidenceRAG.retrieve_for_genes(supporting_features, drug)  [BM25 (+optional dense) + RRF]
+    3. narrator.generate_narrative (LLM, temp 0; verdicts are read-only context; output schema
+       has no verdict field)
+    4. reviewer.review_narrative: deterministic pre-check (fabricated number/drug/verdict/causal)
+       BEFORE the LLM judge; then the LLM judge
+    5. overall_pass -> attach flattened narrative, review_status=llm_output_accepted, source=llm
+       else -> deterministic template, review_status=llm_output_rejected, source=template
+  The disclaimer is present on every branch; the LLM can never alter a verdict/confidence.
+```
+
+```mermaid
+sequenceDiagram
+    participant Pr as predictor primitives
+    participant B as report.build_report
+    participant K as kb (RAG)
+    participant N as narrator (LLM)
+    participant V as reviewer
+    participant E as NarrativeEnvelope
+    Pr->>B: GateResult / ModelPrediction / ConformalSet
+    B->>B: compose verdict + assemble evidence (ADR-0020)
+    B-->>E: GenomeReport (frozen, + disclaimer)
+    opt narrative (client present)
+        B->>K: retrieve_for_genes(genes, drug)
+        K-->>N: cited chunks
+        N->>N: generate NLReportSection (no verdict field)
+        N->>V: deterministic pre-check -> LLM judge
+        alt grounded
+            V-->>E: source=llm, review_status=llm_output_accepted
+        else rejected / error / disabled
+            V-->>E: deterministic template, review_status=llm_output_rejected|llm_disabled
+        end
+    end
+```
+
 ## Training scenario (offline)
 
 ```mermaid
