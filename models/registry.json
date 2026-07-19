@@ -1,0 +1,33 @@
+{
+  "registry_schema": "predictor-registry/1",
+  "amrfinder_db_version": "2026-05-15.1",
+  "schema_version": "1.0.0",
+  "engineered_feature_spec_version": "1",
+  "drugs": {
+    "meropenem": {
+      "status": "trained",
+      "latest_version": "v1",
+      "reason": null
+    },
+    "ceftriaxone": {
+      "status": "trained",
+      "latest_version": "v1",
+      "reason": null
+    },
+    "ciprofloxacin": {
+      "status": "trained",
+      "latest_version": "v1",
+      "reason": null
+    },
+    "gentamicin": {
+      "status": "trained",
+      "latest_version": "v1",
+      "reason": null
+    },
+    "trimethoprim-sulfamethoxazole": {
+      "status": "trained",
+      "latest_version": "v1",
+      "reason": null
+    }
+  }
+}

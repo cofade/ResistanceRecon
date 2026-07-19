@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "qnrS1",
+    "coefficient": 3.090136169389839
+  },
+  {
+    "feature": "eng:n_qrdr_mutations",
+    "coefficient": 3.0624095810949017
+  },
+  {
+    "feature": "ant(2'')-Ia",
+    "coefficient": 2.931210861713016
+  },
+  {
+    "feature": "eng:has_ame",
+    "coefficient": 2.7533897642506706
+  },
+  {
+    "feature": "qnrB1",
+    "coefficient": 2.2494760036206736
+  },
+  {
+    "feature": "tet(A)",
+    "coefficient": 2.124362488424057
+  },
+  {
+    "feature": "blaSHV-7",
+    "coefficient": 1.7103889986621572
+  },
+  {
+    "feature": "blaSHV-30",
+    "coefficient": -1.6491592546606586
+  },
+  {
+    "feature": "blaCTX-M-15",
+    "coefficient": 1.6073627210744943
+  },
+  {
+    "feature": "ompK35_E132K",
+    "coefficient": -1.5740282664862506
+  },
+  {
+    "feature": "oqxB",
+    "coefficient": -1.4076174352998854
+  },
+  {
+    "feature": "blaSHV-1",
+    "coefficient": -1.3703413476598354
+  },
+  {
+    "feature": "aac(6')-Il",
+    "coefficient": -1.1778530932032585
+  },
+  {
+    "feature": "blaVIM-1",
+    "coefficient": -1.1778530932032585
+  },
+  {
+    "feature": "qnrA1",
+    "coefficient": -1.1778530932032585
+  },
+  {
+    "feature": "oqxB19",
+    "coefficient": 1.119769904270552
+  },
+  {
+    "feature": "tet(D)",
+    "coefficient": -1.0434523873104489
+  },
+  {
+    "feature": "eng:has_esbl_or_ampc",
+    "coefficient": 1.0139588433484148
+  },
+  {
+    "feature": "blaLAP-2",
+    "coefficient": -1.013389012826467
+  },
+  {
+    "feature": "blaCTX-M-14",
+    "coefficient": -1.0028336435240497
+  }
+]

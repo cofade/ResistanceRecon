@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "eng:has_dfr",
+    "coefficient": 2.2729818726223265
+  },
+  {
+    "feature": "eng:has_sul",
+    "coefficient": 1.8399127660798997
+  },
+  {
+    "feature": "sul1",
+    "coefficient": 1.8094432645849743
+  },
+  {
+    "feature": "catA1",
+    "coefficient": 1.7026497612603304
+  },
+  {
+    "feature": "blaKPC-2",
+    "coefficient": -1.520941708164638
+  },
+  {
+    "feature": "blaCTX-M-15",
+    "coefficient": 1.0300284964545847
+  },
+  {
+    "feature": "eng:has_esbl_or_ampc",
+    "coefficient": 0.9693255978814231
+  },
+  {
+    "feature": "aph(3'')-Ib",
+    "coefficient": 0.9026217270279656
+  },
+  {
+    "feature": "aph(6)-Id",
+    "coefficient": 0.9026217270279656
+  },
+  {
+    "feature": "aadA1",
+    "coefficient": 0.8860909418372065
+  },
+  {
+    "feature": "eng:has_carbapenemase",
+    "coefficient": -0.8708296825254844
+  },
+  {
+    "feature": "aac(6')-33",
+    "coefficient": -0.8542969556969562
+  },
+  {
+    "feature": "floR",
+    "coefficient": -0.8542969556969562
+  },
+  {
+    "feature": "eng:has_ame",
+    "coefficient": 0.842759523131545
+  },
+  {
+    "feature": "dfrA1",
+    "coefficient": 0.8014716739764041
+  },
+  {
+    "feature": "dfrA14",
+    "coefficient": 0.7810727321753542
+  },
+  {
+    "feature": "blaSHV-5",
+    "coefficient": -0.7144084354897426
+  },
+  {
+    "feature": "tet(D)",
+    "coefficient": 0.6730791629947137
+  },
+  {
+    "feature": "aph(3')-Ia",
+    "coefficient": 0.6663694345476625
+  },
+  {
+    "feature": "dfrA21",
+    "coefficient": 0.6516189453952927
+  }
+]

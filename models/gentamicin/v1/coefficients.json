@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "aac(3)-IIe",
+    "coefficient": 2.979552252832524
+  },
+  {
+    "feature": "eng:has_ame",
+    "coefficient": 2.22248382268111
+  },
+  {
+    "feature": "aac(6')-Ib'",
+    "coefficient": 2.167425719241576
+  },
+  {
+    "feature": "ant(2'')-Ia",
+    "coefficient": 1.3968022667134627
+  },
+  {
+    "feature": "aadA1",
+    "coefficient": 1.3009704238029245
+  },
+  {
+    "feature": "dfrA12",
+    "coefficient": -1.2587262979428682
+  },
+  {
+    "feature": "qnrB1",
+    "coefficient": 1.1796419875419846
+  },
+  {
+    "feature": "blaOXA-9",
+    "coefficient": -1.1415876546675718
+  },
+  {
+    "feature": "eng:has_carbapenemase",
+    "coefficient": 1.107776472803468
+  },
+  {
+    "feature": "aac(3)-IId",
+    "coefficient": 1.1021531040818862
+  },
+  {
+    "feature": "catA1",
+    "coefficient": -1.1015408426688105
+  },
+  {
+    "feature": "blaTEM-1",
+    "coefficient": 1.0758695291906708
+  },
+  {
+    "feature": "eng:has_sul",
+    "coefficient": 0.9784201201400561
+  },
+  {
+    "feature": "aac(3)-IVa",
+    "coefficient": 0.9725017128571607
+  },
+  {
+    "feature": "aph(4)-Ia",
+    "coefficient": 0.9725017128571607
+  },
+  {
+    "feature": "cmlA1",
+    "coefficient": 0.9725017128571607
+  },
+  {
+    "feature": "estX-3",
+    "coefficient": 0.9725017128571607
+  },
+  {
+    "feature": "sul3",
+    "coefficient": 0.9725017128571607
+  },
+  {
+    "feature": "blaSHV-11",
+    "coefficient": 0.9680998238878823
+  },
+  {
+    "feature": "blaKPC-3",
+    "coefficient": -0.9595076225573638
+  }
+]

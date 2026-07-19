@@ -97,7 +97,7 @@ no_implicit_reexport = true
 
 [[tool.mypy.overrides]]
 # Third-party libs without complete type stubs.
-module = ["crepes.*", "mapie.*", "shap.*", "sklearn.*", "Bio.*", "streamlit.*", "plotly.*", "mlflow.*", "rank_bm25.*", "sentence_transformers.*"]
+module = ["crepes.*", "mapie.*", "shap.*", "sklearn.*", "joblib.*", "Bio.*", "streamlit.*", "plotly.*", "mlflow.*", "rank_bm25.*", "sentence_transformers.*"]
 ignore_missing_imports = true
 
 [tool.bandit]

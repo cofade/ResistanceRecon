@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "eng:has_carbapenemase",
+    "coefficient": 1.4928705055293814
+  },
+  {
+    "feature": "blaKPC-2",
+    "coefficient": 0.920371504089474
+  },
+  {
+    "feature": "eng:has_rmtase",
+    "coefficient": 0.5916190246400563
+  },
+  {
+    "feature": "ble",
+    "coefficient": 0.5724990014399073
+  },
+  {
+    "feature": "sul1",
+    "coefficient": 0.519710159779455
+  },
+  {
+    "feature": "blaOXA",
+    "coefficient": 0.5023227914842463
+  },
+  {
+    "feature": "eng:has_esbl_or_ampc",
+    "coefficient": 0.4550325408349162
+  },
+  {
+    "feature": "arr-3",
+    "coefficient": 0.44882860310544265
+  },
+  {
+    "feature": "blaNDM-1",
+    "coefficient": 0.4453920332080381
+  },
+  {
+    "feature": "eng:porin_disrupted",
+    "coefficient": 0.38735686804574976
+  },
+  {
+    "feature": "eng:has_sul",
+    "coefficient": 0.34985827131162084
+  },
+  {
+    "feature": "arr-2",
+    "coefficient": 0.346685593154029
+  },
+  {
+    "feature": "aac(6')-Ib",
+    "coefficient": 0.33366532394593457
+  },
+  {
+    "feature": "aadA1",
+    "coefficient": 0.3271792669221643
+  },
+  {
+    "feature": "tet(A)",
+    "coefficient": 0.3244148882110556
+  },
+  {
+    "feature": "eng:n_qrdr_mutations",
+    "coefficient": 0.3234668907959737
+  },
+  {
+    "feature": "eng:has_ame",
+    "coefficient": 0.31064784950724383
+  },
+  {
+    "feature": "blaTEM-1",
+    "coefficient": 0.3028479830643489
+  },
+  {
+    "feature": "blaOXA-9",
+    "coefficient": 0.2741817374202117
+  },
+  {
+    "feature": "blaSHV-1",
+    "coefficient": 0.2617749224810744
+  }
+]
