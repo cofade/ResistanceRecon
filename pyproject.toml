@@ -52,6 +52,9 @@ dev = [
   "pre-commit>=3.7",
   "pandas-stubs",
   "types-requests",
+  # FastAPI's TestClient (starlette) drives the API integration tests over ASGI; it needs
+  # httpx present. Declared explicitly here rather than relying on it arriving transitively.
+  "httpx>=0.27",
 ]
 
 [project.scripts]
@@ -119,6 +122,11 @@ markers = [
 [tool.coverage.run]
 branch = true
 source = ["genome_firewall"]
+# ui/app.py is the Streamlit entry SCRIPT (its logic-bearing helpers live in the fully-covered
+# ui/render.py). It is behaviorally exercised end-to-end by tests/ui/test_ui_shape7.py, but
+# coverage.py cannot trace Streamlit's ScriptRunner thread, so it would otherwise show a
+# misleading 0%. Excluded from the metric; the AppTest remains its real verification.
+omit = ["*/genome_firewall/ui/app.py"]
 
 [tool.coverage.report]
 show_missing = true

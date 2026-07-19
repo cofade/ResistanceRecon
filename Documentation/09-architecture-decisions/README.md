@@ -25,3 +25,4 @@ One record per non-trivial, hard-to-reverse decision. Format: Title, Date, Statu
 | [0019](ADR-0019-evidence-rag-offline-embedding-and-rrf.md) | Evidence RAG: offline-safe hybrid retrieval (BM25 + optional embedding, RRF) | Accepted |
 | [0020](ADR-0020-evidence-tagging-and-fail-closed-narrative-envelope.md) | Evidence-category tagging policy & fail-closed narrative envelope | Accepted |
 | [0021](ADR-0021-default-llm-gpt56-luna-xhigh-reasoning.md) | Default LLM: GPT-5.6 Luna at Extra-High reasoning (temperature omitted) | Accepted |
+| [0022](ADR-0022-in-process-orchestrator-demo.md) | In-process orchestrator for the demo UI (clarifying ADR-0007) | Accepted |
