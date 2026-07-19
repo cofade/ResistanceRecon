@@ -27,13 +27,16 @@ data/raw/
 data/interim/
 data/processed/
 # models/: commit the small TEXT artifacts (feature_schema/metrics/conformal/coefficients JSON,
-# model_card.md, registry.json, results_summary.json) as reproducible ground-truth; the binary
-# models (*.joblib, caught globally above) and MLflow runs (mlruns/) stay out.
+# model_card.md, registry.json, results_summary.json) as reproducible ground-truth, AND the tiny
+# per-drug calibrated_model.joblib (~3KB each) -- the EPIC 6 demo/API/UI and CI must load the
+# registry from a bare clone (ADR-0022), so these five small demo models are committed. The
+# release-asset convention still governs any FUTURE large model; MLflow runs (mlruns/) stay out.
 models/*
 !models/.gitkeep
 !models/*/
 !models/**/*.json
 !models/**/*.md
+!models/**/*.joblib
 
 # Secrets
 .env

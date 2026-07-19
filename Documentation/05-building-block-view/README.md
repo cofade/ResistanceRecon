@@ -66,7 +66,7 @@ schemas.py   Pydantic contracts crossing every boundary
 constants.py canonical disclaimer, supported species/antibiotics
 ```
 
-Supporting: `scripts/` (BV-BRC fetch, AMRFinderPlus batch, dataset build, env validate, import-boundary check); `data/raw/`, `data/interim/`, `data/processed/`, and `models/` (git-ignored, published as release assets) -- but `data/reference/` (pinned lookup tables like `ReferenceGeneCatalog.txt`, ADR-0013) is committed, matching the fixture-data convention rather than the bulk-data one.
+Supporting: `scripts/` (BV-BRC fetch, AMRFinderPlus batch, dataset build, env validate, import-boundary check); `data/raw/`, `data/interim/`, `data/processed/` (git-ignored, reproducible via `scripts/`), and `models/` (text artifacts + the five ~3KB per-drug `calibrated_model.joblib` are committed so the EPIC 6 demo/CI run from a bare clone, ADR-0022; large future models would be release assets) -- but `data/reference/` (pinned lookup tables like `ReferenceGeneCatalog.txt`, ADR-0013) is committed, matching the fixture-data convention rather than the bulk-data one.
 
 ## Key responsibilities & boundaries
 

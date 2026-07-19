@@ -85,5 +85,10 @@ report-decoupled-from-predict boundary those packages were designed around.
 - One dependency is made explicit: `httpx>=0.27` is added to the `dev` group (FastAPI's
   `TestClient` needs it for the ASGI transport). It is a test-only, already-transitive dep
   pinned for CI robustness — not a new runtime dependency.
+- The demo makes the trained models a first-class dependency of a bare clone: the five tiny
+  per-drug `calibrated_model.joblib` (~3KB each, 20KB total) are now committed (a narrow
+  `.gitignore` exception) so CI, a fresh clone, and a Streamlit deploy can all load the
+  registry. The prior "models are release assets" convention still governs any future *large*
+  model; these five are trivially small and ARE the demo's ground-truth.
 - Pinned by `tests/service/*`, `tests/api/*`, `tests/ui/*`. Does not change the LLM boundary
   (ADR-0006) or any prediction method.
