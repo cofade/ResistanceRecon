@@ -97,6 +97,26 @@ def _ceftriaxone_statistical_input():
     )
 
 
+def test_precheck_is_a_fixed_phrase_guard_not_a_semantic_verifier() -> None:
+    # DOCUMENTS the boundary (ADR-0020): a wrong verdict expressed with a non-canonical synonym
+    # ("should remain effective" for a likely_to_fail drug) is NOT caught by the deterministic
+    # pre-check -- that is the LLM judge's job (defense-in-depth). Pinned so it isn't mistaken
+    # for a bug: the pre-check catches the crudest fixed-phrase failures, not paraphrase.
+    section = _section(
+        NLDrugNarrative(antibiotic="meropenem", narrative="Meropenem should remain effective.")
+    )
+    ok, _ = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert ok  # passes the pre-check; the judge must catch the semantic contradiction
+
+
+def test_precheck_uses_word_boundaries_so_no_callback_is_not_a_no_call() -> None:
+    section = NLReportSection(
+        summary="No callback from the lab is expected.", per_antibiotic=(), caveats=()
+    )
+    ok, _ = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert ok  # 'no callback' must not trip the 'no call' verdict phrase
+
+
 def test_review_short_circuits_before_the_llm_when_precheck_fails() -> None:
     section = _section(summary="Meropenem resistance is 42% likely.")
     # An empty mock would raise on any call; the pre-check must reject first.

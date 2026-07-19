@@ -62,6 +62,14 @@ def _numbers(text: str) -> set[str]:
     return set(_NUMBER_RE.findall(text))
 
 
+def _contains(text_lower: str, phrase: str) -> bool:
+    """Word-boundary containment, so 'no call' does not match 'no callback' and a drug name is
+    not matched inside a longer token. This is a fixed-PHRASE guard: a wrong verdict or cause
+    expressed with a non-canonical synonym ('ineffective', 'drives resistance') is deliberately
+    NOT caught here -- semantic paraphrase is the LLM judge's job (defense-in-depth, ADR-0020)."""
+    return re.search(rf"\b{re.escape(phrase)}\b", text_lower) is not None
+
+
 def _section_prose(section: NLReportSection) -> str:
     parts = [section.summary, *section.caveats]
     parts.extend(d.narrative for d in section.per_antibiotic)
@@ -77,21 +85,21 @@ def _bound_narrative_violation(
     what makes the exact binding sound -- otherwise a plural/aggregate sentence naming a second
     evaluated drug ("X and Y are both likely to fail") could smuggle a wrong verdict for Y."""
     for other in SUPPORTED_ANTIBIOTICS:
-        if other != drug and other in prose_lower:
+        if other != drug and _contains(prose_lower, other):
             return (
                 f"narrative for {drug} names another drug ({other}); a per-antibiotic narrative "
                 "must discuss only its own drug"
             )
     own_verdict = _VERDICT_LABEL[row.verdict]
     for phrase in _VERDICT_PHRASES:
-        if phrase in prose_lower and phrase != own_verdict:
+        if _contains(prose_lower, phrase) and phrase != own_verdict:
             return (
                 f"narrative for {drug} asserts verdict '{phrase}', but its verdict is "
                 f"'{own_verdict}'"
             )
     if row.evidence_category != "known_mechanism":
         for phrase in _CAUSAL_PHRASES:
-            if phrase in prose_lower:
+            if _contains(prose_lower, phrase):
                 return (
                     f"narrative for {drug} uses causal language ('{phrase}'), but its evidence is "
                     f"{row.evidence_category}, not a known mechanism"
@@ -105,13 +113,13 @@ def _free_text_violation(where: str, prose_lower: str) -> str | None:
     here is rejected outright -- unambiguous, with no proximity guessing that a plural/aggregate
     sentence ("both are likely to work") could defeat."""
     for phrase in _VERDICT_PHRASES:
-        if phrase in prose_lower:
+        if _contains(prose_lower, phrase):
             return (
                 f"{where} states a per-drug verdict ('{phrase}'); verdicts belong in the "
                 "per-antibiotic narrative"
             )
     for phrase in _CAUSAL_PHRASES:
-        if phrase in prose_lower:
+        if _contains(prose_lower, phrase):
             return (
                 f"{where} states a causal claim ('{phrase}'); mechanism claims belong in the "
                 "per-antibiotic narrative"
@@ -158,7 +166,7 @@ def deterministic_precheck(
                 "in this report"
             )
     for drug in SUPPORTED_ANTIBIOTICS:
-        if drug in prose and drug not in evaluated:
+        if _contains(prose, drug) and drug not in evaluated:
             return False, f"narrative discusses {drug}, which was not evaluated in this report"
 
     # (3) Per-drug narratives: verdict + causal language bound to their own drug (exact).
