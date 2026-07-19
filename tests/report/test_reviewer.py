@@ -175,6 +175,33 @@ def test_precheck_rejects_a_plural_verdict_statement_in_the_summary() -> None:
     assert "likely to work" in reason
 
 
+def test_precheck_rejects_a_foreign_drug_named_in_a_per_antibiotic_narrative() -> None:
+    # Same masking class as the summary plural case, relocated inside a per-drug entry: meropenem's
+    # narrative naming ceftriaxone and asserting an aggregate verdict must be rejected outright.
+    section = _section(
+        NLDrugNarrative(
+            antibiotic="meropenem",
+            narrative="Meropenem and ceftriaxone are both likely to fail.",
+        )
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "meropenem" in reason and "ceftriaxone" in reason
+
+
+def test_precheck_rejects_a_foreign_causal_claim_inside_a_known_mechanism_entry() -> None:
+    # A causal claim about a different (statistical) drug hidden in a known-mechanism entry.
+    section = _section(
+        NLDrugNarrative(
+            antibiotic="meropenem",
+            narrative="For ceftriaxone the detected gene confers resistance.",
+        )
+    )
+    ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)
+    assert not ok
+    assert "ceftriaxone" in reason
+
+
 def test_precheck_rejects_causal_language_in_the_summary() -> None:
     section = _section(summary="For ceftriaxone, the detected gene confers resistance.")
     ok, reason = deterministic_precheck(section, _REPORT, _NO_RETRIEVAL)

@@ -68,6 +68,11 @@ present known-mechanism gene is a known mechanism); mutating `GenomeReport` to a
 - (−) A present-but-non-gating known mechanism yields a `known_mechanism` row at model confidence;
   the verdict-aware deterministic renderer (and the reviewer's causal-language check on the LLM
   path) keep the wording honest so the category never reads as if it backed the verdict.
+- (−) The unambiguous contract sacrifices some legitimate narrator freedom: a per-antibiotic
+  narrative may not reference another drug, and the free-text summary/caveats may not state a
+  verdict/causal phrase (so an honest aggregate overview like "several agents returned a no call"
+  is rejected). This fails *safe* — the deterministic template is served — and is the deliberate
+  price of a guard whose strength does not depend on parsing which drug a phrase refers to.
 - Pinned by `tests/report/test_builder_validators.py`, `tests/report/test_evidence.py`,
   `tests/report/test_reviewer.py`, `tests/report/test_pipeline.py`, and
   `tests/report/test_safety_invariants.py`.

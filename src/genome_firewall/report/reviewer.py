@@ -71,9 +71,17 @@ def _section_prose(section: NLReportSection) -> str:
 def _bound_narrative_violation(
     drug: str, row: AntibioticPrediction, prose_lower: str
 ) -> str | None:
-    """A single drug's own narrative: it may assert only THAT drug's verdict, and use causal
-    language only if that drug's evidence is a known mechanism. Attribution is exact (the entry
-    is, by contract, about this one drug) -- no proximity guessing."""
+    """A single drug's own narrative: it may not name any OTHER panel drug (so attribution is
+    provably about this one drug), may assert only THAT drug's verdict, and may use causal
+    language only if that drug's evidence is a known mechanism. Banning cross-drug references is
+    what makes the exact binding sound -- otherwise a plural/aggregate sentence naming a second
+    evaluated drug ("X and Y are both likely to fail") could smuggle a wrong verdict for Y."""
+    for other in SUPPORTED_ANTIBIOTICS:
+        if other != drug and other in prose_lower:
+            return (
+                f"narrative for {drug} names another drug ({other}); a per-antibiotic narrative "
+                "must discuss only its own drug"
+            )
     own_verdict = _VERDICT_LABEL[row.verdict]
     for phrase in _VERDICT_PHRASES:
         if phrase in prose_lower and phrase != own_verdict:
