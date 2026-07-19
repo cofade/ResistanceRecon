@@ -33,7 +33,12 @@ from typing import Final, NamedTuple
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
 
-from genome_firewall.constants import KLEBSIELLA_PNEUMONIAE_TAXON_ID
+from genome_firewall.constants import (
+    BINARY_RESISTANT_CLASSES,
+    BINARY_SUSCEPTIBLE_CLASSES,
+    DROPPED_SIR_CLASSES,
+    KLEBSIELLA_PNEUMONIAE_TAXON_ID,
+)
 
 # ---------------------------------------------------------------------------
 # Vocabulary & column contracts
@@ -70,6 +75,17 @@ if set(SIR_CLASSES) - {"Intermediate"} != _SUSCEPTIBLE_SIDE | _RESISTANT_SIDE:
     raise AssertionError(
         "a SIR class is missing from _SUSCEPTIBLE_SIDE/_RESISTANT_SIDE -- "
         "see resolve_duplicate_labels"
+    )
+
+# The binary collapse (ADR-0017) must account for every SIR class: R-side, S-side, or
+# explicitly dropped -- otherwise collapse_sir_to_binary would silently discard a class
+# nobody decided to drop. if/raise (not assert) so it survives `python -O` stripping.
+if set(SIR_CLASSES) != (
+    BINARY_RESISTANT_CLASSES | BINARY_SUSCEPTIBLE_CLASSES | DROPPED_SIR_CLASSES
+):
+    raise AssertionError(
+        "a SIR class is unassigned by the binary collapse policy -- see constants."
+        "BINARY_RESISTANT_CLASSES/BINARY_SUSCEPTIBLE_CLASSES/DROPPED_SIR_CLASSES"
     )
 
 #: Columns the raw PATRIC_genome_AMR flat file must have. A missing column signals a
@@ -219,6 +235,25 @@ def parse_mlst(raw: object) -> tuple[str | None, int | None]:
         return None, None
     scheme, sequence_type = match.groups()
     return scheme, int(sequence_type)
+
+
+def mlst_group_id(mlst_scheme: object, mlst_st: object, genome_id: str) -> str:
+    """Homology-group id for the ADR-0005 grouped split: ``st:<scheme>:<st>`` when a
+    sequence type is present, else a per-genome ``singleton:<genome_id>``.
+
+    The singleton fallback (ADR-0015) is leakage-safe and needs no external tool -- it is
+    this epic's MLST-primary + singleton policy; real Mash/skani ANI-99.5% clustering for
+    missing-ST genomes is deferred. Shared by predictor/subset.py and predictor/split.py so
+    both bucket genomes identically. Robust to the float/NaN forms an mlst_st column takes
+    after a parquet round-trip (e.g. ``258.0``, ``nan``).
+    """
+    scheme = "" if mlst_scheme is None else str(mlst_scheme).strip()
+    st_text = "" if mlst_st is None else str(mlst_st).strip()
+    scheme_missing = scheme == "" or scheme.lower() in {"nan", "none", "<na>"}
+    st_missing = st_text == "" or st_text.lower() in {"nan", "none", "<na>"}
+    if not scheme_missing and not st_missing:
+        return f"st:{scheme}:{int(float(st_text))}"
+    return f"singleton:{genome_id}"
 
 
 def parse_genome_metadata(
@@ -586,6 +621,29 @@ def mark_fasta_availability(
     available = set(genome_ids_with_fasta)
     out["has_fasta"] = out["genome_id"].isin(available)
     return out
+
+
+def collapse_sir_to_binary(
+    labels: pd.DataFrame,
+    *,
+    sir_column: str = "sir",
+    out_column: str = "sir_binary",
+) -> pd.DataFrame:
+    """Map the 3-class ``sir`` label onto the binary R/S target the per-drug models train
+    on (ADR-0017).
+
+    ``Resistant`` -> ``"R"``, ``Susceptible`` -> ``"S"``. Intermediate, Nonsusceptible, and
+    Susceptible-dose dependent are DROPPED (their rows removed), not force-mapped: dropping
+    ambiguous label-noise is the defensive, lower-noise choice over guessing a binary side
+    for a category whose clinical meaning is genuinely in-between or rare. Rows with a
+    null/uncanonical ``sir`` are dropped too. Returns a new frame of only R/S rows with
+    ``out_column`` attached; the input is never mutated.
+    """
+    mapping: dict[str, str] = dict.fromkeys(BINARY_RESISTANT_CLASSES, "R")
+    mapping.update(dict.fromkeys(BINARY_SUSCEPTIBLE_CLASSES, "S"))
+    out = labels.copy()
+    out[out_column] = out[sir_column].map(mapping)
+    return out[out[out_column].notna()].reset_index(drop=True)
 
 
 def select_genome_ids(

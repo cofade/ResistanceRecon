@@ -22,6 +22,7 @@ from genome_firewall.schemas import (
     GateResult,
     GenomeInput,
     GenomeReport,
+    ModelFeatureSchema,
     verdict_for_conformal_set,
 )
 
@@ -175,6 +176,28 @@ def test_antibiotic_prediction_accepts_a_category_backed_by_a_cited_item() -> No
         ),
     )
     assert prediction.evidence_category == "known_mechanism"
+
+
+def test_model_feature_schema_accepts_an_ordered_unique_vocabulary() -> None:
+    schema = ModelFeatureSchema(
+        schema_version="1.0.0",
+        amrfinder_db_version="2026-05-15.1",
+        engineered_feature_spec_version="1",
+        feature_names=("blaKPC-2", "gyrA_S83Y", "has_carbapenemase"),
+        vocabulary_sha256="0" * 64,
+    )
+    assert schema.feature_names[0] == "blaKPC-2"
+
+
+def test_model_feature_schema_rejects_duplicate_feature_names() -> None:
+    with pytest.raises(ValidationError, match="must not contain duplicates"):
+        ModelFeatureSchema(
+            schema_version="1.0.0",
+            amrfinder_db_version="2026-05-15.1",
+            engineered_feature_spec_version="1",
+            feature_names=("blaKPC-2", "blaKPC-2"),
+            vocabulary_sha256="0" * 64,
+        )
 
 
 def test_models_reject_unknown_fields() -> None:
