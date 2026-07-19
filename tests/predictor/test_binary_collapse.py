@@ -46,6 +46,20 @@ def test_collapse_drops_null_sir() -> None:
     assert list(out["genome_id"]) == ["g1"]
 
 
+def test_parse_mlst_handles_the_bvbrc_https_prefix() -> None:
+    from genome_firewall.predictor.dataset import parse_mlst
+
+    # BV-BRC HTTPS Data API genome.mlst format -- the one that silently zeroed every ST
+    assert parse_mlst("MLST.klebsiella.258") == ("klebsiella", 258)
+    assert parse_mlst("MLST.klebsiella.2004") == ("klebsiella", 2004)
+    # historical bare format still works
+    assert parse_mlst("klebsiella.740") == ("klebsiella", 740)
+    # unusable values fail safe -> singleton fallback
+    assert parse_mlst("") == (None, None)
+    assert parse_mlst("MLST.klebsiella.-") == (None, None)
+    assert parse_mlst(None) == (None, None)
+
+
 def test_mlst_group_id_uses_st_when_present_else_singleton() -> None:
     assert mlst_group_id("kpneumoniae", "258", "g1") == "st:kpneumoniae:258"
     # parquet round-trip float form
